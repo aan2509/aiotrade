@@ -9,6 +9,7 @@ datasource db {
 model Profile {
   id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email        String? @unique
+  isAdmin      Boolean @default(false) @map("is_admin")
   whatsapp     String?
   username     String  @unique
   passwordHash String  @map("password_hash")
@@ -17,4 +18,20 @@ model Profile {
 
   @@index([referredBy], map: "profiles_referred_by_idx")
   @@map("profiles")
+}
+
+model HomepageContent {
+  id        String   @id @default("homepage")
+  hero      Json
+  overview  Json
+  benefits  Json
+  pricing   Json
+  faq       Json
+  guide     Json
+  blog      Json
+  footer    Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("homepage_content")
 }

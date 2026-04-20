@@ -21,6 +21,7 @@ import { Alert } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { getUsernameValidationMessage } from "@/lib/username-rules";
 
 type SignupFormProps = {
   referredBy: string | null;
@@ -80,15 +81,7 @@ export function SignupForm({ referredBy }: SignupFormProps) {
       return null;
     }
 
-    if (normalizedUsername.length < 3 || normalizedUsername.length > 24) {
-      return "Pakai 3-24 huruf kecil, angka, atau underscore.";
-    }
-
-    if (!/^[a-z0-9_]+$/.test(normalizedUsername)) {
-      return "Pakai 3-24 huruf kecil, angka, atau underscore.";
-    }
-
-    return null;
+    return getUsernameValidationMessage(normalizedUsername);
   }, [normalizedUsername]);
 
   useEffect(() => {

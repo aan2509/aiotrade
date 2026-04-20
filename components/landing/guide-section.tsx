@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
-import { steps } from "@/components/landing/data";
+import type { GuideContent } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 
-export function GuideSection() {
+type GuideSectionProps = {
+  content: GuideContent;
+};
+
+export function GuideSection({ content }: GuideSectionProps) {
   return (
     <section className="relative overflow-hidden bg-white py-20" id="panduan">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(37,99,235,0.05)_0%,rgba(37,99,235,0)_100%)]" />
@@ -12,15 +16,15 @@ export function GuideSection() {
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <Reveal className="mx-auto max-w-4xl text-center">
           <p className="text-[1.05rem] font-semibold tracking-[-0.02em] text-[#1c74de] sm:text-[1.3rem]">
-            Bagaimana <span className="font-bold">Aio Trade</span> Bekerja?
+            {content.eyebrow}
           </p>
           <h2 className="mt-5 text-[3rem] font-semibold leading-none tracking-[-0.045em] text-[#ffc84a] sm:text-[4.45rem]">
-            3 Langkah Mudah
+            {content.title}
           </h2>
         </Reveal>
 
         <div className="mt-12 grid gap-5 lg:grid-cols-3">
-          {steps.map((step, index) => (
+          {content.steps.map((step, index) => (
             <Reveal
               className="rounded-[24px] border border-[#ece7dc] bg-white px-7 py-9 text-center shadow-[0_18px_46px_rgba(15,23,42,0.12)]"
               delay={index * 0.08}
@@ -49,7 +53,7 @@ export function GuideSection() {
             href="#faq"
           >
             <BookOpen className="h-4 w-4" />
-            Selengkapnya
+            {content.buttonLabel}
           </Link>
         </Reveal>
       </div>

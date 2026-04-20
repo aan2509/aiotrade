@@ -5,8 +5,13 @@ import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { features, landingImages } from "@/components/landing/data";
 import { Reveal } from "@/components/ui/reveal";
+import type { BenefitsContent } from "@/components/landing/types";
 
-export function BenefitsSection() {
+type BenefitsSectionProps = {
+  content: BenefitsContent;
+};
+
+export function BenefitsSection({ content }: BenefitsSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -37,17 +42,16 @@ export function BenefitsSection() {
       <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <Reveal className="mx-auto max-w-5xl text-center">
           <p className="text-lg font-semibold text-[#f6be4f] sm:text-[2.2rem]">
-            Mengapa Trading Crypto Menggunakan Aio Trade?
+            {content.heading}
           </p>
           <p className="mx-auto mt-4 max-w-4xl text-base leading-8 text-white/82 sm:text-[1.05rem]">
-            Aio Trade cocok digunakan untuk semua kalangan, Trader (Pemula atau Profesional)
-            dan Investor
+            {content.description}
           </p>
         </Reveal>
 
         <div className="mx-auto mt-10 grid max-w-6xl gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
+          {content.items.map((feature, index) => {
+            const Icon = features[index % features.length]?.icon ?? features[0].icon;
 
             return (
               <Reveal

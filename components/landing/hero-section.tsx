@@ -6,9 +6,11 @@ import { Users } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { landingImages } from "@/components/landing/data";
 import { LandingCtaButton } from "@/components/landing/landing-cta-button";
-import type { LandingPageUIProps } from "@/components/landing/types";
+import type { HeroContent, LandingPageUIProps } from "@/components/landing/types";
 
-type HeroSectionProps = Pick<LandingPageUIProps, "ctaExternal" | "ctaHref" | "ctaLabel">;
+type HeroSectionProps = Pick<LandingPageUIProps, "ctaExternal" | "ctaHref" | "ctaLabel"> & {
+  content: HeroContent;
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,9 +36,10 @@ const itemVariants = {
 };
 
 export function HeroSection({
+  content,
   ctaExternal = false,
   ctaHref,
-  ctaLabel = "Gabung Komunitas",
+  ctaLabel,
 }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -84,21 +87,22 @@ export function HeroSection({
               className="text-[0.65rem] uppercase tracking-[0.28em] text-white/82 sm:text-sm sm:tracking-[0.5em]"
               variants={itemVariants}
             >
-              Selamat Datang Di Komunitas
+              {content.eyebrow}
             </motion.p>
 
             <motion.h1
               className="mt-5 text-[3rem] font-semibold uppercase leading-[0.95] tracking-[0.015em] text-white sm:mt-6 sm:text-[6.15rem] sm:tracking-[0.045em] lg:text-[8.15rem]"
               variants={itemVariants}
             >
-              <span className="text-[#0ea5ff]">AIO</span>TRADE
+              <span className="text-[#0ea5ff]">{content.titleBlue}</span>
+              {content.titleWhite}
             </motion.h1>
 
             <motion.p
               className="mt-4 max-w-[18rem] text-[1rem] font-normal leading-[1.38] text-white/88 sm:mt-5 sm:max-w-5xl sm:text-[1.7rem] lg:text-[2.15rem]"
               variants={itemVariants}
             >
-              “Edukasi &amp; Trading Otomatis Bersama AIOTrade”
+              {content.subtitle}
             </motion.p>
             <motion.div
               className="mt-8 w-full sm:mt-10 sm:w-auto"
@@ -111,7 +115,7 @@ export function HeroSection({
                 external={ctaExternal}
                 href={ctaHref}
                 icon={Users}
-                label={ctaLabel}
+                label={ctaLabel ?? content.ctaLabel}
               />
             </motion.div>
           </motion.div>

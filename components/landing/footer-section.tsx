@@ -1,20 +1,15 @@
 import Link from "next/link";
 import { ArrowUp, MessageCircle } from "lucide-react";
 import { navItems } from "@/components/landing/data";
+import type { FooterContent } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 
 type FooterSectionProps = {
+  content: FooterContent;
   ctaHref: string;
 };
 
-const guideLinks = [
-  { label: "Daftar", href: null as string | null },
-  { label: "API Binding", href: "#fitur" },
-  { label: "Trading Otomatis", href: "#fitur" },
-  { label: "Setting Custom", href: "#panduan" },
-];
-
-export function FooterSection({ ctaHref }: FooterSectionProps) {
+export function FooterSection({ content, ctaHref }: FooterSectionProps) {
   return (
     <footer className="relative overflow-hidden bg-[#121a2d] py-18 text-white sm:py-20">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(17,167,255,0.1)_0%,rgba(17,167,255,0)_34%)]" />
@@ -31,11 +26,7 @@ export function FooterSection({ ctaHref }: FooterSectionProps) {
               </span>
             </Link>
             <p className="mt-5 max-w-[35rem] text-[1.02rem] leading-[1.72] text-white/72 sm:text-[1.06rem]">
-              Alat bantu (bot trading) berbasis Artificial Intelligence (AI) yang dirancang
-              untuk membantu pengguna melakukan perdagangan aset kripto secara otomatis di pasar
-              spot. AioTrade dapat diintegrasikan dengan exchange global seperti Binance dan
-              Bitget melalui sistem API yang aman, sehingga pengguna dapat menjalankan strategi
-              trading secara efisien dan konsisten.
+              {content.description}
             </p>
 
             <div className="mt-7 flex items-center gap-5 text-white/90">
@@ -68,11 +59,11 @@ export function FooterSection({ ctaHref }: FooterSectionProps) {
               Panduan Pengguna
             </h3>
             <ul className="mt-5 space-y-4 text-[1.06rem] leading-none text-white/72">
-              {guideLinks.map((item) => (
+              {content.guideLinks.map((item) => (
                 <li key={item.label}>
                   <Link
                     className="transition duration-300 hover:text-white"
-                    href={item.href ?? ctaHref}
+                    href={item.href === "/signup" ? ctaHref : item.href}
                   >
                     {item.label}
                   </Link>
@@ -98,7 +89,7 @@ export function FooterSection({ ctaHref }: FooterSectionProps) {
         </div>
 
         <Reveal className="mt-16 flex items-center justify-center text-center text-[1.02rem] text-white/54 sm:mt-18">
-          <p>© 2026 All Rights Reserved.</p>
+          <p>{content.copyright}</p>
         </Reveal>
       </div>
 

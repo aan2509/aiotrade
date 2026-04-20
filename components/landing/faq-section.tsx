@@ -3,10 +3,14 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { faqEntries } from "@/components/landing/data";
+import type { FaqContent } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 
-export function FaqSection() {
+type FaqSectionProps = {
+  content: FaqContent;
+};
+
+export function FaqSection({ content }: FaqSectionProps) {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
@@ -15,15 +19,15 @@ export function FaqSection() {
         <Reveal className="overflow-hidden rounded-[28px] border border-[#e7dfd0] bg-white shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
           <div className="bg-[#121a2d] px-6 py-8 text-center text-white sm:px-10 sm:py-10">
             <p className="text-[2.9rem] font-bold tracking-[0.04em] text-[#f7c85f] sm:text-[4rem]">
-              F.A.Q
+              {content.title}
             </p>
             <p className="mt-2 text-lg text-white/80 sm:text-[1.05rem]">
-              Pertanyaan yang Sering Diajukan
+              {content.subtitle}
             </p>
           </div>
 
           <div className="bg-white">
-            {faqEntries.map((entry, index) => (
+            {content.items.map((entry, index) => (
               <Reveal delay={index * 0.04} direction="right" distance={28} duration={1.02} key={entry.question}>
                 <div className="border-b border-[#ece7dd] last:border-b-0">
                   <button

@@ -1,15 +1,16 @@
 import { LogIn } from "lucide-react";
-import { plans } from "@/components/landing/data";
 import { LandingCtaButton } from "@/components/landing/landing-cta-button";
+import type { PricingContent } from "@/components/landing/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 
 type PricingSectionProps = {
+  content: PricingContent;
   ctaHref: string;
 };
 
-export function PricingSection({ ctaHref }: PricingSectionProps) {
+export function PricingSection({ content, ctaHref }: PricingSectionProps) {
   return (
     <section className="relative overflow-hidden bg-[#f8f6f0] py-20 sm:py-24" id="harga">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(255,200,74,0.12)_0%,rgba(255,200,74,0)_100%)]" />
@@ -18,15 +19,15 @@ export function PricingSection({ ctaHref }: PricingSectionProps) {
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <Reveal className="mx-auto max-w-4xl text-center">
           <p className="text-[1.1rem] font-semibold tracking-[-0.015em] text-[#1b74df] sm:text-[2.05rem]">
-            Berapa <span className="font-bold">Biaya Registrasi</span> Aio Trade?
+            {content.eyebrow}
           </p>
           <h2 className="mt-4 text-[3rem] font-semibold leading-none tracking-[-0.04em] text-[#ffc84a] sm:text-[4.5rem]">
-            Harga
+            {content.title}
           </h2>
         </Reveal>
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:items-center">
-          {plans.map((plan, index) => (
+          {content.plans.map((plan, index) => (
             <Reveal
               className={cn(plan.emphasis ? "lg:-my-6" : undefined)}
               delay={index * 0.08}
@@ -61,7 +62,7 @@ export function PricingSection({ ctaHref }: PricingSectionProps) {
                 >
                   {!plan.emphasis ? (
                     <p className="text-[4.55rem] font-bold leading-none tracking-[-0.05em] text-[#1b74df]">
-                      #{plans.slice(0, index + 1).filter((entry) => !entry.emphasis).length}
+                      #{content.plans.slice(0, index + 1).filter((entry) => !entry.emphasis).length}
                     </p>
                   ) : null}
 
@@ -99,7 +100,7 @@ export function PricingSection({ ctaHref }: PricingSectionProps) {
                       )}
                       href={ctaHref}
                       icon={LogIn}
-                      label="Daftar Sekarang"
+                      label={content.buttonLabel}
                       size="compact"
                     />
                   </div>

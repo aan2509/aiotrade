@@ -10,6 +10,7 @@ import { PricingSection } from "@/components/landing/pricing-section";
 import type { LandingPageUIProps } from "@/components/landing/types";
 
 export default function LandingPageUI({
+  content,
   ctaExternal,
   ctaHref,
   ctaLabel,
@@ -20,6 +21,7 @@ export default function LandingPageUI({
   return (
     <main className="flex-1 bg-[#f4f2ec] text-[#111827]" id="top">
       <HeroSection
+        content={content.hero}
         ctaExternal={ctaExternal}
         ctaHref={ctaHref}
         ctaLabel={ctaLabel}
@@ -27,13 +29,13 @@ export default function LandingPageUI({
 
       <div className="relative">
         <LandingHeader />
-        <OverviewSection ctaHref={registrationHref} />
-        <BenefitsSection />
-        <PricingSection ctaHref={registrationHref} />
-        <FaqSection />
-        <GuideSection />
-        <BlogSection />
-        <FooterSection ctaHref={registrationHref} />
+        <OverviewSection content={content.overview} ctaHref={registrationHref} />
+        <BenefitsSection content={content.benefits} />
+        <PricingSection content={content.pricing} ctaHref={registrationHref} />
+        <FaqSection content={content.faq} />
+        <GuideSection content={content.guide} />
+        <BlogSection content={content.blog} />
+        <FooterSection content={content.footer} ctaHref={registrationHref} />
       </div>
     </main>
   );

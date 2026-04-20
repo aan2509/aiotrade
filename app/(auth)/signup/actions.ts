@@ -2,8 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { ensureEnvAdmin } from "@/lib/admin-bootstrap";
 import { createUserSession, hashPassword } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isReservedUsername, normalizeUsername } from "@/lib/username-rules";
 
 const usernameSchema = z
   .string()
@@ -11,7 +13,8 @@ const usernameSchema = z
   .min(3, "Username must be at least 3 characters.")
   .max(24, "Username must be at most 24 characters.")
   .regex(/^[a-z0-9_]+$/, "Username can only contain lowercase letters, numbers, and underscores.")
-  .transform((value) => value.toLowerCase());
+  .transform((value) => normalizeUsername(value))
+  .refine((value) => !isReservedUsername(value), "This username is reserved.");
 
 const whatsappSchema = z
   .string()
@@ -234,6 +237,13 @@ export async function signUpAction(
       referredBy,
       username,
       whatsapp,
+    });
+
+    await ensureEnvAdmin({
+      email,
+      id: profile.id,
+      isAdmin: false,
+      username,
     });
 
     await createUserSession(profile.id);

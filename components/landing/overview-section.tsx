@@ -8,14 +8,16 @@ import { landingImages, partnerLogos } from "@/components/landing/data";
 import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 import { TickerStrip } from "@/components/landing/ticker-strip";
 import { Reveal } from "@/components/ui/reveal";
+import type { OverviewContent } from "@/components/landing/types";
 
 type OverviewSectionProps = {
+  content: OverviewContent;
   ctaHref: string;
 };
 
 const duplicatedPartnerLogos = [...partnerLogos, ...partnerLogos];
 
-export function OverviewSection({ ctaHref }: OverviewSectionProps) {
+export function OverviewSection({ content, ctaHref }: OverviewSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -106,15 +108,13 @@ export function OverviewSection({ ctaHref }: OverviewSectionProps) {
         >
           <Reveal className="w-full" delay={0.02}>
             <h2 className="text-[2.2rem] font-medium uppercase leading-none tracking-[0.03em] text-white sm:text-[3.05rem] sm:tracking-[0.055em] lg:text-[3.85rem]">
-              <span className="text-[#10a7ff]">AIO</span>TRADE
+              <span className="text-[#10a7ff]">{content.titleBlue}</span>
+              {content.titleWhite}
             </h2>
           </Reveal>
           <Reveal className="w-full" delay={0.08}>
             <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-[1.9] text-white/78 sm:mt-7 sm:max-w-[44rem] sm:text-[1.08rem] sm:leading-[2.05] lg:text-[1.12rem]">
-              Alat bantu trading otomatis berbasis Artificial Intelligence (AI) yang dirancang
-              untuk membantu pengguna menjalankan trading aset kripto di <strong className="font-semibold text-white">pasar spot</strong>.
-              {" "}AIOTrade terhubung dengan Binance, Tokocrypto, dan Bitget melalui API yang aman,
-              sehingga strategi dapat dijalankan lebih rapi, efisien, dan konsisten.
+              {content.description}
             </p>
           </Reveal>
 
@@ -157,7 +157,7 @@ export function OverviewSection({ ctaHref }: OverviewSectionProps) {
               className="w-full max-w-[220px] sm:min-w-[304px] sm:max-w-none sm:w-auto"
               href={ctaHref}
               icon={Users}
-              label="Daftar Sekarang"
+              label={content.ctaLabel}
             />
           </Reveal>
         </motion.div>

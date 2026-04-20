@@ -8,6 +8,7 @@ import {
 } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { ensureEnvAdmin } from "@/lib/admin-bootstrap";
 import { prisma } from "@/lib/prisma";
 
 const SESSION_COOKIE_NAME = "referral_session";
@@ -21,6 +22,7 @@ type SessionPayload = {
 type CurrentProfile = {
   email: string | null;
   id: string;
+  isAdmin: boolean;
   isLpActive: boolean;
   referredBy: string | null;
   username: string;
@@ -147,23 +149,27 @@ export async function getCurrentProfile() {
   }
 
   try {
-    return await prisma.profile.findFirst({
+    const profile = await prisma.profile.findFirst({
       where: {
         id: userId,
       },
       select: {
         email: true,
         id: true,
+        isAdmin: true,
         isLpActive: true,
         referredBy: true,
         whatsapp: true,
         username: true,
       },
     });
+
+    return profile ? ensureEnvAdmin(profile) : null;
   } catch (error) {
     const isStaleWhatsappSelect =
       error instanceof Error &&
-      error.message.includes("Unknown field `whatsapp` for select statement on model `Profile`");
+      (error.message.includes("Unknown field `whatsapp` for select statement on model `Profile`") ||
+        error.message.includes("Unknown field `isAdmin` for select statement on model `Profile`"));
 
     if (!isStaleWhatsappSelect) {
       throw error;
@@ -173,6 +179,7 @@ export async function getCurrentProfile() {
       SELECT
         "id",
         "email",
+        "is_admin" AS "isAdmin",
         "is_lp_active" AS "isLpActive",
         "referred_by" AS "referredBy",
         "whatsapp",
@@ -182,7 +189,9 @@ export async function getCurrentProfile() {
       LIMIT 1
     `;
 
-    return profiles[0] ?? null;
+    const profile = profiles[0] ?? null;
+
+    return profile ? ensureEnvAdmin(profile) : null;
   }
 }
 
@@ -191,6 +200,16 @@ export async function requireCurrentProfile() {
 
   if (!profile) {
     redirect("/login");
+  }
+
+  return profile;
+}
+
+export async function requireAdminProfile() {
+  const profile = await requireCurrentProfile();
+
+  if (!profile.isAdmin) {
+    redirect("/dashboard");
   }
 
   return profile;

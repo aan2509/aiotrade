@@ -2,9 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { articles, landingImages } from "@/components/landing/data";
+import type { BlogContent } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 
-export function BlogSection() {
+type BlogSectionProps = {
+  content: BlogContent;
+};
+
+export function BlogSection({ content }: BlogSectionProps) {
   return (
     <section className="relative overflow-hidden bg-[#f8f6f0] py-20" id="blog">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[linear-gradient(180deg,rgba(246,190,79,0.08)_0%,rgba(246,190,79,0)_100%)]" />
@@ -13,12 +18,12 @@ export function BlogSection() {
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <Reveal className="text-center lg:text-left">
           <h2 className="text-[3rem] font-semibold leading-none tracking-[-0.05em] text-[#ffc84a] sm:text-[4.3rem]">
-            Blog - Crypto News
+            {content.title}
           </h2>
         </Reveal>
 
         <div className="mt-12 grid gap-5 lg:grid-cols-3">
-          {articles.map((article, index) => (
+          {content.items.map((article, index) => (
             <Reveal
               className="overflow-hidden rounded-none border border-[#ece7dc] bg-white shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
               delay={index * 0.08}
@@ -48,7 +53,7 @@ export function BlogSection() {
                       alt={article.title}
                       className="h-auto max-h-14 w-auto max-w-full object-contain"
                       sizes="180px"
-                      src={article.image}
+                      src={articles[index % articles.length]?.image ?? articles[0].image}
                     />
                   </div>
                   <p className="max-w-[16rem] text-[1rem] font-medium leading-[1.35] text-white sm:text-[1.05rem]">

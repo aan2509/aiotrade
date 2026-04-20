@@ -16,7 +16,15 @@ const initialLoginState: LoginActionState = {
   fieldErrors: {},
 };
 
-export function LoginForm() {
+type LoginFormProps = {
+  showSignupLink?: boolean;
+  signupHref?: string;
+};
+
+export function LoginForm({
+  showSignupLink = true,
+  signupHref = "/signup",
+}: LoginFormProps) {
   const [state, formAction] = useActionState(loginAction, initialLoginState);
   const fieldErrors = state?.fieldErrors ?? {};
 
@@ -89,15 +97,17 @@ export function LoginForm() {
         Masuk
       </SubmitButton>
 
-      <p className="text-center text-sm text-slate-600">
-        Belum punya akun?{" "}
-        <Link
-          className="font-medium text-slate-950 underline decoration-slate-300 underline-offset-4"
-          href="/signup"
-        >
-          Daftar di sini
-        </Link>
-      </p>
+      {showSignupLink ? (
+        <p className="text-center text-sm text-slate-600">
+          Belum punya akun?{" "}
+          <Link
+            className="font-medium text-slate-950 underline decoration-slate-300 underline-offset-4"
+            href={signupHref}
+          >
+            Daftar di sini
+          </Link>
+        </p>
+      ) : null}
     </form>
   );
 }

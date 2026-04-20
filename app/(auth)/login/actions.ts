@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { ensureEnvAdmin } from "@/lib/admin-bootstrap";
 import { createUserSession, verifyPassword } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -21,6 +22,53 @@ export type LoginActionState = {
     email?: string;
   };
 };
+
+type LoginProfile = {
+  email: string | null;
+  id: string;
+  isAdmin: boolean;
+  passwordHash: string;
+  username: string;
+};
+
+async function getLoginProfileByEmail(email: string) {
+  try {
+    return await prisma.profile.findFirst({
+      where: {
+        email,
+      },
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        passwordHash: true,
+        username: true,
+      },
+    });
+  } catch (error) {
+    const isStaleIsAdminSelect =
+      error instanceof Error &&
+      error.message.includes("Unknown field `isAdmin` for select statement on model `Profile`");
+
+    if (!isStaleIsAdminSelect) {
+      throw error;
+    }
+
+    const profiles = await prisma.$queryRaw<LoginProfile[]>`
+      SELECT
+        "email",
+        "id",
+        "is_admin" AS "isAdmin",
+        "password_hash" AS "passwordHash",
+        "username"
+      FROM "public"."profiles"
+      WHERE "email" = ${email}
+      LIMIT 1
+    `;
+
+    return profiles[0] ?? null;
+  }
+}
 
 export async function loginAction(
   _prevState: LoginActionState,
@@ -52,15 +100,7 @@ export async function loginAction(
 
   const { email, password } = parsed.data;
 
-  const profile = await prisma.profile.findFirst({
-    where: {
-      email,
-    },
-    select: {
-      id: true,
-      passwordHash: true,
-    },
-  });
+  const profile = await getLoginProfileByEmail(email);
 
   if (!profile || !verifyPassword(password, profile.passwordHash)) {
     return {
@@ -72,6 +112,13 @@ export async function loginAction(
       },
     };
   }
+
+  await ensureEnvAdmin({
+    email: profile.email,
+    id: profile.id,
+    isAdmin: profile.isAdmin,
+    username: profile.username,
+  });
 
   await createUserSession(profile.id);
 

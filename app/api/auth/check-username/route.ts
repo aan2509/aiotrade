@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { getUsernameValidationMessage, normalizeUsername } from "@/lib/username-rules";
 
 const usernameSchema = z
   .string()
@@ -7,12 +8,24 @@ const usernameSchema = z
   .min(3)
   .max(24)
   .regex(/^[a-z0-9_]+$/)
-  .transform((value) => value.toLowerCase());
+  .transform((value) => normalizeUsername(value));
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const rawUsername = String(searchParams.get("username") ?? "");
+  const usernameIssue = getUsernameValidationMessage(rawUsername);
 
-  const parsed = usernameSchema.safeParse(searchParams.get("username"));
+  if (usernameIssue) {
+    return Response.json(
+      {
+        available: false,
+        message: usernameIssue,
+      },
+      { status: 400 },
+    );
+  }
+
+  const parsed = usernameSchema.safeParse(rawUsername);
 
   if (!parsed.success) {
     return Response.json(

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Link2, Sparkles } from "lucide-react";
+import { ExternalLink, Link2, Settings2, Sparkles } from "lucide-react";
 import { logoutAction } from "@/app/(protected)/dashboard/actions";
 import { buildProfileUrl, getSiteUrl } from "@/lib/site";
 import { requireCurrentProfile } from "@/lib/auth";
@@ -18,25 +18,36 @@ export default async function DashboardPage() {
     <main className="flex-1 bg-stone-50 px-6 py-12">
       <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.95fr,1.05fr]">
         <section className="space-y-6">
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                <Sparkles className="h-4 w-4" />
-                Member dashboard
-              </div>
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                  <Sparkles className="h-4 w-4" />
+                  Member dashboard
+                </div>
 
-              <form action={logoutAction}>
-                <Button type="submit" variant="outline">
-                  Log out
-                </Button>
-              </form>
-            </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  {profile.isAdmin ? (
+                    <Link href="/admin">
+                      <span className="inline-flex h-10 items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-4 text-sm font-medium text-sky-800 transition hover:bg-sky-100">
+                        <Settings2 className="h-4 w-4" />
+                        Admin panel
+                      </span>
+                    </Link>
+                  ) : null}
+
+                  <form action={logoutAction}>
+                    <Button type="submit" variant="outline">
+                      Log out
+                    </Button>
+                  </form>
+                </div>
+              </div>
             <div>
               <h1 className="text-3xl font-semibold tracking-tight text-stone-950">
                 Welcome back, {profile.username}
               </h1>
               <p className="mt-2 text-base leading-7 text-stone-600">
-                Manage your personal landing page and keep track of the referral connection attached to your account.
+                Share your referral entry link and let visitors land on the main homepage with your referral attached automatically.
               </p>
             </div>
           </div>
@@ -76,7 +87,7 @@ export default async function DashboardPage() {
             <CardHeader>
               <CardTitle>Generate Landing Page</CardTitle>
               <CardDescription>
-                Turn on your personal landing page and share a direct signup link that preserves attribution.
+                Share a clean entry link. Visitors who open it will be redirected to the main homepage, while your referral stays attached in the background.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -97,7 +108,7 @@ export default async function DashboardPage() {
               {profile.isLpActive ? (
                 <div className="space-y-4">
                   <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
-                    <p className="text-sm font-medium text-emerald-800">Your replicated landing page</p>
+                    <p className="text-sm font-medium text-emerald-800">Your referral entry link</p>
                     <p className="mt-2 break-all text-sm text-emerald-900">{landingPageUrl}</p>
                   </div>
 
@@ -106,7 +117,7 @@ export default async function DashboardPage() {
                     <Link href={`/${profile.username}`} target="_blank">
                       <span className="inline-flex h-11 items-center gap-2 rounded-lg border border-stone-300 bg-white px-4 text-sm font-medium text-stone-900 transition hover:bg-stone-50">
                         <ExternalLink className="h-4 w-4" />
-                        Open Page
+                        Open Entry Link
                       </span>
                     </Link>
                   </div>
