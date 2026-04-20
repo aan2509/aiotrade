@@ -56,6 +56,12 @@ export default async function DashboardPage() {
                 <p className="mt-1 text-base font-semibold text-stone-950">{profile.email}</p>
               </div>
               <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-stone-500">WhatsApp</p>
+                <p className="mt-1 text-base font-semibold text-stone-950">
+                  {profile.whatsapp ?? "-"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-stone-500">Referred by</p>
                 <p className="mt-1 text-base font-semibold text-stone-950">
                   {profile.referredBy ? `@${profile.referredBy}` : "Direct signup"}

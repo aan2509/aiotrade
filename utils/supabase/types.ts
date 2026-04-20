@@ -5,6 +5,7 @@ export type Database = {
         Row: {
           id: string;
           email: string | null;
+          whatsapp: string | null;
           username: string;
           is_lp_active: boolean;
           referred_by: string | null;
@@ -12,12 +13,14 @@ export type Database = {
         Insert: {
           id: string;
           email?: string | null;
+          whatsapp?: string | null;
           username: string;
           is_lp_active?: boolean;
           referred_by?: string | null;
         };
         Update: {
           email?: string | null;
+          whatsapp?: string | null;
           username?: string;
           is_lp_active?: boolean;
           referred_by?: string | null;

@@ -18,6 +18,15 @@ type SessionPayload = {
   sub: string;
 };
 
+type CurrentProfile = {
+  email: string | null;
+  id: string;
+  isLpActive: boolean;
+  referredBy: string | null;
+  username: string;
+  whatsapp: string | null;
+};
+
 function getAuthSecret() {
   return (
     process.env.AUTH_SECRET ??
@@ -137,18 +146,44 @@ export async function getCurrentProfile() {
     return null;
   }
 
-  return prisma.profile.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      email: true,
-      id: true,
-      isLpActive: true,
-      referredBy: true,
-      username: true,
-    },
-  });
+  try {
+    return await prisma.profile.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        email: true,
+        id: true,
+        isLpActive: true,
+        referredBy: true,
+        whatsapp: true,
+        username: true,
+      },
+    });
+  } catch (error) {
+    const isStaleWhatsappSelect =
+      error instanceof Error &&
+      error.message.includes("Unknown field `whatsapp` for select statement on model `Profile`");
+
+    if (!isStaleWhatsappSelect) {
+      throw error;
+    }
+
+    const profiles = await prisma.$queryRaw<CurrentProfile[]>`
+      SELECT
+        "id",
+        "email",
+        "is_lp_active" AS "isLpActive",
+        "referred_by" AS "referredBy",
+        "whatsapp",
+        "username"
+      FROM "public"."profiles"
+      WHERE "id" = ${userId}
+      LIMIT 1
+    `;
+
+    return profiles[0] ?? null;
+  }
 }
 
 export async function requireCurrentProfile() {

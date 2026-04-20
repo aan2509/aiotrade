@@ -27,3 +27,41 @@ export function buildProfileUrl(siteUrl: string, username: string) {
   const baseUrl = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
   return new URL(username, baseUrl).toString();
 }
+
+function normalizeWhatsappNumber(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return "";
+  }
+
+  const digits = trimmed.replace(/\D/g, "");
+
+  if (digits.startsWith("00")) {
+    return digits.slice(2);
+  }
+
+  if (trimmed.startsWith("+")) {
+    return digits;
+  }
+
+  if (digits.startsWith("0")) {
+    return `62${digits.slice(1)}`;
+  }
+
+  return digits;
+}
+
+export function buildWhatsAppUrl(phone: string, username?: string) {
+  const normalizedPhone = normalizeWhatsappNumber(phone);
+
+  if (!normalizedPhone) {
+    return null;
+  }
+
+  const message = username
+    ? `Halo kak ${username}, saya tertarik gabung komunitas AIOTrade.`
+    : "Halo, saya tertarik gabung komunitas AIOTrade.";
+
+  return `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(message)}`;
+}

@@ -17,6 +17,9 @@ export type LoginActionState = {
     email?: string;
     password?: string;
   };
+  formValues?: {
+    email?: string;
+  };
 };
 
 export async function loginAction(
@@ -32,6 +35,7 @@ export async function loginAction(
 
   if (!parsed.success) {
     const fieldErrors = parsed.error.flatten().fieldErrors;
+    const email = formData.get("email");
 
     return {
       status: "error",
@@ -40,12 +44,15 @@ export async function loginAction(
         email: fieldErrors.email?.[0],
         password: fieldErrors.password?.[0],
       },
+      formValues: {
+        email: typeof email === "string" ? email : "",
+      },
     };
   }
 
   const { email, password } = parsed.data;
 
-  const profile = await prisma.profile.findUnique({
+  const profile = await prisma.profile.findFirst({
     where: {
       email,
     },
@@ -60,6 +67,9 @@ export async function loginAction(
       status: "error",
       message: "Email or password is incorrect.",
       fieldErrors: {},
+      formValues: {
+        email,
+      },
     };
   }
 

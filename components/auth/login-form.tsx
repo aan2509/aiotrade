@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, KeyRound, Mail } from "lucide-react";
 import { loginAction, type LoginActionState } from "@/app/(auth)/login/actions";
+import { AuthFieldShell } from "@/components/auth/auth-field-shell";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
@@ -31,28 +32,70 @@ export function LoginForm() {
         </Alert>
       ) : null}
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input autoComplete="email" id="email" name="email" placeholder="you@example.com" required type="email" />
-        {fieldErrors.email ? <p className="text-sm text-rose-600">{fieldErrors.email}</p> : null}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <AuthFieldShell error={fieldErrors.email}>
+            <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="email">
+              <Mail className="h-4 w-4 text-sky-500" />
+              Email
+            </Label>
+            <Input
+              autoComplete="email"
+              className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
+              defaultValue={state.formValues?.email ?? ""}
+              id="email"
+              name="email"
+              placeholder="you@example.com"
+              required
+              type="email"
+            />
+          </AuthFieldShell>
+          {fieldErrors.email ? <p className="text-sm text-rose-600">{fieldErrors.email}</p> : null}
+        </div>
+
+        <div className="space-y-2">
+          <AuthFieldShell error={fieldErrors.password}>
+            <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="password">
+              <KeyRound className="h-4 w-4 text-sky-500" />
+              Password
+            </Label>
+            <Input
+              autoComplete="current-password"
+              className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
+              id="password"
+              name="password"
+              placeholder="Masukkan password Anda"
+              required
+              type="password"
+            />
+          </AuthFieldShell>
+          {fieldErrors.password ? (
+            <p className="text-sm text-rose-600">{fieldErrors.password}</p>
+          ) : null}
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input autoComplete="current-password" id="password" name="password" required type="password" />
-        {fieldErrors.password ? (
-          <p className="text-sm text-rose-600">{fieldErrors.password}</p>
-        ) : null}
+      <div className="rounded-lg border border-slate-200 bg-slate-50/80 p-4">
+        <p className="text-sm font-medium text-slate-700">Siap lanjut</p>
+        <p className="mt-2 text-sm leading-7 text-slate-500">
+          Pakai email yang sama seperti saat daftar agar Anda bisa masuk tanpa repot.
+        </p>
       </div>
 
-      <SubmitButton className="w-full" pendingText="Signing in...">
-        Sign in
+      <SubmitButton
+        className="h-12 w-full rounded-lg bg-sky-500 text-base font-semibold text-white shadow-[0_16px_30px_rgba(14,165,233,0.22)] hover:bg-sky-600"
+        pendingText="Sedang masuk..."
+      >
+        Masuk
       </SubmitButton>
 
-      <p className="text-center text-sm text-stone-600">
-        Need an account?{" "}
-        <Link className="font-medium text-stone-950 underline decoration-stone-300 underline-offset-4" href="/signup">
-          Create one
+      <p className="text-center text-sm text-slate-600">
+        Belum punya akun?{" "}
+        <Link
+          className="font-medium text-slate-950 underline decoration-slate-300 underline-offset-4"
+          href="/signup"
+        >
+          Daftar di sini
         </Link>
       </p>
     </form>

@@ -1,0 +1,125 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
+import type { TickerItem } from "@/components/landing/types";
+import { fallbackTickerItems, getTickerInitials } from "@/lib/market";
+
+type TickerStripProps = {
+  className?: string;
+};
+
+const duplicatedFallbackItems = [...fallbackTickerItems, ...fallbackTickerItems];
+
+export function TickerStrip({ className }: TickerStripProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const [items, setItems] = useState<TickerItem[]>(fallbackTickerItems);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadTicker() {
+      try {
+        const response = await fetch("/api/market/ticker", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch ticker");
+        }
+
+        const payload = (await response.json()) as { items?: TickerItem[] };
+
+        if (isMounted && payload.items?.length) {
+          setItems(payload.items);
+        }
+      } catch {
+        if (isMounted) {
+          setItems(fallbackTickerItems);
+        }
+      }
+    }
+
+    void loadTicker();
+    const intervalId = window.setInterval(() => {
+      void loadTicker();
+    }, 20000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  const tickerItems = useMemo(() => {
+    if (!items.length) {
+      return duplicatedFallbackItems;
+    }
+
+    return [...items, ...items];
+  }, [items]);
+
+  return (
+    <section
+      className={[
+        "relative overflow-hidden border-t border-white/8 bg-[rgba(8,14,27,0.62)] py-4 text-white",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-[linear-gradient(90deg,rgba(8,14,27,0.96)_0%,rgba(8,14,27,0)_100%)]" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-[linear-gradient(270deg,rgba(8,14,27,0.96)_0%,rgba(8,14,27,0)_100%)]" />
+
+      <motion.div
+        animate={prefersReducedMotion ? { x: "0%" } : { x: ["0%", "-50%"] }}
+        className="flex w-max items-stretch gap-4 px-6 sm:px-8 lg:px-10"
+        transition={
+          prefersReducedMotion
+            ? undefined
+            : {
+                duration: 24,
+                ease: "linear",
+                repeat: Number.POSITIVE_INFINITY,
+              }
+        }
+      >
+        {tickerItems.map((item, index) => (
+          <article
+            className="min-w-[190px] rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.06)] px-4 py-3 backdrop-blur-sm"
+            key={`${item.symbol}-${index}`}
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {item.logoUrl ? (
+                  <Image
+                    alt={item.name ?? item.symbol}
+                    className="h-7 w-7 rounded-full bg-white/5 object-cover"
+                    height="28"
+                    loading="lazy"
+                    src={item.logoUrl}
+                    width="28"
+                    unoptimized
+                  />
+                ) : (
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/8 text-[0.62rem] font-semibold tracking-[0.08em] text-white/84">
+                    {getTickerInitials(item.symbol)}
+                  </span>
+                )}
+                <div>
+                  <p className="text-sm font-semibold tracking-[0.08em] text-white">{item.symbol}</p>
+                  {item.rank ? <p className="text-[0.68rem] text-white/42">CMC #{item.rank}</p> : null}
+                </div>
+              </div>
+              <span className={item.positive ? "text-[#34d399]" : "text-[#f87171]"}>
+                {item.change}
+              </span>
+            </div>
+            <p className="mt-2 text-xl font-semibold text-white">{item.price}</p>
+          </article>
+        ))}
+      </motion.div>
+    </section>
+  );
+}
