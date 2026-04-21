@@ -1,5 +1,3 @@
-import DOMPurify from "isomorphic-dompurify";
-
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -39,50 +37,8 @@ export function normalizeArticleContent(value: string) {
   return paragraphs.join("");
 }
 
-export function sanitizeArticleHtml(value: string) {
-  return DOMPurify.sanitize(normalizeArticleContent(value), {
-    ALLOWED_ATTR: [
-      "alt",
-      "checked",
-      "class",
-      "data-checked",
-      "data-type",
-      "disabled",
-      "href",
-      "rel",
-      "src",
-      "target",
-      "title",
-      "type",
-    ],
-    ALLOWED_TAGS: [
-      "a",
-      "blockquote",
-      "br",
-      "div",
-      "em",
-      "figcaption",
-      "figure",
-      "h2",
-      "h3",
-      "h4",
-      "hr",
-      "img",
-      "input",
-      "label",
-      "li",
-      "ol",
-      "p",
-      "span",
-      "strong",
-      "u",
-      "ul",
-    ],
-  });
-}
-
 export function extractPlainTextFromArticleContent(value: string) {
-  return sanitizeArticleHtml(value)
+  return normalizeArticleContent(value)
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/(p|li|h2|h3|h4|blockquote)>/gi, "\n")
     .replace(/<[^>]+>/g, " ")

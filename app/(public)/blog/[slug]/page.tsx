@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { notFound } from "next/navigation";
-import { sanitizeArticleHtml } from "@/lib/article-content";
+import { sanitizeArticleHtml } from "@/lib/article-sanitizer";
 import { estimateReadingTime, formatBlogDate } from "@/lib/blog-helpers";
 import {
   buildBlogPostMetadata,

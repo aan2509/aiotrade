@@ -7,7 +7,7 @@ import { Check, CloudUpload, Eye, FileText, PencilLine, Search, Sparkles } from 
 import { saveBlogPostAction } from "@/app/(protected)/admin/posts/actions";
 import { ArticleRichEditor } from "@/components/admin/article-rich-editor";
 import type { HomepageAsset } from "@/components/landing/types";
-import { sanitizeArticleHtml } from "@/lib/article-content";
+import { normalizeArticleContent } from "@/lib/article-content";
 import { createPostSlug, estimateReadingTime, formatBlogDate } from "@/lib/blog-helpers";
 import type { BlogPostDetail } from "@/lib/blog-types";
 import { Alert } from "@/components/ui/alert";
@@ -411,7 +411,7 @@ export function PostsComposerView({
     draft.excerpt.trim() || "Ringkasan artikel akan membantu visitor mengenali isi tulisan dengan cepat.";
   const previewCategory = draft.category.trim() || "Crypto News";
   const previewImage = draft.thumbnailUrl || draft.openGraphImageUrl;
-  const previewHtml = sanitizeArticleHtml(draft.content);
+  const previewHtml = normalizeArticleContent(draft.content);
   const readingTime = estimateReadingTime(draft.content || draft.excerpt);
 
   return (
