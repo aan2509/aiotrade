@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { MemberGuideAsset, MemberGuidePost, MemberGuideType } from "@/lib/member-guide-types";
+import type { MemberGuideAsset, MemberGuidePost, MemberGuideSection, MemberGuideType } from "@/lib/member-guide-types";
 import { validateMemberGuideInput } from "@/lib/member-guide-utils";
 import { prisma } from "@/lib/prisma";
 
@@ -24,6 +24,7 @@ type MemberGuidePostRecord = {
   id: string;
   isPublished: boolean;
   publishedAt: Date;
+  section: string;
   sortOrder: number;
   title: string;
   type: string;
@@ -47,6 +48,7 @@ type SaveMemberGuidePostInput = {
   id?: string | null;
   isPublished: boolean;
   publishedAt?: string | null;
+  section: MemberGuideSection;
   sortOrder: number;
   title: string;
   type: MemberGuideType;
@@ -95,6 +97,10 @@ function toMemberGuidePost(post: MemberGuidePostRecord): MemberGuidePost {
     throw new Error(`Unknown member guide type: ${post.type}`);
   }
 
+  if (post.section !== "activation" && post.section !== "bot_settings" && post.section !== "files") {
+    throw new Error(`Unknown member guide section: ${post.section}`);
+  }
+
   return {
     createdAt: post.createdAt.toISOString(),
     description: post.description,
@@ -104,6 +110,7 @@ function toMemberGuidePost(post: MemberGuidePostRecord): MemberGuidePost {
     id: post.id,
     isPublished: post.isPublished,
     publishedAt: post.publishedAt.toISOString(),
+    section: post.section,
     sortOrder: post.sortOrder,
     title: post.title,
     type: post.type,
@@ -258,6 +265,7 @@ export async function getAdminMemberGuidePosts() {
           id: true,
           isPublished: true,
           publishedAt: true,
+          section: true,
           sortOrder: true,
           title: true,
           type: true,
@@ -276,6 +284,7 @@ export async function getAdminMemberGuidePosts() {
           "sort_order" AS "sortOrder",
           "is_published" AS "isPublished",
           "published_at" AS "publishedAt",
+          "section",
           "created_at" AS "createdAt",
           "updated_at" AS "updatedAt"
         FROM "public"."member_guide_posts"
@@ -309,6 +318,7 @@ export async function getPublishedMemberGuidePosts() {
           id: true,
           isPublished: true,
           publishedAt: true,
+          section: true,
           sortOrder: true,
           title: true,
           type: true,
@@ -327,6 +337,7 @@ export async function getPublishedMemberGuidePosts() {
           "sort_order" AS "sortOrder",
           "is_published" AS "isPublished",
           "published_at" AS "publishedAt",
+          "section",
           "created_at" AS "createdAt",
           "updated_at" AS "updatedAt"
         FROM "public"."member_guide_posts"
@@ -355,6 +366,7 @@ export async function saveMemberGuidePost(input: SaveMemberGuidePostInput) {
     fileUrl: normalizedGuideInput.fileUrl,
     isPublished: input.isPublished,
     publishedAt: toDateOrNow(input.publishedAt),
+    section: input.section,
     sortOrder: Number.isFinite(input.sortOrder) ? input.sortOrder : 0,
     title: input.title.trim(),
     type: input.type,
@@ -374,6 +386,7 @@ export async function saveMemberGuidePost(input: SaveMemberGuidePostInput) {
             id: true,
             isPublished: true,
             publishedAt: true,
+            section: true,
             sortOrder: true,
             title: true,
             type: true,
@@ -391,6 +404,7 @@ export async function saveMemberGuidePost(input: SaveMemberGuidePostInput) {
             id: true,
             isPublished: true,
             publishedAt: true,
+            section: true,
             sortOrder: true,
             title: true,
             type: true,
@@ -414,6 +428,7 @@ export async function saveMemberGuidePost(input: SaveMemberGuidePostInput) {
           "sort_order" = ${payload.sortOrder},
           "is_published" = ${payload.isPublished},
           "published_at" = ${payload.publishedAt},
+          "section" = ${payload.section},
           "updated_at" = CURRENT_TIMESTAMP
         WHERE "id" = ${input.id}
         RETURNING
@@ -427,6 +442,7 @@ export async function saveMemberGuidePost(input: SaveMemberGuidePostInput) {
           "sort_order" AS "sortOrder",
           "is_published" AS "isPublished",
           "published_at" AS "publishedAt",
+          "section",
           "created_at" AS "createdAt",
           "updated_at" AS "updatedAt"
       `
@@ -440,7 +456,8 @@ export async function saveMemberGuidePost(input: SaveMemberGuidePostInput) {
           "file_url",
           "sort_order",
           "is_published",
-          "published_at"
+          "published_at",
+          "section"
         )
         VALUES (
           ${payload.type},
@@ -451,7 +468,8 @@ export async function saveMemberGuidePost(input: SaveMemberGuidePostInput) {
           ${payload.fileUrl},
           ${payload.sortOrder},
           ${payload.isPublished},
-          ${payload.publishedAt}
+          ${payload.publishedAt},
+          ${payload.section}
         )
         RETURNING
           "id",
@@ -464,6 +482,7 @@ export async function saveMemberGuidePost(input: SaveMemberGuidePostInput) {
           "sort_order" AS "sortOrder",
           "is_published" AS "isPublished",
           "published_at" AS "publishedAt",
+          "section",
           "created_at" AS "createdAt",
           "updated_at" AS "updatedAt"
       `;
@@ -487,6 +506,7 @@ export async function setMemberGuidePublishedState(id: string, isPublished: bool
         id: true,
         isPublished: true,
         publishedAt: true,
+        section: true,
         sortOrder: true,
         title: true,
         type: true,
@@ -514,6 +534,7 @@ export async function setMemberGuidePublishedState(id: string, isPublished: bool
       "sort_order" AS "sortOrder",
       "is_published" AS "isPublished",
       "published_at" AS "publishedAt",
+      "section",
       "created_at" AS "createdAt",
       "updated_at" AS "updatedAt"
   `;

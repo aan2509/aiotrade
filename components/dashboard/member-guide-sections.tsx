@@ -4,51 +4,56 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, FileText, PlayCircle } from "lucide-react";
 import type { MemberGuidePost } from "@/lib/member-guide-types";
+import { memberGlassPanelClass, MemberPageHeader } from "@/components/dashboard/member-ui";
 
-type MemberGuidesViewProps = {
+type MemberVideoGuideSectionProps = {
+  badge: string;
+  description: string;
+  emptyMessage: string;
   guides: MemberGuidePost[];
+  title: string;
 };
 
-const glassPanelClass =
-  "rounded-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.86)_0%,rgba(246,249,252,0.72)_100%)] shadow-[0_24px_80px_rgba(15,23,42,0.18),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-2xl";
+type MemberPdfGuideSectionProps = {
+  badge: string;
+  description: string;
+  emptyMessage: string;
+  guides: MemberGuidePost[];
+  title: string;
+};
 
-export function MemberGuidesView({ guides }: MemberGuidesViewProps) {
+export function MemberVideoGuideSection({
+  badge,
+  description,
+  emptyMessage,
+  guides,
+  title,
+}: MemberVideoGuideSectionProps) {
   const videoGuides = useMemo(() => guides.filter((guide) => guide.type === "video"), [guides]);
-  const pdfGuides = useMemo(() => guides.filter((guide) => guide.type === "pdf"), [guides]);
   const [selectedVideoId, setSelectedVideoId] = useState(videoGuides[0]?.id ?? null);
   const selectedVideo = videoGuides.find((guide) => guide.id === selectedVideoId) ?? videoGuides[0] ?? null;
 
   return (
     <div className="space-y-6 px-4 py-6 sm:px-5 lg:px-6 lg:py-8">
-      <section className={`relative overflow-hidden px-6 py-6 sm:px-7 sm:py-7 lg:px-8 lg:py-8 ${glassPanelClass}`}>
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(59,130,246,0.12)_0%,rgba(255,255,255,0)_44%,rgba(16,185,129,0.1)_100%)]" />
-        <div className="relative space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-sky-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.68)]">
-            <PlayCircle className="h-3.5 w-3.5" />
-            Panduan Member
-          </div>
-          <div>
-            <h1 className="text-[2.1rem] font-semibold tracking-tight text-stone-950 sm:text-[2.5rem]">
-              Video & PDF Panduan
-            </h1>
-            <p className="mt-3 max-w-3xl text-base leading-8 text-stone-600">
-              Semua materi di halaman ini hanya tersedia untuk member aktif. Pilih video yang ingin dipelajari atau buka PDF untuk panduan yang lebih detail.
-            </p>
-          </div>
-        </div>
-      </section>
+      <MemberPageHeader
+        badge={badge}
+        description={description}
+        icon={PlayCircle}
+        title={title}
+        toneClassName="bg-[linear-gradient(135deg,rgba(59,130,246,0.12)_0%,rgba(255,255,255,0)_44%,rgba(16,185,129,0.1)_100%)]"
+      />
 
       <section className="space-y-4">
         <div className="px-1">
-          <h2 className="text-[1.7rem] font-semibold tracking-tight text-white">Video Panduan</h2>
+          <h2 className="text-[1.7rem] font-semibold tracking-tight text-white">Video panduan</h2>
           <p className="mt-1 text-sm leading-7 text-white/68">
-            Pilih video di panel samping untuk melihat preview utama.
+            Pilih materi di samping untuk melihat preview utama dan mulai belajar lebih cepat.
           </p>
         </div>
 
         {selectedVideo ? (
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1.08fr)_360px]">
-            <div className={`overflow-hidden ${glassPanelClass}`}>
+            <div className={`overflow-hidden ${memberGlassPanelClass}`}>
               <div className="aspect-video overflow-hidden bg-[#060b14]">
                 <iframe
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -65,10 +70,10 @@ export function MemberGuidesView({ guides }: MemberGuidesViewProps) {
               </div>
             </div>
 
-            <div className={`px-5 py-5 ${glassPanelClass}`}>
+            <div className={`px-5 py-5 ${memberGlassPanelClass}`}>
               <div className="px-1">
-                <h3 className="text-[1.35rem] font-semibold tracking-tight text-stone-950">Daftar Video</h3>
-                <p className="mt-1 text-sm leading-7 text-stone-600">Pilih materi yang ingin dipelajari lebih dulu.</p>
+                <h3 className="text-[1.35rem] font-semibold tracking-tight text-stone-950">Daftar video</h3>
+                <p className="mt-1 text-sm leading-7 text-stone-600">Semua materi yang masuk kategori ini akan muncul di sini.</p>
               </div>
 
               <div className="mt-5 space-y-3">
@@ -108,24 +113,38 @@ export function MemberGuidesView({ guides }: MemberGuidesViewProps) {
             </div>
           </div>
         ) : (
-          <div className={`px-6 py-8 text-sm text-stone-600 ${glassPanelClass}`}>
-            Belum ada video panduan yang dipublish.
-          </div>
+          <div className={`px-6 py-8 text-sm text-stone-600 ${memberGlassPanelClass}`}>{emptyMessage}</div>
         )}
       </section>
+    </div>
+  );
+}
+
+export function MemberPdfGuideSection({ badge, description, emptyMessage, guides, title }: MemberPdfGuideSectionProps) {
+  const pdfGuides = useMemo(() => guides.filter((guide) => guide.type === "pdf"), [guides]);
+
+  return (
+    <div className="space-y-6 px-4 py-6 sm:px-5 lg:px-6 lg:py-8">
+      <MemberPageHeader
+        badge={badge}
+        description={description}
+        icon={FileText}
+        title={title}
+        toneClassName="bg-[linear-gradient(135deg,rgba(244,63,94,0.12)_0%,rgba(255,255,255,0)_44%,rgba(168,85,247,0.09)_100%)]"
+      />
 
       <section className="space-y-4">
         <div className="px-1">
-          <h2 className="text-[1.7rem] font-semibold tracking-tight text-white">PDF Panduan</h2>
+          <h2 className="text-[1.7rem] font-semibold tracking-tight text-white">File PDF</h2>
           <p className="mt-1 text-sm leading-7 text-white/68">
-            Buka dokumen untuk membaca materi yang lebih lengkap dan lebih tenang dibaca.
+            Buka dokumen untuk membaca materi lebih lengkap, lebih tenang, dan bisa diulang kapan saja.
           </p>
         </div>
 
         {pdfGuides.length ? (
           <div className="grid gap-4 md:grid-cols-2">
             {pdfGuides.map((guide) => (
-              <div className={`flex h-full flex-col gap-5 px-6 py-6 ${glassPanelClass}`} key={guide.id}>
+              <div className={`flex h-full flex-col gap-5 px-6 py-6 ${memberGlassPanelClass}`} key={guide.id}>
                 <div className="flex items-start gap-4">
                   <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/12 text-rose-800">
                     <FileText className="h-5 w-5" />
@@ -150,9 +169,7 @@ export function MemberGuidesView({ guides }: MemberGuidesViewProps) {
             ))}
           </div>
         ) : (
-          <div className={`px-6 py-8 text-sm text-stone-600 ${glassPanelClass}`}>
-            Belum ada PDF panduan yang dipublish.
-          </div>
+          <div className={`px-6 py-8 text-sm text-stone-600 ${memberGlassPanelClass}`}>{emptyMessage}</div>
         )}
       </section>
     </div>

@@ -109,6 +109,7 @@ model MemberGuideAsset {
 model MemberGuidePost {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type        String
+  section     String
   title       String
   description String
   embedUrl    String?  @map("embed_url")
@@ -121,5 +122,6 @@ model MemberGuidePost {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@index([isPublished, sortOrder, publishedAt], map: "member_guide_posts_published_idx")
+  @@index([section, isPublished, sortOrder], map: "member_guide_posts_section_idx")
   @@map("member_guide_posts")
 }

@@ -29,7 +29,12 @@ export function ActivateLandingPageButton() {
 
   return (
     <form action={formAction} className="space-y-3">
-      <SubmitButton pendingText="Activating...">Activate My Landing Page</SubmitButton>
+      <SubmitButton
+        className="rounded-2xl bg-[linear-gradient(135deg,#111827_0%,#0f172a_100%)] shadow-[0_18px_40px_rgba(15,23,42,0.24)] hover:bg-[linear-gradient(135deg,#0f172a_0%,#020617_100%)]"
+        pendingText="Activating..."
+      >
+        Activate My Landing Page
+      </SubmitButton>
       {state.message ? (
         <Alert variant={state.status === "error" ? "error" : "success"}>{state.message}</Alert>
       ) : null}

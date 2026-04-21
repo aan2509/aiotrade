@@ -17,7 +17,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { MemberGuideAsset, MemberGuidePost, MemberGuideType } from "@/lib/member-guide-types";
+import {
+  getMemberGuideSectionLabel,
+  getMemberGuideTypeForSection,
+  MEMBER_GUIDE_SECTION_OPTIONS,
+  type MemberGuideAsset,
+  type MemberGuidePost,
+  type MemberGuideSection,
+} from "@/lib/member-guide-types";
 import { normalizeMemberGuideVideoUrl } from "@/lib/member-guide-utils";
 import { cn } from "@/lib/utils";
 
@@ -38,9 +45,9 @@ type DraftGuide = {
   id: string | null;
   isPublished: boolean;
   publishedAt: string;
+  section: MemberGuideSection;
   sortOrder: number;
   title: string;
-  type: MemberGuideType;
 };
 
 const EMPTY_GUIDE: DraftGuide = {
@@ -51,9 +58,9 @@ const EMPTY_GUIDE: DraftGuide = {
   id: null,
   isPublished: true,
   publishedAt: new Date().toISOString().slice(0, 16),
+  section: "activation",
   sortOrder: 0,
   title: "",
-  type: "video",
 };
 
 function toDraftGuide(guide: MemberGuidePost | null | undefined): DraftGuide {
@@ -69,9 +76,9 @@ function toDraftGuide(guide: MemberGuidePost | null | undefined): DraftGuide {
     id: guide.id,
     isPublished: guide.isPublished,
     publishedAt: guide.publishedAt.slice(0, 16),
+    section: guide.section,
     sortOrder: guide.sortOrder,
     title: guide.title,
-    type: guide.type,
   };
 }
 
@@ -144,11 +151,18 @@ export function MemberGuideComposerView({
     setDraft((current) => ({
       ...current,
       [key]: value,
-      ...(key === "type" && value === "video"
+    }));
+  }
+
+  function updateSection(section: MemberGuideSection) {
+    const nextType = getMemberGuideTypeForSection(section);
+
+    setDraft((current) => ({
+      ...current,
+      section,
+      ...(nextType === "video"
         ? { fileAssetId: null, fileUrl: null }
-        : key === "type" && value === "pdf"
-          ? { embedUrl: "" }
-          : {}),
+        : { embedUrl: "" }),
     }));
   }
 
@@ -262,6 +276,8 @@ export function MemberGuideComposerView({
   }
 
   const activeAlert = statusAlert(status, message);
+  const draftType = getMemberGuideTypeForSection(draft.section);
+  const draftSectionLabel = getMemberGuideSectionLabel(draft.section);
   const previewEmbedUrl = normalizeMemberGuideVideoUrl(draft.embedUrl);
 
   return (
@@ -288,7 +304,7 @@ export function MemberGuideComposerView({
             <CardContent>
               <form action={saveMemberGuidePostAction} className="space-y-6">
                 <input name="guideId" type="hidden" value={draft.id ?? ""} />
-                <input name="type" type="hidden" value={draft.type} />
+                <input name="section" type="hidden" value={draft.section} />
                 <input name="title" type="hidden" value={draft.title} />
                 <input name="description" type="hidden" value={draft.description} />
                 <input name="embedUrl" type="hidden" value={draft.embedUrl} />
@@ -298,39 +314,31 @@ export function MemberGuideComposerView({
                 <input name="publishedAt" type="hidden" value={draft.publishedAt} />
                 <input name="isPublished" type="hidden" value={String(draft.isPublished)} />
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <button
-                    className={cn(
-                      "rounded-xl border px-4 py-4 text-left transition",
-                      draft.type === "video"
-                        ? "border-stone-900 bg-stone-900 text-white"
-                        : "border-stone-200 bg-stone-50 hover:bg-stone-100",
-                    )}
-                    onClick={() => updateDraft("type", "video")}
-                    type="button"
-                  >
-                    <PlayCircle className="h-5 w-5" />
-                    <p className="mt-3 text-sm font-semibold">Video Panduan</p>
-                    <p className={cn("mt-1 text-xs leading-5", draft.type === "video" ? "text-white/72" : "text-stone-500")}>
-                      Masukan link embed untuk di tampilkan di dashboard member.
-                    </p>
-                  </button>
-                  <button
-                    className={cn(
-                      "rounded-xl border px-4 py-4 text-left transition",
-                      draft.type === "pdf"
-                        ? "border-stone-900 bg-stone-900 text-white"
-                        : "border-stone-200 bg-stone-50 hover:bg-stone-100",
-                    )}
-                    onClick={() => updateDraft("type", "pdf")}
-                    type="button"
-                  >
-                    <FileText className="h-5 w-5" />
-                    <p className="mt-3 text-sm font-semibold">PDF Panduan</p>
-                    <p className={cn("mt-1 text-xs leading-5", draft.type === "pdf" ? "text-white/72" : "text-stone-500")}>
-                      Upload PDF untuk di tampilkan di dashboard member.
-                    </p>
-                  </button>
+                <div className="grid gap-3 lg:grid-cols-3">
+                  {MEMBER_GUIDE_SECTION_OPTIONS.map((option) => {
+                    const active = draft.section === option.value;
+                    const Icon = option.type === "video" ? PlayCircle : FileText;
+
+                    return (
+                      <button
+                        className={cn(
+                          "rounded-xl border px-4 py-4 text-left transition",
+                          active
+                            ? "border-stone-900 bg-stone-900 text-white"
+                            : "border-stone-200 bg-stone-50 hover:bg-stone-100",
+                        )}
+                        key={option.value}
+                        onClick={() => updateSection(option.value)}
+                        type="button"
+                      >
+                        <Icon className="h-5 w-5" />
+                        <p className="mt-3 text-sm font-semibold">{option.label}</p>
+                        <p className={cn("mt-1 text-xs leading-5", active ? "text-white/72" : "text-stone-500")}>
+                          {option.description}
+                        </p>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-2">
@@ -385,7 +393,7 @@ export function MemberGuideComposerView({
                   </label>
                 </div>
 
-                {draft.type === "video" ? (
+                {draftType === "video" ? (
                   <TextField
                     label="Link Embed Video"
                     name="member-guide-embed"
@@ -486,8 +494,8 @@ export function MemberGuideComposerView({
             <CardContent className="space-y-4">
               <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">
-                  {draft.type === "video" ? <PlayCircle className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
-                  {draft.type === "video" ? "Video Panduan" : "PDF Panduan"}
+                  {draftType === "video" ? <PlayCircle className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                  {draftSectionLabel}
                 </div>
                 <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-stone-950">
                   {draft.title.trim() || "Judul panduan akan tampil di sini"}
@@ -495,7 +503,7 @@ export function MemberGuideComposerView({
                 <p className="mt-3 text-sm leading-7 text-stone-600">
                   {draft.description.trim() || "Deskripsi singkat panduan akan membantu member memahami isi materi."}
                 </p>
-                {draft.type === "video" ? (
+                {draftType === "video" ? (
                   previewEmbedUrl ? (
                     <div className="mt-5 overflow-hidden rounded-2xl border border-stone-200 bg-black">
                       <div className="aspect-video w-full">
@@ -573,7 +581,7 @@ export function MemberGuideComposerView({
                       <div className="min-w-0">
                         <p className="line-clamp-2 text-sm font-semibold">{guide.title}</p>
                         <p className={cn("mt-2 text-xs", active ? "text-white/70" : "text-stone-500")}>
-                          {guide.type === "video" ? "Video Panduan" : "PDF Panduan"} • Urutan {guide.sortOrder}
+                          {getMemberGuideSectionLabel(guide.section)} • Urutan {guide.sortOrder}
                         </p>
                       </div>
                       <span

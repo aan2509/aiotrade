@@ -67,19 +67,22 @@ export function ChangePasswordView({ description, title }: ChangePasswordViewPro
   );
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-3">
-        <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+    <div className="space-y-6 px-4 py-6 sm:px-5 lg:px-6 lg:py-8">
+      <div className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.86)_0%,rgba(246,249,252,0.72)_100%)] px-6 py-6 shadow-[0_24px_80px_rgba(15,23,42,0.18),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-2xl sm:px-7 sm:py-7 lg:px-8 lg:py-8">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(16,185,129,0.12)_0%,rgba(255,255,255,0)_46%,rgba(59,130,246,0.1)_100%)]" />
+        <div className="relative space-y-3">
+        <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-emerald-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.68)]">
           <ShieldCheck className="h-4 w-4" />
           Account Security
         </div>
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-stone-950">{title}</h1>
+          <h1 className="text-[2.1rem] font-semibold tracking-tight text-stone-950 sm:text-[2.5rem]">{title}</h1>
           <p className="mt-2 max-w-3xl text-base leading-7 text-stone-600">{description}</p>
         </div>
       </div>
+      </div>
 
-      <Card className="max-w-2xl">
+      <Card className="max-w-2xl rounded-[30px] border-transparent bg-[linear-gradient(180deg,rgba(255,255,255,0.86)_0%,rgba(246,249,252,0.72)_100%)] shadow-[0_24px_80px_rgba(15,23,42,0.18),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-2xl">
         <CardHeader>
           <CardTitle>Reset Password</CardTitle>
           <CardDescription>
@@ -125,14 +128,17 @@ export function ChangePasswordView({ description, title }: ChangePasswordViewPro
               placeholder="Ulangi password baru"
             />
 
-            <div className="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <div className="rounded-[24px] bg-white/48 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.76)]">
               <p className="text-sm font-medium text-stone-800">Catatan</p>
               <p className="mt-2 text-sm leading-7 text-stone-600">
                 Setelah password diganti, login berikutnya akan memakai password baru ini.
               </p>
             </div>
 
-            <SubmitButton className="w-full sm:w-auto" pendingText="Menyimpan password...">
+            <SubmitButton
+              className="w-full rounded-2xl bg-[linear-gradient(135deg,#111827_0%,#0f172a_100%)] shadow-[0_18px_40px_rgba(15,23,42,0.24)] hover:bg-[linear-gradient(135deg,#0f172a_0%,#020617_100%)] sm:w-auto"
+              pendingText="Menyimpan password..."
+            >
               Simpan Password Baru
             </SubmitButton>
           </form>

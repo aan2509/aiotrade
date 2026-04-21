@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdminProfile } from "@/lib/auth";
 import { saveMemberGuidePost } from "@/lib/member-guides";
+import { getMemberGuideTypeForSection } from "@/lib/member-guide-types";
 import { normalizeMemberGuideFileUrl, normalizeMemberGuideVideoUrl } from "@/lib/member-guide-utils";
 
 const nullableString = z
@@ -19,12 +20,14 @@ const memberGuideSchema = z
     guideId: nullableString,
     isPublished: z.string().transform((value) => value === "true"),
     publishedAt: nullableString,
+    section: z.enum(["activation", "bot_settings", "files"]),
     sortOrder: z.coerce.number().int().min(0).max(9999),
     title: z.string().trim().min(4, "Judul panduan minimal 4 karakter."),
-    type: z.enum(["video", "pdf"]),
   })
   .superRefine((value, ctx) => {
-    if (value.type === "video" && !value.embedUrl) {
+    const type = getMemberGuideTypeForSection(value.section);
+
+    if (type === "video" && !value.embedUrl) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Link embed video wajib diisi.",
@@ -32,7 +35,7 @@ const memberGuideSchema = z
       });
     }
 
-    if (value.type === "video" && value.embedUrl && !normalizeMemberGuideVideoUrl(value.embedUrl)) {
+    if (type === "video" && value.embedUrl && !normalizeMemberGuideVideoUrl(value.embedUrl)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Link video harus berupa URL YouTube atau Vimeo yang bisa di-embed.",
@@ -40,7 +43,7 @@ const memberGuideSchema = z
       });
     }
 
-    if (value.type === "pdf" && !value.fileUrl) {
+    if (type === "pdf" && !value.fileUrl) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "File PDF wajib dipilih.",
@@ -48,7 +51,7 @@ const memberGuideSchema = z
       });
     }
 
-    if (value.type === "pdf" && !value.fileAssetId) {
+    if (type === "pdf" && !value.fileAssetId) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Asset PDF wajib tersimpan sebelum panduan dipublish.",
@@ -56,7 +59,7 @@ const memberGuideSchema = z
       });
     }
 
-    if (value.type === "pdf" && value.fileUrl && !normalizeMemberGuideFileUrl(value.fileUrl)) {
+    if (type === "pdf" && value.fileUrl && !normalizeMemberGuideFileUrl(value.fileUrl)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "URL PDF tidak valid.",
@@ -76,9 +79,9 @@ export async function saveMemberGuidePostAction(formData: FormData) {
     guideId: formData.get("guideId"),
     isPublished: formData.get("isPublished"),
     publishedAt: formData.get("publishedAt"),
+    section: formData.get("section"),
     sortOrder: formData.get("sortOrder"),
     title: formData.get("title"),
-    type: formData.get("type"),
   });
 
   if (!parsed.success) {
@@ -96,9 +99,10 @@ export async function saveMemberGuidePostAction(formData: FormData) {
       id: parsed.data.guideId,
       isPublished: parsed.data.isPublished,
       publishedAt: parsed.data.publishedAt,
+      section: parsed.data.section,
       sortOrder: parsed.data.sortOrder,
       title: parsed.data.title,
-      type: parsed.data.type,
+      type: getMemberGuideTypeForSection(parsed.data.section),
     });
 
     redirectTo = `/admin/member-posts?status=saved&guide=${encodeURIComponent(guide.id)}`;

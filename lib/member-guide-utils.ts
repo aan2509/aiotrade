@@ -1,4 +1,5 @@
-import type { MemberGuideType } from "@/lib/member-guide-types";
+import type { MemberGuideSection, MemberGuideType } from "@/lib/member-guide-types";
+import { getMemberGuideTypeForSection } from "@/lib/member-guide-types";
 
 function normalizeUrl(value: string | null | undefined) {
   const trimmedValue = value?.trim();
@@ -80,9 +81,16 @@ export function validateMemberGuideInput(input: {
   embedUrl?: string | null;
   fileAssetId?: string | null;
   fileUrl?: string | null;
+  section: MemberGuideSection;
   type: MemberGuideType;
 }) {
-  if (input.type === "video") {
+  const expectedType = getMemberGuideTypeForSection(input.section);
+
+  if (expectedType !== input.type) {
+    throw new Error("Kategori panduan tidak sesuai dengan tipe konten.");
+  }
+
+  if (expectedType === "video") {
     return {
       embedUrl: normalizeMemberGuideVideoUrl(input.embedUrl),
       fileAssetId: null,

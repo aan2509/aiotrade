@@ -8,7 +8,7 @@ import {
 } from "@/app/(protected)/admin/member-posts/published/actions";
 import { Alert } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { MemberGuidePost } from "@/lib/member-guide-types";
+import { getMemberGuideSectionLabel, type MemberGuidePost } from "@/lib/member-guide-types";
 
 type PublishedMemberGuidesViewProps = {
   guides: MemberGuidePost[];
@@ -49,6 +49,7 @@ export function PublishedMemberGuidesView({ guides, status }: PublishedMemberGui
                 <tr className="text-left text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
                   <th className="px-3 py-3">Panduan</th>
                   <th className="px-3 py-3">Tipe</th>
+                  <th className="px-3 py-3">Menu Member</th>
                   <th className="px-3 py-3">Urutan</th>
                   <th className="px-3 py-3 text-right">Aksi</th>
                 </tr>
@@ -70,6 +71,7 @@ export function PublishedMemberGuidesView({ guides, status }: PublishedMemberGui
                         {guide.type === "video" ? "Video" : "PDF"}
                       </span>
                     </td>
+                    <td className="px-3 py-4 text-stone-600">{getMemberGuideSectionLabel(guide.section)}</td>
                     <td className="px-3 py-4 font-semibold text-stone-950">{guide.sortOrder}</td>
                     <td className="px-3 py-4">
                       <div className="flex flex-wrap justify-end gap-2">

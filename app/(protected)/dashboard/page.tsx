@@ -1,141 +1,177 @@
 import Link from "next/link";
-import { ExternalLink, Link2, Settings2, Sparkles } from "lucide-react";
-import { logoutAction } from "@/app/(protected)/account/actions";
-import { buildProfileUrl, getSiteUrl } from "@/lib/site";
+import {
+  BookOpen,
+  CreditCard,
+  FileText,
+  Link2,
+  PlayCircle,
+  Settings2,
+  Sparkles,
+  UserRound,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { requireCurrentProfile } from "@/lib/auth";
-import { ActivateLandingPageButton } from "@/components/dashboard/activate-lp-button";
-import { CopyLinkButton } from "@/components/dashboard/copy-link-button";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getMemberDashboardStats } from "@/lib/member-dashboard-stats";
+import { memberGlassPanelClass, MemberPageHeader } from "@/components/dashboard/member-ui";
+
+type MemberStatCard = {
+  icon: LucideIcon;
+  label: string;
+  tone: string;
+  value: string;
+  valueIcon?: LucideIcon;
+};
+
+const quickLinks = [
+  {
+    description: "Kelola profil akun, status landing page, dan reset password dari satu grup menu.",
+    href: "/dashboard/account/profile",
+    icon: UserRound,
+    label: "Buka menu akun",
+    title: "Akun",
+  },
+  {
+    description: "Masuk ke panduan video untuk aktivasi bot, pengaturan bot, dan file PDF member.",
+    href: "/dashboard/guides/activation",
+    icon: BookOpen,
+    label: "Lihat panduan",
+    title: "Panduan",
+  },
+  {
+    description: "Halaman ini disiapkan untuk fitur lanjutan member pada fase berikutnya.",
+    href: "/dashboard/subscription",
+    icon: CreditCard,
+    label: "Cek langganan",
+    title: "Langganan",
+  },
+] as const;
 
 export default async function DashboardPage() {
   const profile = await requireCurrentProfile();
+  const stats = await getMemberDashboardStats({
+    isLpActive: profile.isLpActive,
+    username: profile.username,
+  });
 
-  const siteUrl = await getSiteUrl();
-  const landingPageUrl = buildProfileUrl(siteUrl, profile.username);
+  const statCards: MemberStatCard[] = [
+    {
+      icon: Users,
+      label: "Referral Masuk",
+      tone: "bg-[linear-gradient(135deg,rgba(14,165,233,0.14)_0%,rgba(255,255,255,0.42)_100%)] text-sky-900",
+      value: String(stats.referralCount),
+    },
+    {
+      icon: Link2,
+      label: "Landing Page",
+      tone: stats.landingPageActive
+        ? "bg-[linear-gradient(135deg,rgba(16,185,129,0.16)_0%,rgba(255,255,255,0.42)_100%)] text-emerald-900"
+        : "bg-[linear-gradient(135deg,rgba(148,163,184,0.18)_0%,rgba(255,255,255,0.42)_100%)] text-stone-700",
+      value: stats.landingPageActive ? "Active" : "Inactive",
+    },
+    {
+      icon: BookOpen,
+      label: "Total Panduan",
+      tone: "bg-[linear-gradient(135deg,rgba(245,158,11,0.15)_0%,rgba(255,255,255,0.42)_100%)] text-amber-900",
+      value: String(stats.publishedGuideCount),
+    },
+    {
+      icon: PlayCircle,
+      label: "Video / PDF",
+      tone: "bg-[linear-gradient(135deg,rgba(168,85,247,0.14)_0%,rgba(255,255,255,0.42)_100%)] text-violet-900",
+      value: `${stats.publishedVideoCount} / ${stats.publishedPdfCount}`,
+      valueIcon: FileText,
+    },
+  ];
 
   return (
-    <main className="flex-1 bg-stone-50 px-6 py-12">
-      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.95fr,1.05fr]">
-        <section className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                  <Sparkles className="h-4 w-4" />
-                  Member dashboard
-                </div>
+    <main className="flex-1 px-4 py-6 sm:px-5 lg:px-6 lg:py-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <MemberPageHeader
+          badge="Dashboard"
+          description="Ini pusat statistik member Anda. Pantau referral, status landing page, dan jumlah materi panduan tanpa bercampur dengan info akun."
+          icon={Sparkles}
+          title={`Halo, ${profile.username}`}
+        />
 
-                <div className="flex flex-wrap items-center gap-3">
-                  {profile.isAdmin ? (
-                    <Link href="/admin">
-                      <span className="inline-flex h-10 items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-4 text-sm font-medium text-sky-800 transition hover:bg-sky-100">
-                        <Settings2 className="h-4 w-4" />
-                        Admin panel
-                      </span>
-                    </Link>
-                  ) : null}
-
-                  <form action={logoutAction}>
-                    <Button type="submit" variant="outline">
-                      Log out
-                    </Button>
-                  </form>
-                </div>
-              </div>
+        <section className={`px-6 py-6 sm:px-7 sm:py-7 ${memberGlassPanelClass}`}>
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-950/[0.045] text-stone-900">
+              <Sparkles className="h-5 w-5" />
+            </span>
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-stone-950">
-                Welcome back, {profile.username}
-              </h1>
-              <p className="mt-2 text-base leading-7 text-stone-600">
-                Share your referral entry link and let visitors land on the main homepage with your referral attached automatically.
+              <h2 className="text-[1.5rem] font-semibold tracking-tight text-stone-950">Statistik member</h2>
+              <p className="mt-1 text-sm leading-7 text-stone-600">
+                Ringkasan cepat performa referral dan ketersediaan panduan yang bisa Anda akses saat ini.
               </p>
             </div>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Account details</CardTitle>
-              <CardDescription>Your current profile information.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-stone-500">Username</p>
-                <p className="mt-1 text-base font-semibold text-stone-950">@{profile.username}</p>
-              </div>
-              <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-stone-500">Email</p>
-                <p className="mt-1 text-base font-semibold text-stone-950">{profile.email}</p>
-              </div>
-              <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-stone-500">WhatsApp</p>
-                <p className="mt-1 text-base font-semibold text-stone-950">
-                  {profile.whatsapp ?? "-"}
-                </p>
-              </div>
-              <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-stone-500">Link Referral</p>
-                <p className="mt-1 break-all text-base font-semibold text-stone-950">
-                  {profile.referralLink ?? "-"}
-                </p>
-              </div>
-              <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-stone-500">Referred by</p>
-                <p className="mt-1 text-base font-semibold text-stone-950">
-                  {profile.referredBy ? `@${profile.referredBy}` : "Direct signup"}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {statCards.map((item) => {
+              const Icon = item.icon;
+              const ValueIcon = item.valueIcon;
+
+              return (
+                <div
+                  className={`rounded-[24px] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_14px_34px_rgba(15,23,42,0.08)] ${item.tone}`}
+                  key={item.label}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-current/65">
+                        {item.label}
+                      </p>
+                      <div className="mt-3 flex items-center gap-2">
+                        <p className="text-[1.7rem] font-semibold tracking-tight text-stone-950">{item.value}</p>
+                        {ValueIcon ? <ValueIcon className="h-4 w-4 text-current/70" /> : null}
+                      </div>
+                    </div>
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/42 text-current shadow-[inset_0_1px_0_rgba(255,255,255,0.78)]">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </section>
 
-        <section>
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Generate Landing Page</CardTitle>
-              <CardDescription>
-                Share a clean entry link. Visitors who open it will be redirected to the main homepage, while your referral stays attached in the background.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="rounded-lg border border-stone-200 bg-stone-50 p-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
-                    <Link2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-stone-500">Status</p>
-                    <p className="text-lg font-semibold text-stone-950">
-                      {profile.isLpActive ? "Active and shareable" : "Inactive"}
-                    </p>
-                  </div>
-                </div>
-              </div>
+        <section className={`px-6 py-6 sm:px-7 sm:py-7 ${memberGlassPanelClass}`}>
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-950/[0.045] text-stone-900">
+              <Settings2 className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="text-[1.5rem] font-semibold tracking-tight text-stone-950">Akses cepat</h2>
+              <p className="mt-1 text-sm leading-7 text-stone-600">
+                Navigasi utama dipisahkan jelas: statistik di dashboard, detail di menu akun, dan materi belajar di menu panduan.
+              </p>
+            </div>
+          </div>
 
-              {profile.isLpActive ? (
-                <div className="space-y-4">
-              <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
-                    <p className="text-sm font-medium text-emerald-800">Your referral entry link</p>
-                    <p className="mt-2 break-all text-sm text-emerald-900">{landingPageUrl}</p>
-                    <p className="mt-3 text-xs leading-6 text-emerald-700">
-                      Tombol Daftar Sekarang di landing page Anda akan mengikuti link referral yang tersimpan di profil.
-                    </p>
-                  </div>
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            {quickLinks.map((item) => {
+              const Icon = item.icon;
 
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <CopyLinkButton link={landingPageUrl} />
-                    <Link href={`/${profile.username}`} target="_blank">
-                      <span className="inline-flex h-11 items-center gap-2 rounded-lg border border-stone-300 bg-white px-4 text-sm font-medium text-stone-900 transition hover:bg-stone-50">
-                        <ExternalLink className="h-4 w-4" />
-                        Open Entry Link
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-              ) : (
-                <ActivateLandingPageButton />
-              )}
-            </CardContent>
-          </Card>
+              return (
+                <Link
+                  className="group rounded-[24px] bg-white/44 px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_14px_34px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-0.5 hover:bg-white/56"
+                  href={item.href}
+                  key={item.href}
+                >
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-stone-950/[0.05] text-stone-900 transition group-hover:bg-stone-950 group-hover:text-white">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <h3 className="mt-4 text-[1.2rem] font-semibold tracking-tight text-stone-950">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-stone-600">{item.description}</p>
+                  <span className="mt-5 inline-flex items-center text-sm font-semibold text-stone-900">
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </section>
       </div>
     </main>

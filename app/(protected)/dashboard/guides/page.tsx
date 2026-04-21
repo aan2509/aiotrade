@@ -1,8 +1,5 @@
-import { MemberGuidesView } from "@/components/dashboard/member-guides-view";
-import { getPublishedMemberGuidePosts } from "@/lib/member-guides";
+import { redirect } from "next/navigation";
 
 export default async function DashboardGuidesPage() {
-  const guides = await getPublishedMemberGuidePosts();
-
-  return <MemberGuidesView guides={guides} />;
+  redirect("/dashboard/guides/activation");
 }
