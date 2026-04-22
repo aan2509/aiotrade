@@ -1,6 +1,14 @@
 import { Link2, Mail, MessageCircle, UserRound, Users } from "lucide-react";
 import { requireCurrentProfile } from "@/lib/auth";
-import { memberGlassPanelClass, memberGlassRowClass, MemberPageHeader } from "@/components/dashboard/member-ui";
+import {
+  memberGlassPanelClass,
+  memberGlassRowClass,
+  memberIconSurfaceClass,
+  MemberPageHeader,
+  memberTextMutedClass,
+  memberTextPrimaryClass,
+  memberTextSecondaryClass,
+} from "@/components/dashboard/member-ui";
 
 type CurrentProfile = Awaited<ReturnType<typeof requireCurrentProfile>>;
 
@@ -17,12 +25,12 @@ export function MemberAccountOverview({ profile }: { profile: CurrentProfile }) 
 
       <section className={`px-6 py-6 sm:px-7 sm:py-7 ${memberGlassPanelClass}`}>
         <div className="flex items-start gap-3">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-950/[0.045] text-stone-900">
+          <span className={memberIconSurfaceClass}>
             <UserRound className="h-5 w-5" />
           </span>
           <div>
-            <h2 className="text-[1.55rem] font-semibold tracking-tight text-stone-950">Info akun</h2>
-            <p className="mt-1 text-sm leading-7 text-stone-600">
+            <h2 className={`text-[1.55rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>Info akun</h2>
+            <p className={`mt-1 text-sm leading-7 ${memberTextSecondaryClass}`}>
               Detail profil, kontak, dan informasi referral yang tersimpan pada akun member Anda.
             </p>
           </div>
@@ -35,8 +43,8 @@ export function MemberAccountOverview({ profile }: { profile: CurrentProfile }) 
                 <UserRound className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-stone-500">Username</p>
-                <p className="mt-2 text-lg font-semibold text-stone-950">@{profile.username}</p>
+                <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>Username</p>
+                <p className={`mt-2 text-lg font-semibold ${memberTextPrimaryClass}`}>@{profile.username}</p>
               </div>
             </div>
           </div>
@@ -47,8 +55,8 @@ export function MemberAccountOverview({ profile }: { profile: CurrentProfile }) 
                 <Mail className="h-4 w-4" />
               </span>
               <div className="min-w-0">
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-stone-500">Email</p>
-                <p className="mt-2 break-all text-lg font-semibold text-stone-950">{profile.email ?? "-"}</p>
+                <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>Email</p>
+                <p className={`mt-2 break-all text-lg font-semibold ${memberTextPrimaryClass}`}>{profile.email ?? "-"}</p>
               </div>
             </div>
           </div>
@@ -59,8 +67,8 @@ export function MemberAccountOverview({ profile }: { profile: CurrentProfile }) 
                 <MessageCircle className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-stone-500">WhatsApp</p>
-                <p className="mt-2 text-lg font-semibold text-stone-950">{profile.whatsapp ?? "-"}</p>
+                <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>WhatsApp</p>
+                <p className={`mt-2 text-lg font-semibold ${memberTextPrimaryClass}`}>{profile.whatsapp ?? "-"}</p>
               </div>
             </div>
           </div>
@@ -71,8 +79,8 @@ export function MemberAccountOverview({ profile }: { profile: CurrentProfile }) 
                 <Users className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-stone-500">Referred By</p>
-                <p className="mt-2 text-lg font-semibold text-stone-950">
+                <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>Referred By</p>
+                <p className={`mt-2 text-lg font-semibold ${memberTextPrimaryClass}`}>
                   {profile.referredBy ? `@${profile.referredBy}` : "Direct signup"}
                 </p>
               </div>
@@ -86,8 +94,8 @@ export function MemberAccountOverview({ profile }: { profile: CurrentProfile }) 
               <Link2 className="h-4 w-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-stone-500">Link Referral</p>
-              <p className="mt-2 break-all text-lg font-semibold text-stone-950">{profile.referralLink ?? "-"}</p>
+              <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>Link Referral</p>
+              <p className={`mt-2 break-all text-lg font-semibold ${memberTextPrimaryClass}`}>{profile.referralLink ?? "-"}</p>
             </div>
           </div>
         </div>

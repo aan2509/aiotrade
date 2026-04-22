@@ -7,6 +7,7 @@ import {
   type ActivateLandingPageState,
 } from "@/app/(protected)/dashboard/actions";
 import { SubmitButton } from "@/components/auth/submit-button";
+import { memberSolidButtonClass } from "@/components/dashboard/member-ui";
 import { Alert } from "@/components/ui/alert";
 
 const initialActivateLandingPageState: ActivateLandingPageState = {
@@ -30,7 +31,7 @@ export function ActivateLandingPageButton() {
   return (
     <form action={formAction} className="space-y-3">
       <SubmitButton
-        className="rounded-2xl bg-[linear-gradient(135deg,#111827_0%,#0f172a_100%)] shadow-[0_18px_40px_rgba(15,23,42,0.24)] hover:bg-[linear-gradient(135deg,#0f172a_0%,#020617_100%)]"
+        className={memberSolidButtonClass}
         pendingText="Activating..."
       >
         Activate My Landing Page

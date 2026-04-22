@@ -1,5 +1,11 @@
 import { CreditCard, Sparkles } from "lucide-react";
-import { memberGlassPanelClass, MemberPageHeader } from "@/components/dashboard/member-ui";
+import {
+  memberGlassPanelClass,
+  memberIconSurfaceClass,
+  MemberPageHeader,
+  memberTextPrimaryClass,
+  memberTextSecondaryClass,
+} from "@/components/dashboard/member-ui";
 
 export default function DashboardSubscriptionPage() {
   return (
@@ -14,19 +20,19 @@ export default function DashboardSubscriptionPage() {
 
       <section className={`px-6 py-6 sm:px-7 sm:py-7 ${memberGlassPanelClass}`}>
         <div className="flex items-start gap-3">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/12 text-amber-800">
+          <span className={memberIconSurfaceClass}>
             <Sparkles className="h-5 w-5" />
           </span>
           <div>
-            <h2 className="text-[1.55rem] font-semibold tracking-tight text-stone-950">Fitur lanjutan segera hadir</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-stone-600">
+            <h2 className={`text-[1.55rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>Fitur lanjutan segera hadir</h2>
+            <p className={`mt-2 max-w-3xl text-sm leading-7 ${memberTextSecondaryClass}`}>
               Area langganan akan dipakai untuk fitur advanced berikutnya. Untuk sekarang, dashboard tetap fokus ke
               statistik referral, panduan member, dan pengelolaan akun.
             </p>
           </div>
         </div>
 
-        <div className="mt-6 rounded-[24px] bg-white/44 px-5 py-5 text-sm leading-7 text-stone-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_14px_34px_rgba(15,23,42,0.08)]">
+        <div className={`member-glass-row mt-6 rounded-[24px] px-5 py-5 text-sm leading-7 ${memberTextSecondaryClass}`}>
           Setelah modul ini aktif, menu ini akan menampilkan informasi paket, status akses, dan fitur premium member.
         </div>
       </section>

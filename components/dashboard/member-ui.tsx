@@ -1,10 +1,20 @@
 import type { LucideIcon } from "lucide-react";
 
 export const memberGlassPanelClass =
-  "rounded-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.9)_0%,rgba(247,250,253,0.78)_100%)] shadow-[0_26px_72px_rgba(148,163,184,0.24),0_10px_28px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-2xl";
+  "member-glass-panel rounded-[30px] backdrop-blur-2xl";
 
 export const memberGlassRowClass =
-  "rounded-[24px] bg-white/56 px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.86),0_18px_38px_rgba(148,163,184,0.2),0_8px_22px_rgba(15,23,42,0.06)]";
+  "member-glass-row rounded-[24px] px-5 py-5";
+
+export const memberTextPrimaryClass = "text-[var(--member-text-primary)]";
+export const memberTextSecondaryClass = "text-[var(--member-text-secondary)]";
+export const memberTextMutedClass = "text-[var(--member-text-muted)]";
+export const memberIconSurfaceClass =
+  "inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--member-icon-surface)] text-[var(--member-icon-foreground)]";
+export const memberSoftButtonClass =
+  "inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-[var(--member-row-border)] bg-[var(--member-soft-button-bg)] px-5 text-sm font-medium text-[var(--member-text-primary)] shadow-[var(--member-soft-button-shadow)] transition hover:bg-[var(--member-soft-button-hover-bg)] hover:shadow-[var(--member-soft-button-hover-shadow)]";
+export const memberSolidButtonClass =
+  "rounded-2xl bg-[var(--member-solid-button-bg)] text-[var(--member-solid-button-text)] shadow-[var(--member-solid-button-shadow)] hover:bg-[var(--member-solid-button-hover-bg)]";
 
 type MemberPageHeaderProps = {
   badge: string;
@@ -27,15 +37,15 @@ export function MemberPageHeader({
     >
       <div className={`pointer-events-none absolute inset-0 ${toneClassName}`} />
       <div className="relative space-y-4">
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/42 px-3 py-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-stone-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.68)]">
+        <div className="member-page-badge inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.24em]">
           <Icon className="h-3.5 w-3.5" />
           {badge}
         </div>
         <div>
-          <h1 className="text-[2.1rem] font-semibold tracking-tight text-stone-950 sm:text-[2.5rem]">
+          <h1 className={`text-[2.1rem] font-semibold tracking-tight sm:text-[2.5rem] ${memberTextPrimaryClass}`}>
             {title}
           </h1>
-          <p className="mt-3 max-w-3xl text-base leading-8 text-stone-600">{description}</p>
+          <p className={`mt-3 max-w-3xl text-base leading-8 ${memberTextSecondaryClass}`}>{description}</p>
         </div>
       </div>
     </section>

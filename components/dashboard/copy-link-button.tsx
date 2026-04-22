@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { memberSoftButtonClass } from "@/components/dashboard/member-ui";
 
 type CopyLinkButtonProps = {
   link: string;
@@ -23,7 +24,7 @@ export function CopyLinkButton({ link }: CopyLinkButtonProps) {
 
   return (
     <Button
-      className="rounded-2xl border-transparent bg-white/52 text-stone-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.78)] hover:bg-white/64 hover:shadow-[0_16px_28px_rgba(15,23,42,0.08)]"
+      className={memberSoftButtonClass}
       onClick={handleCopy}
       type="button"
       variant="outline"

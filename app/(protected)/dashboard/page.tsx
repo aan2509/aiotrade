@@ -13,12 +13,19 @@ import {
 } from "lucide-react";
 import { requireCurrentProfile } from "@/lib/auth";
 import { getMemberDashboardStats } from "@/lib/member-dashboard-stats";
-import { memberGlassPanelClass, MemberPageHeader } from "@/components/dashboard/member-ui";
+import {
+  memberGlassPanelClass,
+  memberIconSurfaceClass,
+  MemberPageHeader,
+  memberTextMutedClass,
+  memberTextPrimaryClass,
+  memberTextSecondaryClass,
+} from "@/components/dashboard/member-ui";
 
 type MemberStatCard = {
+  accentClassName: string;
   icon: LucideIcon;
   label: string;
-  tone: string;
   value: string;
   valueIcon?: LucideIcon;
 };
@@ -56,29 +63,27 @@ export default async function DashboardPage() {
 
   const statCards: MemberStatCard[] = [
     {
+      accentClassName: "bg-sky-500/12 text-sky-700",
       icon: Users,
       label: "Referral Masuk",
-      tone: "bg-[linear-gradient(135deg,rgba(14,165,233,0.14)_0%,rgba(255,255,255,0.42)_100%)] text-sky-900",
       value: String(stats.referralCount),
     },
     {
+      accentClassName: stats.landingPageActive ? "bg-emerald-500/12 text-emerald-700" : "bg-slate-400/14 text-slate-700",
       icon: Link2,
       label: "Landing Page",
-      tone: stats.landingPageActive
-        ? "bg-[linear-gradient(135deg,rgba(16,185,129,0.16)_0%,rgba(255,255,255,0.42)_100%)] text-emerald-900"
-        : "bg-[linear-gradient(135deg,rgba(148,163,184,0.18)_0%,rgba(255,255,255,0.42)_100%)] text-stone-700",
       value: stats.landingPageActive ? "Active" : "Inactive",
     },
     {
+      accentClassName: "bg-amber-500/12 text-amber-700",
       icon: BookOpen,
       label: "Total Panduan",
-      tone: "bg-[linear-gradient(135deg,rgba(245,158,11,0.15)_0%,rgba(255,255,255,0.42)_100%)] text-amber-900",
       value: String(stats.publishedGuideCount),
     },
     {
+      accentClassName: "bg-violet-500/12 text-violet-700",
       icon: PlayCircle,
       label: "Video / PDF",
-      tone: "bg-[linear-gradient(135deg,rgba(168,85,247,0.14)_0%,rgba(255,255,255,0.42)_100%)] text-violet-900",
       value: `${stats.publishedVideoCount} / ${stats.publishedPdfCount}`,
       valueIcon: FileText,
     },
@@ -96,12 +101,12 @@ export default async function DashboardPage() {
 
         <section className={`px-6 py-6 sm:px-7 sm:py-7 ${memberGlassPanelClass}`}>
           <div className="flex items-start gap-3">
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-950/[0.045] text-stone-900">
+            <span className={memberIconSurfaceClass}>
               <Sparkles className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="text-[1.5rem] font-semibold tracking-tight text-stone-950">Statistik member</h2>
-              <p className="mt-1 text-sm leading-7 text-stone-600">
+              <h2 className={`text-[1.5rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>Statistik member</h2>
+              <p className={`mt-1 text-sm leading-7 ${memberTextSecondaryClass}`}>
                 Ringkasan cepat performa referral dan ketersediaan panduan yang bisa Anda akses saat ini.
               </p>
             </div>
@@ -114,20 +119,20 @@ export default async function DashboardPage() {
 
               return (
                 <div
-                  className={`rounded-[24px] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_14px_34px_rgba(15,23,42,0.08)] ${item.tone}`}
+                  className="rounded-[24px] border border-[var(--member-row-border)] bg-[var(--member-row-bg)] px-5 py-5 shadow-[var(--member-row-shadow)]"
                   key={item.label}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-current/65">
+                      <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
                         {item.label}
                       </p>
                       <div className="mt-3 flex items-center gap-2">
-                        <p className="text-[1.7rem] font-semibold tracking-tight text-stone-950">{item.value}</p>
-                        {ValueIcon ? <ValueIcon className="h-4 w-4 text-current/70" /> : null}
+                        <p className={`text-[1.7rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{item.value}</p>
+                        {ValueIcon ? <ValueIcon className="h-4 w-4 text-[var(--member-text-muted)]" /> : null}
                       </div>
                     </div>
-                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/42 text-current shadow-[inset_0_1px_0_rgba(255,255,255,0.78)]">
+                    <span className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] ${item.accentClassName}`}>
                       <Icon className="h-5 w-5" />
                     </span>
                   </div>
@@ -139,12 +144,12 @@ export default async function DashboardPage() {
 
         <section className={`px-6 py-6 sm:px-7 sm:py-7 ${memberGlassPanelClass}`}>
           <div className="flex items-start gap-3">
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-950/[0.045] text-stone-900">
+            <span className={memberIconSurfaceClass}>
               <Settings2 className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="text-[1.5rem] font-semibold tracking-tight text-stone-950">Akses cepat</h2>
-              <p className="mt-1 text-sm leading-7 text-stone-600">
+              <h2 className={`text-[1.5rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>Akses cepat</h2>
+              <p className={`mt-1 text-sm leading-7 ${memberTextSecondaryClass}`}>
                 Navigasi utama dipisahkan jelas: statistik di dashboard, detail di menu akun, dan materi belajar di menu panduan.
               </p>
             </div>
@@ -156,16 +161,16 @@ export default async function DashboardPage() {
 
               return (
                 <Link
-                  className="group rounded-[24px] bg-white/44 px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_14px_34px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-0.5 hover:bg-white/56"
+                  className="group rounded-[24px] border border-[var(--member-row-border)] bg-[var(--member-row-bg)] px-5 py-5 shadow-[var(--member-row-shadow)] transition duration-300 hover:-translate-y-0.5 hover:bg-[var(--member-row-hover-bg)]"
                   href={item.href}
                   key={item.href}
                 >
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-stone-950/[0.05] text-stone-900 transition group-hover:bg-stone-950 group-hover:text-white">
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--member-icon-surface)] text-[var(--member-icon-foreground)] transition group-hover:bg-[var(--member-sidebar-active-bg)] group-hover:text-[var(--member-sidebar-active-text)]">
                     <Icon className="h-5 w-5" />
                   </span>
-                  <h3 className="mt-4 text-[1.2rem] font-semibold tracking-tight text-stone-950">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-stone-600">{item.description}</p>
-                  <span className="mt-5 inline-flex items-center text-sm font-semibold text-stone-900">
+                  <h3 className={`mt-4 text-[1.2rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{item.title}</h3>
+                  <p className={`mt-2 text-sm leading-7 ${memberTextSecondaryClass}`}>{item.description}</p>
+                  <span className={`mt-5 inline-flex items-center text-sm font-semibold ${memberTextPrimaryClass}`}>
                     {item.label}
                   </span>
                 </Link>
