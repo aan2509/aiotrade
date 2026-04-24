@@ -119,7 +119,7 @@ export function LandingHeader({
   const activeItem = headerItems.find((item) => item.href === activeHref) ?? headerItems[0];
 
   return (
-    <div className="relative z-40 h-[60px] sm:h-[70px]" ref={anchorRef}>
+    <div className="relative z-40 h-[106px] sm:h-[70px]" ref={anchorRef}>
       <header
         className={cn(
           "landing-header-shell left-0 right-0 z-40 w-full backdrop-blur-2xl transition duration-300",
@@ -129,13 +129,13 @@ export function LandingHeader({
       >
         <motion.div
           animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-          className="relative mx-auto flex min-h-[60px] w-full max-w-7xl items-center justify-center px-3 sm:min-h-[70px] sm:px-8 lg:px-10"
+          className="relative mx-auto flex min-h-[106px] w-full max-w-7xl items-center justify-center px-3 py-2 sm:min-h-[70px] sm:px-8 sm:py-0 lg:px-10"
           initial={prefersReducedMotion ? false : { opacity: 0, y: -18 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex w-full items-center gap-2 sm:gap-4">
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <nav
-              className="landing-header-nav no-scrollbar relative flex min-w-0 flex-1 items-center justify-start overflow-x-auto px-1 text-[0.82rem] sm:justify-center sm:px-4 sm:text-[1rem]"
+              className="landing-header-nav no-scrollbar relative flex min-w-0 w-full flex-1 items-center justify-start overflow-x-auto px-1 text-[0.82rem] sm:justify-center sm:px-4 sm:text-[1rem]"
               style={
                 {
                   "--active-nav-accent": activeItem?.accent ?? "#10a7ff",
@@ -199,7 +199,7 @@ export function LandingHeader({
               </div>
             </nav>
             {!previewMode && onThemeChange ? (
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex w-full items-center justify-end gap-2 px-1 sm:w-auto sm:shrink-0 sm:px-0">
                 <span className="landing-header-divider hidden sm:inline">|</span>
                 <SiteLanguageSelector
                   currentLanguage={currentLanguage}
