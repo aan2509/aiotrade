@@ -45,7 +45,7 @@ export function BlogSection({ content, posts }: BlogSectionProps) {
         <div className="mt-12 grid gap-5 lg:grid-cols-3">
           {items.map((article, index) => (
             <Reveal
-              className="overflow-hidden rounded-none border border-[#ece7dc] bg-white shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
+              className="landing-glass-card landing-glass-card-hover overflow-hidden rounded-[28px]"
               delay={index * 0.08}
               direction="right"
               distance={42}

@@ -8,8 +8,11 @@ export const RESERVED_USERNAMES = new Set([
   "auth",
   "dashboard",
   "login",
+  "register",
   "signup",
 ]);
+
+export const SPECIAL_REFERRAL_USERNAMES = new Set(["register"]);
 
 export function normalizeUsername(value: string) {
   return value.trim().toLowerCase();

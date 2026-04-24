@@ -5,7 +5,7 @@ import {
   getActiveReferralOwner,
   parseReferralUsername,
 } from "@/lib/referral";
-import { RESERVED_USERNAMES } from "@/lib/username-rules";
+import { RESERVED_USERNAMES, SPECIAL_REFERRAL_USERNAMES } from "@/lib/username-rules";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -28,7 +28,12 @@ export async function proxy(request: NextRequest) {
   const [candidateSegment] = pathSegments;
   const normalizedCandidate = parseReferralUsername(candidateSegment);
 
-  if (!normalizedCandidate || RESERVED_USERNAMES.has(normalizedCandidate)) {
+  const isReservedNonReferralUsername =
+    normalizedCandidate &&
+    RESERVED_USERNAMES.has(normalizedCandidate) &&
+    !SPECIAL_REFERRAL_USERNAMES.has(normalizedCandidate);
+
+  if (!normalizedCandidate || isReservedNonReferralUsername) {
     return nextResponse();
   }
 

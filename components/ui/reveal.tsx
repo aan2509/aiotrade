@@ -21,6 +21,7 @@ type RevealProps = PropsWithChildren<
     duration?: number;
     hover?: boolean;
     once?: boolean;
+    stable?: boolean;
   }
 >;
 
@@ -48,6 +49,7 @@ export function Reveal({
   duration = 1.12,
   hover = false,
   once = false,
+  stable = false,
   ...props
 }: RevealProps) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -57,8 +59,10 @@ export function Reveal({
   const initialPosition = getInitialPosition(direction, distance);
   const hiddenState = useMemo(
     () =>
-      prefersReducedMotion ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, ...initialPosition },
-    [initialPosition, prefersReducedMotion],
+      prefersReducedMotion
+        ? { opacity: 1, x: 0, y: 0 }
+        : { opacity: stable ? 1 : 0, ...initialPosition },
+    [initialPosition, prefersReducedMotion, stable],
   );
   const visibleState = useMemo(() => ({ opacity: 1, x: 0, y: 0 }), []);
 

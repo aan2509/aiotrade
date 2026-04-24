@@ -55,7 +55,7 @@ export function BenefitsSection({ content }: BenefitsSectionProps) {
 
             return (
               <Reveal
-                className="rounded-lg border border-white/8 bg-[rgba(10,18,34,0.78)] px-6 py-8 text-center shadow-[0_24px_50px_rgba(0,0,0,0.18)] backdrop-blur-sm sm:px-7"
+                className="landing-glass-dark-panel rounded-[24px] px-6 py-8 text-center sm:px-7"
                 delay={index * 0.08}
                 direction="right"
                 distance={38}

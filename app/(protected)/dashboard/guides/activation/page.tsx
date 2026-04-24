@@ -8,10 +8,10 @@ export default async function DashboardGuideActivationPage() {
   return (
     <MemberVideoGuideSection
       badge="Panduan"
-      description="Materi langkah awal untuk mengaktifkan bot dan menyiapkan alur penggunaan member area dengan lebih cepat."
-      emptyMessage="Belum ada video panduan aktivasi bot yang dipublish."
+      description="Materi langkah awal untuk setup bot, sambungan API, dan persiapan penggunaan member area."
+      emptyMessage="Belum ada video panduan setup bot yang dipublish."
       guides={guides}
-      title="Aktivasi bot"
+      title="Setup Bot"
     />
   );
 }

@@ -53,6 +53,7 @@ export function HomepagePreviewPage({ initialContent }: HomepagePreviewPageProps
       ctaHref="/login"
       previewMode
       signupCtaHref="/login"
+      whatsappHref={null}
     />
   );
 }

@@ -1,7 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { normalizeReferralLink } from "@/lib/referral-links";
 import { buildWhatsAppUrl } from "@/lib/site";
-import { parsePublicUsernameCandidate } from "@/lib/username-rules";
+import {
+  isValidUsernameFormat,
+  normalizeUsername,
+  parsePublicUsernameCandidate,
+  SPECIAL_REFERRAL_USERNAMES,
+} from "@/lib/username-rules";
 
 export const LANDING_REFERRAL_COOKIE_NAME = "landing_referral";
 export const LANDING_REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
@@ -18,6 +23,7 @@ export type ReferralLandingState = {
   ctaHref: string;
   signupExternal: boolean;
   signupHref: string;
+  whatsappHref: string | null;
 };
 
 export function buildReferralSignupUrl(username: string) {
@@ -25,6 +31,12 @@ export function buildReferralSignupUrl(username: string) {
 }
 
 export function parseReferralUsername(value: string | null | undefined) {
+  const normalizedValue = normalizeUsername(value ?? "");
+
+  if (SPECIAL_REFERRAL_USERNAMES.has(normalizedValue) && isValidUsernameFormat(normalizedValue)) {
+    return normalizedValue;
+  }
+
   return parsePublicUsernameCandidate(value);
 }
 
@@ -64,6 +76,7 @@ export async function resolveHomepageReferralState(cookieReferralUsername: strin
       ctaHref: "/login",
       signupExternal: false,
       signupHref: "/login",
+      whatsappHref: null,
     } satisfies ReferralLandingState;
   }
 
@@ -79,5 +92,6 @@ export async function resolveHomepageReferralState(cookieReferralUsername: strin
     ctaHref: whatsappUrl ?? signupHref,
     signupExternal: Boolean(externalSignupHref),
     signupHref,
+    whatsappHref: whatsappUrl,
   } satisfies ReferralLandingState;
 }

@@ -1,5 +1,9 @@
 import type { MemberGuidePost } from "@/lib/member-guide-types";
 
+export function getStartGuides(guides: MemberGuidePost[]) {
+  return guides.filter((guide) => guide.section === "start" && guide.type === "video");
+}
+
 export function getActivationGuides(guides: MemberGuidePost[]) {
   return guides.filter((guide) => guide.section === "activation" && guide.type === "video");
 }

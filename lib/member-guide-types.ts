@@ -1,11 +1,12 @@
 export type MemberGuideType = "video" | "pdf";
-export type MemberGuideSection = "activation" | "bot_settings" | "files";
+export type MemberGuideSection = "start" | "activation" | "bot_settings" | "files";
 
 export const MEMBER_GUIDE_SECTION_OPTIONS = [
-  { description: "Embed video untuk proses aktivasi bot member.", label: "Aktivasi Bot", type: "video", value: "activation" },
+  { description: "Embed video untuk materi mulai, orientasi awal, dan pengenalan member area.", label: "Mulai", type: "video", value: "start" },
+  { description: "Embed video untuk proses setup bot dan langkah penyambungan awal.", label: "Setup Bot", type: "video", value: "activation" },
   {
-    description: "Embed video untuk pengaturan, strategi, dan konfigurasi bot.",
-    label: "Pengaturan Bot",
+    description: "Embed video untuk materi lanjutan, strategi, dan pengembangan penggunaan bot.",
+    label: "Materi Lanjutan",
     type: "video",
     value: "bot_settings",
   },

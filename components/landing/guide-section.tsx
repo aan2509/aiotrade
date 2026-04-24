@@ -35,7 +35,7 @@ export function GuideSection({ content }: GuideSectionProps) {
         <div className="mt-12 grid gap-5 lg:grid-cols-3">
           {content.steps.map((step, index) => (
             <Reveal
-              className="rounded-[24px] border border-[#ece7dc] bg-white px-7 py-9 text-center shadow-[0_18px_46px_rgba(15,23,42,0.12)]"
+              className="landing-glass-card landing-glass-card-hover rounded-[28px] px-7 py-9 text-center"
               delay={index * 0.08}
               direction="right"
               distance={40}
@@ -58,8 +58,8 @@ export function GuideSection({ content }: GuideSectionProps) {
 
         <Reveal className="mt-10 flex justify-center" delay={0.16}>
           <Link
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[16px] border border-[#5aa0ff] bg-white px-6 text-[1.05rem] font-medium text-[#2a7df1] shadow-[0_10px_24px_rgba(42,125,241,0.1)] transition duration-300 hover:bg-[#eef5ff]"
-            href="#faq"
+            className="landing-glass-button inline-flex min-h-12 items-center justify-center gap-2 rounded-[16px] px-6 text-[1.05rem] font-medium text-[#2a7df1] transition duration-300 hover:-translate-y-0.5"
+            href="/guide"
           >
             <BookOpen className="h-4 w-4" />
             {content.buttonLabel}

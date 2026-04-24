@@ -57,6 +57,15 @@ const pricingSchema = z.object({
   plans: z.array(pricingPlanSchema).min(1),
 });
 
+const videoSectionSchema = z.object({
+  background: sectionBackgroundSchema,
+  description: z.string().min(1),
+  embedUrl: z.string().min(1),
+  eyebrow: z.string().min(1),
+  isVisible: z.boolean(),
+  title: z.string().min(1),
+});
+
 const faqSchema = z.object({
   background: sectionBackgroundSchema,
   title: z.string().min(1),
@@ -83,6 +92,23 @@ const guideSchema = z.object({
   ),
 });
 
+const testimonialSchema = z.object({
+  background: sectionBackgroundSchema,
+  eyebrow: z.string().min(1),
+  subtitle: z.string().min(1),
+  title: z.string().min(1),
+  items: z.array(
+    z.object({
+      imageAssetId: z.string().optional(),
+      imageAlt: z.string().optional(),
+      imageUrl: z.string().optional(),
+      name: z.string().min(1),
+      quote: z.string().min(1),
+      role: z.string().min(1),
+    }),
+  ).min(1),
+});
+
 const blogSchema = z.object({
   background: sectionBackgroundSchema,
   title: z.string().min(1),
@@ -93,6 +119,18 @@ const blogSchema = z.object({
       label: z.string().min(1),
     }),
   ),
+});
+
+const bannerAdsSchema = z.object({
+  background: sectionBackgroundSchema,
+  buttonLabel: z.string().min(1),
+  description: z.string().min(1),
+  imageAssetId: z.string().optional(),
+  imageAlt: z.string().optional(),
+  imageUrl: z.string().optional(),
+  isVisible: z.boolean(),
+  title: z.string().min(1),
+  whatsappNumber: z.string().optional(),
 });
 
 const footerSchema = z.object({
@@ -155,6 +193,19 @@ export const defaultHomepageContent: HomepageContent = {
       highlight: plan.highlight,
     })),
   },
+  video: {
+    background: createDefaultSectionBackground("dark-slate-cinematic", {
+      imageUrl: landingImages.heroImage.src,
+      overlayColor: "#08111d",
+      overlayOpacity: 68,
+    }),
+    description:
+      "Lihat gambaran alur penggunaan AIOTrade secara lebih cepat lewat video penjelasan singkat yang akan otomatis mulai saat section ini masuk ke layar.",
+    embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    eyebrow: "Lihat AIOTrade lebih dekat",
+    isVisible: true,
+    title: "Video Penjelasan Singkat",
+  },
   faq: {
     background: createDefaultSectionBackground("warm-ivory"),
     title: "F.A.Q",
@@ -168,6 +219,32 @@ export const defaultHomepageContent: HomepageContent = {
     buttonLabel: "Selengkapnya",
     steps: steps,
   },
+  testimonial: {
+    background: createDefaultSectionBackground("warm-ivory"),
+    eyebrow: "Apa kata mereka tentang AIOTrade?",
+    subtitle: "Pengalaman member yang sudah mencoba alur penggunaan, setup, dan pendampingan.",
+    title: "Testimoni",
+    items: [
+      {
+        name: "Member AIOTrade",
+        quote:
+          "Alur daftar, setup bot, dan materi panduannya terasa jauh lebih rapi. Saya jadi lebih cepat paham langkah yang harus diikuti dari awal.",
+        role: "Crypto Trader",
+      },
+      {
+        name: "User Komunitas",
+        quote:
+          "Yang paling membantu adalah panduan langkah awalnya jelas, lalu materi lanjutan juga enak dibuka ulang saat butuh review konfigurasi.",
+        role: "Member Baru",
+      },
+      {
+        name: "Pengguna Aktif",
+        quote:
+          "Dari sisi onboarding, AIOTrade terasa lebih siap. Saya bisa baca panduan publik dulu sebelum lanjut ke dashboard member.",
+        role: "Investor Spot",
+      },
+    ],
+  },
   blog: {
     background: createDefaultSectionBackground("warm-ivory"),
     title: "Blog - Crypto News",
@@ -176,6 +253,15 @@ export const defaultHomepageContent: HomepageContent = {
       description: article.description,
       label: article.label,
     })),
+  },
+  bannerAds: {
+    background: createDefaultSectionBackground("warm-ivory"),
+    buttonLabel: "Pesan Sekarang",
+    description: "Tampilkan banner kaos, merchandise, atau materi promo lain yang ingin diarahkan langsung ke WhatsApp admin.",
+    imageAlt: "Banner merchandise AIOTrade",
+    isVisible: true,
+    title: "Banner Promosi",
+    whatsappNumber: "",
   },
   footer: {
     background: createDefaultSectionBackground("dark-slate-cinematic"),
@@ -196,9 +282,12 @@ const homepageContentSchema = z.object({
   overview: overviewSchema,
   benefits: benefitsSchema,
   pricing: pricingSchema,
+  video: videoSectionSchema,
   faq: faqSchema,
   guide: guideSchema,
+  testimonial: testimonialSchema,
   blog: blogSchema,
+  bannerAds: bannerAdsSchema,
   footer: footerSchema,
 });
 
@@ -227,9 +316,12 @@ function toHomepageContent(record: {
   overview: unknown;
   benefits: unknown;
   pricing: unknown;
+  video: unknown;
   faq: unknown;
   guide: unknown;
+  testimonial: unknown;
   blog: unknown;
+  bannerAds: unknown;
   footer: unknown;
 } | null): HomepageContent {
   if (!record) {
@@ -246,9 +338,12 @@ function toHomepageContent(record: {
     overview: parseSectionWithBackground(overviewSchema, record.overview, defaultHomepageContent.overview),
     benefits: parseSectionWithBackground(benefitsSchema, record.benefits, defaultHomepageContent.benefits),
     pricing: parseSectionWithBackground(pricingSchema, record.pricing, defaultHomepageContent.pricing),
+    video: parseSectionWithBackground(videoSectionSchema, record.video, defaultHomepageContent.video),
     faq: parseSectionWithBackground(faqSchema, record.faq, defaultHomepageContent.faq),
     guide: parseSectionWithBackground(guideSchema, record.guide, defaultHomepageContent.guide),
+    testimonial: parseSectionWithBackground(testimonialSchema, record.testimonial, defaultHomepageContent.testimonial),
     blog: parseSectionWithBackground(blogSchema, record.blog, defaultHomepageContent.blog),
+    bannerAds: parseSectionWithBackground(bannerAdsSchema, record.bannerAds, defaultHomepageContent.bannerAds),
     footer: parseSectionWithBackground(footerSchema, record.footer, defaultHomepageContent.footer),
   };
 
@@ -270,9 +365,12 @@ async function getHomepageContentRaw() {
       overview: unknown;
       benefits: unknown;
       pricing: unknown;
+      video: unknown;
       faq: unknown;
       guide: unknown;
+      testimonial: unknown;
       blog: unknown;
+      bannerAds: unknown;
       footer: unknown;
     }>
   >`
@@ -281,9 +379,12 @@ async function getHomepageContentRaw() {
       "overview",
       "benefits",
       "pricing",
+      "video",
       "faq",
       "guide",
+      "testimonial",
       "blog",
+      "banner_ads" AS "bannerAds",
       "footer"
     FROM "public"."homepage_content"
     WHERE "id" = ${HOMEPAGE_CONTENT_ID}
@@ -311,9 +412,12 @@ export async function getHomepageContent() {
             overview: true,
             benefits: true,
             pricing: true,
+            video: true,
             faq: true,
             guide: true,
+            testimonial: true,
             blog: true,
+            bannerAds: true,
             footer: true,
           },
         })
@@ -354,9 +458,12 @@ export async function updateHomepageContentSection<
       "overview",
       "benefits",
       "pricing",
+      "video",
       "faq",
       "guide",
+      "testimonial",
       "blog",
+      "banner_ads",
       "footer"
     )
     VALUES (
@@ -365,9 +472,12 @@ export async function updateHomepageContentSection<
       CAST(${JSON.stringify(defaultHomepageContent.overview)} AS jsonb),
       CAST(${JSON.stringify(defaultHomepageContent.benefits)} AS jsonb),
       CAST(${JSON.stringify(defaultHomepageContent.pricing)} AS jsonb),
+      CAST(${JSON.stringify(defaultHomepageContent.video)} AS jsonb),
       CAST(${JSON.stringify(defaultHomepageContent.faq)} AS jsonb),
       CAST(${JSON.stringify(defaultHomepageContent.guide)} AS jsonb),
+      CAST(${JSON.stringify(defaultHomepageContent.testimonial)} AS jsonb),
       CAST(${JSON.stringify(defaultHomepageContent.blog)} AS jsonb),
+      CAST(${JSON.stringify(defaultHomepageContent.bannerAds)} AS jsonb),
       CAST(${JSON.stringify(defaultHomepageContent.footer)} AS jsonb)
     )
     ON CONFLICT ("id") DO NOTHING
@@ -402,6 +512,13 @@ export async function updateHomepageContentSection<
         WHERE "id" = ${HOMEPAGE_CONTENT_ID}
       `;
       break;
+    case "video":
+      await prisma.$executeRaw`
+        UPDATE "public"."homepage_content"
+        SET "video" = CAST(${JSON.stringify(parsedSection)} AS jsonb), "updated_at" = CURRENT_TIMESTAMP
+        WHERE "id" = ${HOMEPAGE_CONTENT_ID}
+      `;
+      break;
     case "faq":
       await prisma.$executeRaw`
         UPDATE "public"."homepage_content"
@@ -416,10 +533,24 @@ export async function updateHomepageContentSection<
         WHERE "id" = ${HOMEPAGE_CONTENT_ID}
       `;
       break;
+    case "testimonial":
+      await prisma.$executeRaw`
+        UPDATE "public"."homepage_content"
+        SET "testimonial" = CAST(${JSON.stringify(parsedSection)} AS jsonb), "updated_at" = CURRENT_TIMESTAMP
+        WHERE "id" = ${HOMEPAGE_CONTENT_ID}
+      `;
+      break;
     case "blog":
       await prisma.$executeRaw`
         UPDATE "public"."homepage_content"
         SET "blog" = CAST(${JSON.stringify(parsedSection)} AS jsonb), "updated_at" = CURRENT_TIMESTAMP
+        WHERE "id" = ${HOMEPAGE_CONTENT_ID}
+      `;
+      break;
+    case "bannerAds":
+      await prisma.$executeRaw`
+        UPDATE "public"."homepage_content"
+        SET "banner_ads" = CAST(${JSON.stringify(parsedSection)} AS jsonb), "updated_at" = CURRENT_TIMESTAMP
         WHERE "id" = ${HOMEPAGE_CONTENT_ID}
       `;
       break;

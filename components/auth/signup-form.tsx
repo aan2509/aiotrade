@@ -1,30 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   AlertCircle,
+  ArrowUpRight,
   AtSign,
   CheckCircle2,
   Circle,
+  Copy,
+  CreditCard,
+  Hash,
   KeyRound,
   LoaderCircle,
-  Link2,
   Mail,
   MessageCircleMore,
+  QrCode,
+  RefreshCw,
   ShieldCheck,
   UserRound,
+  Wallet,
 } from "lucide-react";
 import { signUpAction, type SignupActionState } from "@/app/(auth)/signup/actions";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { AuthFieldShell } from "@/components/auth/auth-field-shell";
 import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatIdrCurrency } from "@/lib/payment-gateway-config";
+import type { PublicSignupPaymentSettings } from "@/lib/payment-gateway-types";
+import type { SignupPaymentPublicState } from "@/lib/signup-payment-types";
 import { cn } from "@/lib/utils";
 import { getUsernameValidationMessage } from "@/lib/username-rules";
 
 type SignupFormProps = {
+  initialMemberId: string;
+  paymentSettings: PublicSignupPaymentSettings;
   referredBy: string | null;
 };
 
@@ -39,6 +51,16 @@ type UsernameAvailability =
       value: string;
       message: string;
     };
+
+type PaymentFlowState = {
+  fingerprint: string | null;
+  message: string | null;
+  payment: SignupPaymentPublicState | null;
+  referenceId: string | null;
+  status: "idle" | "creating" | "pending" | "paid" | "failed" | "error";
+};
+
+type PaymentInstructionKind = "qris" | "bank" | "link";
 
 const initialSignupState: SignupActionState = {
   status: "idle",
@@ -63,12 +85,72 @@ function ChecklistItem({
   );
 }
 
-export function SignupForm({ referredBy }: SignupFormProps) {
+function paymentChannelIcon(type: PublicSignupPaymentSettings["activeChannels"][number]["type"]) {
+  if (type === "ewallet") {
+    return Wallet;
+  }
+
+  if (type === "qris") {
+    return QrCode;
+  }
+
+  return CreditCard;
+}
+
+function paymentInstructionKind(
+  channelType: PublicSignupPaymentSettings["activeChannels"][number]["type"] | undefined,
+  payment: SignupPaymentPublicState | null,
+): PaymentInstructionKind {
+  if (channelType === "qris" || payment?.qrImageUrl || payment?.qrString) {
+    return "qris";
+  }
+
+  if (channelType === "va" || payment?.paymentNumber) {
+    return "bank";
+  }
+
+  return "link";
+}
+
+function subscribeHydration() {
+  return () => {};
+}
+
+function getClientHydrationSnapshot() {
+  return true;
+}
+
+function getServerHydrationSnapshot() {
+  return false;
+}
+
+export function SignupForm({ initialMemberId, paymentSettings, referredBy }: SignupFormProps) {
   const [state, formAction] = useActionState(signUpAction, initialSignupState);
   const fieldErrors = state?.fieldErrors ?? {};
+  const hasHydrated = useSyncExternalStore(
+    subscribeHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
   const [username, setUsername] = useState(state.formValues?.username ?? "");
+  const [email, setEmail] = useState(state.formValues?.email ?? "");
+  const [whatsapp, setWhatsapp] = useState(state.formValues?.whatsapp ?? "");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [selectedChannelCode, setSelectedChannelCode] = useState(
+    paymentSettings.defaultChannelCode ?? paymentSettings.activeChannels[0]?.code ?? "",
+  );
+  const [selectedPlanId, setSelectedPlanId] = useState(
+    paymentSettings.defaultPlanId ?? paymentSettings.plans[0]?.id ?? "",
+  );
+  const [paymentFlow, setPaymentFlow] = useState<PaymentFlowState>({
+    fingerprint: null,
+    message: null,
+    payment: null,
+    referenceId: null,
+    status: "idle",
+  });
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [usernameAvailability, setUsernameAvailability] = useState<UsernameAvailability>({
     status: "idle",
     value: "",
@@ -76,6 +158,8 @@ export function SignupForm({ referredBy }: SignupFormProps) {
   });
 
   const normalizedUsername = username.trim().toLowerCase();
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedWhatsapp = whatsapp.trim();
 
   const usernameLocalIssue = useMemo(() => {
     if (!normalizedUsername) {
@@ -243,9 +327,224 @@ export function SignupForm({ referredBy }: SignupFormProps) {
     usernameStatus.tone === "invalid" ||
     usernameStatus.tone === "taken" ||
     usernameStatus.tone === "checking";
+  const memberId = state.formValues?.memberId ?? initialMemberId;
+  const selectedPlan =
+    paymentSettings.plans.find((plan) => plan.id === selectedPlanId) ??
+    paymentSettings.plans.find((plan) => plan.id === paymentSettings.defaultPlanId) ??
+    paymentSettings.plans[0];
+  const paymentIdentity = useMemo(
+    () =>
+      JSON.stringify({
+        channel: selectedChannelCode,
+        email: normalizedEmail,
+        planId: selectedPlanId,
+        username: normalizedUsername,
+        whatsapp: normalizedWhatsapp,
+      }),
+    [normalizedEmail, normalizedUsername, normalizedWhatsapp, selectedChannelCode, selectedPlanId],
+  );
+  const isPaymentRequired = paymentSettings.isEnabled;
+  const canCreatePayment =
+    Boolean(normalizedUsername && normalizedEmail && normalizedWhatsapp && selectedChannelCode && selectedPlanId) &&
+    !isUsernameBlocked &&
+    paymentFlow.status !== "creating";
+  const isSignupLocked = isPaymentRequired && paymentFlow.status !== "paid";
+  const currentPaymentChannel =
+    paymentSettings.activeChannels.find(
+      (channel) => channel.code === (paymentFlow.payment?.channelCode ?? selectedChannelCode),
+    ) ?? null;
+  const currentInstructionKind = paymentInstructionKind(currentPaymentChannel?.type, paymentFlow.payment);
+
+  function clearPaymentFlow(message: string) {
+    if (!paymentFlow.referenceId) {
+      return;
+    }
+
+    setPaymentFlow({
+      fingerprint: null,
+      message,
+      payment: null,
+      referenceId: null,
+      status: "idle",
+    });
+  }
+
+  useEffect(() => {
+    if (paymentFlow.status !== "pending" || !paymentFlow.referenceId) {
+      return;
+    }
+
+    const intervalId = window.setInterval(async () => {
+      try {
+        const response = await fetch(
+          `/api/signup/payment/status?referenceId=${encodeURIComponent(paymentFlow.referenceId ?? "")}`,
+          {
+            cache: "no-store",
+          },
+        );
+        const payload = (await response.json()) as {
+          message?: string;
+          payment?: SignupPaymentPublicState;
+        };
+
+        if (!response.ok || !payload.payment) {
+          return;
+        }
+
+        const payment = payload.payment;
+
+        setPaymentFlow((current) => ({
+          fingerprint: current.fingerprint,
+          message:
+            payment.status === "paid"
+              ? "Pembayaran terverifikasi. Sekarang Anda bisa membuat akun."
+              : payment.message ?? current.message,
+          payment,
+          referenceId: payment.referenceId,
+          status: payment.status === "paid" ? "paid" : payment.status,
+        }));
+      } catch {
+        // Keep local pending state and let manual check handle messaging.
+      }
+    }, 6000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [paymentFlow.referenceId, paymentFlow.status]);
+
+  async function handleCreatePayment() {
+    setPaymentFlow({
+      fingerprint: paymentIdentity,
+      message: null,
+      payment: null,
+      referenceId: null,
+      status: "creating",
+    });
+
+    try {
+      const response = await fetch("/api/signup/payment/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          channelCode: selectedChannelCode,
+          email: normalizedEmail,
+          planId: selectedPlan?.id ?? selectedPlanId,
+          username: normalizedUsername,
+          whatsapp: normalizedWhatsapp,
+        }),
+      });
+
+      const payload = (await response.json()) as {
+        message?: string;
+        payment?: SignupPaymentPublicState;
+      };
+
+      if (!response.ok || !payload.payment) {
+        setPaymentFlow({
+          fingerprint: null,
+          message: payload.message ?? "Belum bisa membuat pembayaran sekarang.",
+          payment: null,
+          referenceId: null,
+          status: "error",
+        });
+
+        return;
+      }
+
+      setPaymentFlow({
+        fingerprint: paymentIdentity,
+        message:
+          payload.payment.status === "paid"
+            ? "Pembayaran langsung terverifikasi. Anda bisa lanjut membuat akun."
+            : "Pembayaran berhasil dibuat. Selesaikan pembayaran, lalu sistem akan memeriksa statusnya otomatis.",
+        payment: payload.payment,
+        referenceId: payload.payment.referenceId,
+        status: payload.payment.status,
+      });
+    } catch {
+      setPaymentFlow({
+        fingerprint: null,
+        message: "Belum bisa membuat pembayaran sekarang.",
+        payment: null,
+        referenceId: null,
+        status: "error",
+      });
+    }
+  }
+
+  async function handleCheckPaymentStatus() {
+    if (!paymentFlow.referenceId) {
+      return;
+    }
+
+    setPaymentFlow((current) => ({
+      ...current,
+      message: "Sedang memeriksa status pembayaran...",
+    }));
+
+    try {
+      const response = await fetch(
+        `/api/signup/payment/status?referenceId=${encodeURIComponent(paymentFlow.referenceId)}`,
+        {
+          cache: "no-store",
+        },
+      );
+      const payload = (await response.json()) as {
+        message?: string;
+        payment?: SignupPaymentPublicState;
+      };
+
+      if (!response.ok || !payload.payment) {
+        setPaymentFlow((current) => ({
+          ...current,
+          message: payload.message ?? "Belum bisa memeriksa status pembayaran.",
+          status: current.payment ? current.status : "error",
+        }));
+
+        return;
+      }
+
+      const payment = payload.payment;
+
+      setPaymentFlow((current) => ({
+        fingerprint: current.fingerprint,
+        message:
+          payment.status === "paid"
+            ? "Pembayaran terverifikasi. Sekarang Anda bisa membuat akun."
+            : payment.message ?? "Pembayaran masih menunggu penyelesaian.",
+        payment,
+        referenceId: payment.referenceId,
+        status: payment.status,
+      }));
+    } catch {
+      setPaymentFlow((current) => ({
+        ...current,
+        message: "Belum bisa memeriksa status pembayaran.",
+      }));
+    }
+  }
+
+  async function handleCopyPaymentValue(value: string, field: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(field);
+      window.setTimeout(() => setCopiedField((current) => (current === field ? null : current)), 1800);
+    } catch {
+      setPaymentFlow((current) => ({
+        ...current,
+        message: "Belum bisa menyalin data pembayaran dari browser ini.",
+      }));
+    }
+  }
 
   return (
     <form action={formAction} className="space-y-5">
+      <input name="memberId" type="hidden" value={memberId} />
+      <input name="paymentReferenceId" type="hidden" value={paymentFlow.referenceId ?? ""} />
+      <input name="selectedPlanId" type="hidden" value={selectedPlan?.id ?? ""} />
       <input name="referredBy" type="hidden" value={referredBy ?? ""} />
 
       {referredBy ? (
@@ -253,7 +552,7 @@ export function SignupForm({ referredBy }: SignupFormProps) {
           <UserRound className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
             <p className="font-medium text-sky-950">Undangan sudah tersimpan</p>
-            <p className="text-sm text-sky-700">Akun ini akan terhubung ke @{referredBy}.</p>
+            
           </div>
         </Alert>
       ) : null}
@@ -265,6 +564,20 @@ export function SignupForm({ referredBy }: SignupFormProps) {
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <p>{state.message}</p>
+        </Alert>
+      ) : null}
+
+      {paymentFlow.message ? (
+        <Alert
+          className="flex items-start gap-3"
+          variant={paymentFlow.status === "paid" ? "success" : paymentFlow.status === "error" ? "error" : "default"}
+        >
+          {paymentFlow.status === "paid" ? (
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          ) : (
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          )}
+          <p>{paymentFlow.message}</p>
         </Alert>
       ) : null}
 
@@ -281,7 +594,10 @@ export function SignupForm({ referredBy }: SignupFormProps) {
               className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
               id="username"
               name="username"
-              onChange={(event) => setUsername(event.target.value)}
+              onChange={(event) => {
+                clearPaymentFlow("Data form berubah. Buat ulang pembayaran agar datanya tetap sinkron.");
+                setUsername(event.target.value);
+              }}
               placeholder="yourname"
               required
               spellCheck={false}
@@ -331,12 +647,16 @@ export function SignupForm({ referredBy }: SignupFormProps) {
             <Input
               autoComplete="email"
               className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
-              defaultValue={state.formValues?.email ?? ""}
               id="email"
               name="email"
+              onChange={(event) => {
+                clearPaymentFlow("Data form berubah. Buat ulang pembayaran agar datanya tetap sinkron.");
+                setEmail(event.target.value);
+              }}
               placeholder="you@example.com"
               required
               type="email"
+              value={email}
             />
           </AuthFieldShell>
           {fieldErrors.email ? <p className="text-sm text-rose-600">{fieldErrors.email}</p> : null}
@@ -351,42 +671,36 @@ export function SignupForm({ referredBy }: SignupFormProps) {
             <Input
               autoComplete="tel"
               className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
-              defaultValue={state.formValues?.whatsapp ?? ""}
               id="whatsapp"
               name="whatsapp"
+              onChange={(event) => {
+                clearPaymentFlow("Data form berubah. Buat ulang pembayaran agar datanya tetap sinkron.");
+                setWhatsapp(event.target.value);
+              }}
               placeholder="+6281234567890"
               required
               type="tel"
+              value={whatsapp}
             />
           </AuthFieldShell>
           {fieldErrors.whatsapp ? <p className="text-sm text-rose-600">{fieldErrors.whatsapp}</p> : null}
         </div>
 
         <div className="space-y-2 sm:col-span-2">
-          <AuthFieldShell error={fieldErrors.referralLink}>
-            <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="referralLink">
-              <Link2 className="h-4 w-4 text-sky-500" />
-              Link Referral
+          <AuthFieldShell>
+            <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="memberId">
+              <Hash className="h-4 w-4 text-sky-500" />
+              Member ID
             </Label>
             <Input
-              autoCapitalize="none"
-              autoComplete="url"
               className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
-              defaultValue={state.formValues?.referralLink ?? ""}
-              id="referralLink"
-              name="referralLink"
-              placeholder="https://partner.com/ref/username"
-              required
-              spellCheck={false}
-              type="url"
+              id="memberId"
+              readOnly
+              type="text"
+              value={memberId}
             />
-            <p className="mt-2 text-xs text-slate-500">
-              Link ini akan dipakai untuk tombol Daftar Sekarang di landing page Anda.
-            </p>
+
           </AuthFieldShell>
-          {fieldErrors.referralLink ? (
-            <p className="text-sm text-rose-600">{fieldErrors.referralLink}</p>
-          ) : null}
         </div>
 
         <div className="space-y-2">
@@ -473,12 +787,306 @@ export function SignupForm({ referredBy }: SignupFormProps) {
         </div>
       </div>
 
+      {paymentSettings.isEnabled ? (
+        <div className="rounded-xl border border-sky-100 bg-[linear-gradient(180deg,rgba(240,249,255,0.96)_0%,rgba(248,250,252,0.98)_100%)] p-5 shadow-[0_18px_40px_rgba(14,165,233,0.08)]">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
+                <CreditCard className="h-3.5 w-3.5" />
+                Payment
+              </p>
+              <h3 className="mt-4 text-lg font-semibold text-slate-950">
+                {selectedPlan?.label ?? paymentSettings.priceLabel}
+              </h3>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {formatIdrCurrency(selectedPlan?.price ?? paymentSettings.registrationPrice)}
+              </p>
+              <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600">{paymentSettings.checkoutNote}</p>
+              
+            </div>
+            <span className="rounded-2xl bg-sky-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800">
+              {paymentSettings.provider}
+            </span>
+          </div>
+
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Pilih durasi langganan</p>
+            <div className="mt-3 grid gap-3">
+              {paymentSettings.plans.map((plan) => {
+                const selected = selectedPlan?.id === plan.id;
+                const isDefault = paymentSettings.defaultPlanId === plan.id;
+
+                return (
+                  <button
+                    className={cn(
+                      "flex items-start justify-between gap-3 rounded-2xl border px-4 py-4 text-left transition-colors",
+                      selected
+                        ? "border-sky-300 bg-sky-100 text-sky-950 shadow-[0_14px_28px_rgba(14,165,233,0.14)]"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-sky-200 hover:bg-sky-50/70",
+                    )}
+                    key={plan.id}
+                    onClick={() => {
+                      if (plan.id !== selectedPlanId) {
+                        clearPaymentFlow("Paket langganan diganti. Buat ulang pembayaran agar nominalnya sesuai.");
+                        setSelectedPlanId(plan.id);
+                      }
+                    }}
+                    type="button"
+                  >
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold">{plan.label}</span>
+                        {isDefault ? (
+                          <span className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-sky-700">
+                            Default
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-2 text-sm text-slate-600">{plan.description}</p>
+                      <p className="mt-3 text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+                        {plan.isLifetime ? "Lifetime" : `${plan.durationMonths} bulan`}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-base font-semibold text-slate-950">{formatIdrCurrency(plan.price)}</p>
+                      {selected ? <CheckCircle2 className="ml-auto mt-3 h-4 w-4 text-sky-700" /> : null}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Metode pembayaran</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {paymentSettings.activeChannels.map((channel) => {
+                const Icon = paymentChannelIcon(channel.type);
+                const active = paymentSettings.defaultChannelCode === channel.code;
+                const selected = selectedChannelCode === channel.code;
+
+                return (
+                  <button
+                    className={cn(
+                      "flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left text-sm font-medium transition-colors",
+                      selected
+                        ? "border-sky-300 bg-sky-100 text-sky-950 shadow-[0_14px_28px_rgba(14,165,233,0.14)]"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-sky-200 hover:bg-sky-50/70",
+                    )}
+                    key={channel.code}
+                    onClick={() => {
+                      if (channel.code !== selectedChannelCode) {
+                        clearPaymentFlow("Metode pembayaran diganti. Buat ulang pembayaran agar datanya tetap sinkron.");
+                        setSelectedChannelCode(channel.code);
+                      }
+                    }}
+                    type="button"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <span className="rounded-full bg-white/80 p-2 text-sky-700">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span className="space-y-1">
+                        <span className="block">{channel.name}</span>
+                        <span className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+                          {channel.type === "va"
+                            ? "Virtual Account"
+                            : channel.type === "qris"
+                              ? "QRIS"
+                              : "E-Wallet"}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-2">
+                      {active ? (
+                        <span className="rounded-full bg-white px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-sky-700">
+                          Default
+                        </span>
+                      ) : null}
+                      {selected ? <CheckCircle2 className="h-4 w-4 text-sky-700" /> : null}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-5 space-y-4">
+            <div className="rounded-2xl bg-white/60 p-1">
+              <div className="flex flex-col gap-3 rounded-2xl bg-white/80 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Langkah pembayaran</p>
+                <p className="mt-1 text-sm text-slate-600">
+                  Lengkapi form dan buat pembayaran.
+                </p>
+              </div>
+              <Button
+                className="h-11 w-full rounded-xl bg-sky-500 px-5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.22)] hover:bg-sky-600 sm:w-auto"
+                disabled={!hasHydrated || !canCreatePayment}
+                onClick={handleCreatePayment}
+                type="button"
+              >
+                {paymentFlow.status === "creating" ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CreditCard className="h-4 w-4" />
+                )}
+                {paymentFlow.referenceId ? "Buat ulang pembayaran" : "Buat pembayaran"}
+              </Button>
+            </div>
+            </div>
+
+            {paymentFlow.payment ? (
+              <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-[0_20px_44px_rgba(15,23,42,0.06)] sm:p-5">
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Status pembayaran</p>
+                    <p className="mt-2 text-lg font-semibold text-slate-950">
+                      {paymentFlow.status === "paid"
+                        ? "Sudah berhasil"
+                        : paymentFlow.status === "failed"
+                          ? "Perlu dibuat ulang"
+                          : "Menunggu pembayaran"}
+                    </p>
+                    <div className="mt-3 space-y-1 text-sm text-slate-600">
+                      <p>Reference: {paymentFlow.payment.referenceId}</p>
+                      <p>Paket: {paymentFlow.payment.planLabel ?? selectedPlan?.label ?? "-"}</p>
+                      <p>Channel: {paymentFlow.payment.paymentName ?? paymentFlow.payment.channelCode}</p>
+                      {paymentFlow.payment.paymentNumber ? <p>No. bayar: {paymentFlow.payment.paymentNumber}</p> : null}
+                      {paymentFlow.payment.expiresAt ? <p>Berlaku sampai: {paymentFlow.payment.expiresAt}</p> : null}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button className="w-full rounded-xl sm:w-auto" onClick={handleCheckPaymentStatus} type="button" variant="outline">
+                      <RefreshCw className="h-4 w-4" />
+                      Cek status
+                    </Button>
+                    
+                  </div>
+                </div>
+
+                <div className="mt-5 border-t border-slate-200 pt-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    Instruksi pembayaran
+                  </p>
+
+                  {currentInstructionKind === "qris" ? (
+                    <div className="mt-4 space-y-4">
+                      <div className="mx-auto w-full max-w-[280px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                        {paymentFlow.payment.qrImageUrl ? (
+                          <img
+                            alt="QRIS pembayaran signup"
+                            className="aspect-square w-full rounded-xl bg-white object-contain"
+                            src={paymentFlow.payment.qrImageUrl}
+                          />
+                        ) : (
+                          <div className="flex aspect-square items-center justify-center rounded-xl bg-slate-100 p-6 text-center text-sm text-slate-500">
+                            QR sedang disiapkan.
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="rounded-2xl bg-slate-50 p-4">
+                        <div>
+                          <p className="text-sm font-semibold text-slate-950">Bayar langsung</p>
+                          <p className="mt-1 text-sm leading-6 text-slate-600">
+                            Scan QRIS menggunakan mobile banking atau e-wallet yang mendukung QRIS. Setelah pembayaran sukses, status akan diperiksa otomatis.
+                          </p>
+                        </div>
+                      </div>
+
+                      
+
+                      
+                    </div>
+                  ) : null}
+
+                  {currentInstructionKind === "bank" ? (
+                    <div className="mt-4 space-y-4">
+                      <div className="rounded-2xl bg-[linear-gradient(180deg,rgba(248,250,252,1)_0%,rgba(241,245,249,0.95)_100%)] p-4">
+                        <p className="text-sm font-medium text-slate-700">Nomor pembayaran</p>
+                        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="min-w-0">
+                            <p className="break-all text-xl font-semibold tracking-[0.06em] text-slate-950">
+                              {paymentFlow.payment.paymentNumber ?? "-"}
+                            </p>
+                            <p className="mt-1 text-sm text-slate-500">
+                              Transfer tepat sesuai nominal ke{" "}
+                              {paymentFlow.payment.paymentName ?? currentPaymentChannel?.name ?? "virtual account"}.
+                            </p>
+                          </div>
+                          {paymentFlow.payment.paymentNumber ? (
+                            <Button
+                              className="w-full rounded-xl sm:w-auto"
+                              onClick={() =>
+                                handleCopyPaymentValue(
+                                  paymentFlow.payment?.paymentNumber ?? "",
+                                  "payment-number",
+                                )
+                              }
+                              type="button"
+                              variant="outline"
+                            >
+                              <Copy className="h-4 w-4" />
+                              {copiedField === "payment-number" ? "Tersalin" : "Salin nomor"}
+                            </Button>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-2xl bg-slate-50 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            Nominal
+                          </p>
+                          <p className="mt-2 text-lg font-semibold text-slate-950">
+                            {formatIdrCurrency(paymentFlow.payment.amount)}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl bg-slate-50 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            Metode
+                          </p>
+                          <p className="mt-2 text-lg font-semibold text-slate-950">
+                            {paymentFlow.payment.paymentName ?? currentPaymentChannel?.name ?? "Virtual Account"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {currentInstructionKind === "link" ? (
+                    <div className="mt-4 rounded-2xl bg-slate-50 p-4">
+                      <p className="text-sm leading-6 text-slate-600">
+                        Metode ini perlu dibuka melalui halaman payment provider. Gunakan tombol di bawah untuk menyelesaikan pembayaran.
+                      </p>
+                      {paymentFlow.payment.paymentUrl ? (
+                        <a
+                          className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-semibold text-white transition-colors hover:bg-slate-800 sm:w-auto"
+                          href={paymentFlow.payment.paymentUrl}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          <ArrowUpRight className="h-4 w-4" />
+                          Buka pembayaran
+                        </a>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       <SubmitButton
         className="h-12 w-full rounded-lg bg-sky-500 text-base font-semibold text-white shadow-[0_16px_30px_rgba(14,165,233,0.22)] hover:bg-sky-600"
-        disabled={isUsernameBlocked}
+        disabled={isUsernameBlocked || isSignupLocked}
         pendingText="Sedang membuat akun..."
       >
-        Buat akun
+        {isSignupLocked ? "Selesaikan pembayaran dulu" : "Buat akun"}
       </SubmitButton>
 
       <p className="text-center text-sm text-slate-600">

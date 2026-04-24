@@ -10,11 +10,11 @@ export const memberTextPrimaryClass = "text-[var(--member-text-primary)]";
 export const memberTextSecondaryClass = "text-[var(--member-text-secondary)]";
 export const memberTextMutedClass = "text-[var(--member-text-muted)]";
 export const memberIconSurfaceClass =
-  "inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--member-icon-surface)] text-[var(--member-icon-foreground)]";
+  "member-icon-surface inline-flex h-12 w-12 items-center justify-center rounded-2xl";
 export const memberSoftButtonClass =
-  "inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-[var(--member-row-border)] bg-[var(--member-soft-button-bg)] px-5 text-sm font-medium text-[var(--member-text-primary)] shadow-[var(--member-soft-button-shadow)] transition hover:bg-[var(--member-soft-button-hover-bg)] hover:shadow-[var(--member-soft-button-hover-shadow)]";
+  "member-soft-button inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-medium text-[var(--member-text-primary)] transition duration-300 hover:-translate-y-0.5";
 export const memberSolidButtonClass =
-  "rounded-2xl bg-[var(--member-solid-button-bg)] text-[var(--member-solid-button-text)] shadow-[var(--member-solid-button-shadow)] hover:bg-[var(--member-solid-button-hover-bg)]";
+  "member-solid-button inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-semibold transition duration-300 hover:-translate-y-0.5";
 
 type MemberPageHeaderProps = {
   badge: string;

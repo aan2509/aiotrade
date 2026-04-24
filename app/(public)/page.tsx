@@ -39,6 +39,7 @@ export default async function HomePage() {
       ctaHref={referralState.ctaHref}
       signupCtaExternal={referralState.signupExternal}
       signupCtaHref={referralState.signupHref}
+      whatsappHref={referralState.whatsappHref}
     />
   );
 }

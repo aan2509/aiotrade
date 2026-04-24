@@ -49,14 +49,14 @@ export function PricingSection({ content, ctaExternal = false, ctaHref }: Pricin
             >
               <Card
                 className={cn(
-                  "relative overflow-hidden rounded-[24px] border px-0 py-0 text-center shadow-[0_24px_50px_rgba(15,23,42,0.12)] transition duration-300",
+                  "landing-glass-card landing-glass-card-hover relative overflow-hidden rounded-[30px] px-0 py-0 text-center transition duration-300",
                   plan.emphasis
-                    ? "border-[#ece7dc] bg-[linear-gradient(180deg,#ffffff_0%,#fbfaf7_100%)] lg:shadow-[0_30px_70px_rgba(15,23,42,0.18)]"
-                    : "border-[#e6e1d6] bg-[linear-gradient(180deg,#ffffff_0%,#f9f8f4_100%)]",
+                    ? "lg:shadow-[0_34px_74px_rgba(148,163,184,0.22),0_14px_34px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.94)]"
+                    : undefined,
                 )}
               >
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(27,116,223,0.06)_0%,rgba(27,116,223,0)_100%)]" />
-                <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(27,116,223,0.28)_50%,rgba(255,255,255,0)_100%)]" />
+                <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.82)_50%,rgba(255,255,255,0)_100%)]" />
 
                 {plan.highlight ? (
                   <span className="absolute right-6 top-5 inline-flex rounded-full bg-[#ffcc45] px-4 py-2 text-sm font-bold uppercase text-[#1f2937]">
@@ -106,7 +106,7 @@ export function PricingSection({ content, ctaExternal = false, ctaHref }: Pricin
                     <LandingCtaButton
                       className={cn(
                         "min-w-[212px]",
-                        plan.emphasis && "shadow-[0_14px_30px_rgba(0,0,0,0.12)]",
+                        plan.emphasis && "landing-glass-button-accent text-white",
                       )}
                       external={ctaExternal}
                       href={ctaHref}

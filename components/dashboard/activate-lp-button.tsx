@@ -31,7 +31,7 @@ export function ActivateLandingPageButton() {
   return (
     <form action={formAction} className="space-y-3">
       <SubmitButton
-        className={memberSolidButtonClass}
+        className={`min-w-[250px] ${memberSolidButtonClass}`}
         pendingText="Activating..."
       >
         Activate My Landing Page

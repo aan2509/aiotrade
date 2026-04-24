@@ -69,7 +69,7 @@ export function OverviewSection({
         <motion.div
           animate={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
           className="relative flex min-h-[250px] items-center justify-center pb-2 lg:min-h-[600px] lg:justify-start lg:pb-0"
-          initial={prefersReducedMotion ? false : { opacity: 0, x: -36 }}
+          initial={prefersReducedMotion ? false : { opacity: 1, x: -20 }}
           style={{ y: phoneY }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
@@ -116,23 +116,23 @@ export function OverviewSection({
         <motion.div
           animate={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
           className="relative z-10 mx-auto flex w-full max-w-[24rem] flex-col items-center text-center lg:max-w-none lg:items-start lg:pl-3 lg:text-left"
-          initial={prefersReducedMotion ? false : { opacity: 0, x: 36 }}
+          initial={prefersReducedMotion ? false : { opacity: 1, x: 18 }}
           style={{ y: contentY }}
           transition={{ duration: 0.8, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Reveal className="w-full" delay={0.02}>
+          <Reveal className="w-full" delay={0.02} stable>
             <h2 className="text-[2.2rem] font-medium uppercase leading-none tracking-[0.03em] text-white sm:text-[3.05rem] sm:tracking-[0.055em] lg:text-[3.85rem]">
               <span className="text-[#10a7ff]">{content.titleBlue}</span>
               {content.titleWhite}
             </h2>
           </Reveal>
-          <Reveal className="w-full" delay={0.08}>
+          <Reveal className="w-full" delay={0.08} stable>
             <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-[1.9] text-white/78 sm:mt-7 sm:max-w-[44rem] sm:text-[1.08rem] sm:leading-[2.05] lg:text-[1.12rem]">
               {content.description}
             </p>
           </Reveal>
 
-          <Reveal className="relative mt-8 w-full max-w-[24rem] overflow-hidden sm:mt-10 lg:max-w-none" delay={0.14}>
+          <Reveal className="relative mt-8 w-full max-w-[24rem] overflow-hidden sm:mt-10 lg:max-w-none" delay={0.14} stable>
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-[linear-gradient(90deg,#0f1728_0%,rgba(15,23,40,0)_100%)] sm:w-16" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-[linear-gradient(270deg,#124a8b_0%,rgba(18,74,139,0)_100%)] sm:w-16" />
             <motion.div
@@ -166,6 +166,7 @@ export function OverviewSection({
           <Reveal
             className="mt-8 flex w-full justify-center sm:mt-10 lg:justify-start"
             delay={0.18}
+            stable
           >
             <LandingCtaButton
               className="w-full max-w-[220px] sm:min-w-[304px] sm:max-w-none sm:w-auto"

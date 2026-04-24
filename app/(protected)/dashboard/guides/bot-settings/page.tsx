@@ -8,10 +8,10 @@ export default async function DashboardGuideBotSettingsPage() {
   return (
     <MemberVideoGuideSection
       badge="Panduan"
-      description="Materi ini fokus ke pengaturan bot, konfigurasi parameter, dan penyesuaian yang relevan untuk penggunaan harian."
-      emptyMessage="Belum ada video panduan pengaturan bot yang dipublish."
+      description="Materi ini fokus ke strategi, pengembangan penggunaan bot, dan penyesuaian yang relevan untuk pemakaian lanjutan."
+      emptyMessage="Belum ada video materi lanjutan yang dipublish."
       guides={guides}
-      title="Pengaturan bot"
+      title="Materi Lanjutan"
     />
   );
 }

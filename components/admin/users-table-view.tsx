@@ -4,6 +4,7 @@ import { DeleteUserButton } from "@/components/admin/delete-user-button";
 import { Alert } from "@/components/ui/alert";
 import type { AdminUserRow } from "@/lib/admin-users";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { extractMemberIdFromReferralLink } from "@/lib/member-id";
 
 type UsersTableViewProps = {
   currentAdminId: string;
@@ -93,7 +94,7 @@ export function UsersTableView({ currentAdminId, status, users }: UsersTableView
                   <th className="px-3 py-3">Username</th>
                   <th className="px-3 py-3">Email</th>
                   <th className="px-3 py-3">WhatsApp</th>
-                  <th className="px-3 py-3">Link Referral</th>
+                  <th className="px-3 py-3">Member ID</th>
                   <th className="px-3 py-3">Referral</th>
                   <th className="px-3 py-3">Landing Page</th>
                   <th className="px-3 py-3">Admin</th>
@@ -101,23 +102,27 @@ export function UsersTableView({ currentAdminId, status, users }: UsersTableView
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200">
-                {users.map((user) => (
+                {users.map((user) => {
+                  const memberId = extractMemberIdFromReferralLink(user.referralLink);
+
+                  return (
                   <tr className="align-top text-stone-700" key={user.id}>
                     <td className="px-3 py-4 font-semibold text-stone-950">@{user.username}</td>
                     <td className="px-3 py-4">{user.email ?? "-"}</td>
                     <td className="px-3 py-4">{user.whatsapp ?? "-"}</td>
                     <td className="px-3 py-4">
-                      {user.referralLink ? (
-                        <Link
-                          className="break-all text-sky-700 underline decoration-sky-300 underline-offset-4"
-                          href={user.referralLink}
-                          target="_blank"
-                        >
-                          {user.referralLink}
-                        </Link>
-                      ) : (
-                        "-"
-                      )}
+                      <div className="space-y-1">
+                        <p className="font-mono text-sm font-semibold text-stone-950">{memberId ?? "-"}</p>
+                        {user.referralLink ? (
+                          <Link
+                            className="break-all text-xs text-sky-700 underline decoration-sky-300 underline-offset-4"
+                            href={user.referralLink}
+                            target="_blank"
+                          >
+                            Buka link referral
+                          </Link>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-3 py-4 font-semibold text-stone-950">{user.referralCount}</td>
                     <td className="px-3 py-4">
@@ -145,7 +150,7 @@ export function UsersTableView({ currentAdminId, status, users }: UsersTableView
                       )}
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>

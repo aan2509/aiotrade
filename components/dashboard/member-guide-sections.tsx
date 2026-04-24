@@ -91,17 +91,18 @@ export function MemberVideoGuideSection({
                     <button
                       className={`w-full rounded-[24px] px-4 py-4 text-left transition duration-300 ${
                         active
-                          ? "bg-[var(--member-sidebar-active-bg)] text-[var(--member-sidebar-active-text)] shadow-[var(--member-sidebar-active-shadow)]"
-                          : "border border-[var(--member-row-border)] bg-[var(--member-row-bg)] text-[var(--member-text-primary)] shadow-[var(--member-row-shadow)] hover:bg-[var(--member-row-hover-bg)]"
+                          ? "text-[var(--member-sidebar-active-text)]"
+                          : "member-row-surface text-[var(--member-text-primary)]"
                       }`}
                       key={guide.id}
                       onClick={() => setSelectedVideoId(guide.id)}
+                      style={active ? { background: "var(--member-sidebar-active-bg)", boxShadow: "var(--member-sidebar-active-shadow)" } : undefined}
                       type="button"
                     >
                       <div className="flex items-start gap-3">
                         <span
                           className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
-                            active ? "bg-white/10" : "bg-[var(--member-icon-surface)]"
+                            active ? "bg-white/18 text-[var(--member-sidebar-active-text)]" : "member-icon-surface"
                           }`}
                         >
                           <PlayCircle className="h-5 w-5" />

@@ -4,6 +4,8 @@ import { ShieldCheck } from "lucide-react";
 import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { SignupForm } from "@/components/auth/signup-form";
 import { getCurrentProfile } from "@/lib/auth";
+import { generateMemberId } from "@/lib/member-id";
+import { getPublicSignupPaymentSettings } from "@/lib/payment-gateway-settings";
 import {
   getActiveReferralOwner,
   LANDING_REFERRAL_COOKIE_NAME,
@@ -15,7 +17,10 @@ type SignupPageProps = {
 };
 
 export default async function SignupPage({ searchParams }: SignupPageProps) {
-  const profile = await getCurrentProfile();
+  const [profile, paymentSettings] = await Promise.all([
+    getCurrentProfile(),
+    getPublicSignupPaymentSettings(),
+  ]);
 
   if (profile) {
     redirect("/dashboard");
@@ -38,6 +43,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
   }
 
   const referredBy = referralOwner.username;
+  const initialMemberId = generateMemberId();
 
   return (
     <AuthPageShell
@@ -52,7 +58,11 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
       sideTitle="Buat akun baru dengan langkah yang terasa ringan."
       title="Buat akun Anda"
     >
-      <SignupForm referredBy={referredBy} />
+      <SignupForm
+        initialMemberId={initialMemberId}
+        paymentSettings={paymentSettings}
+        referredBy={referredBy}
+      />
     </AuthPageShell>
   );
 }

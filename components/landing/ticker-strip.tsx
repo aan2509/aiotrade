@@ -116,7 +116,7 @@ export function TickerStrip({ className, previewMode = false }: TickerStripProps
                 )}
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold tracking-[0.05em] text-white sm:text-sm sm:tracking-[0.08em]">{item.symbol}</p>
-                  {item.rank ? <p className="text-[0.68rem] text-white/42">CMC #{item.rank}</p> : null}
+                  
                 </div>
               </div>
               <span className={cn("text-xs sm:text-sm", item.positive ? "text-[#34d399]" : "text-[#f87171]")}>

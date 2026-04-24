@@ -23,27 +23,27 @@ export function FaqSection({ content }: FaqSectionProps) {
         fallbackPreset="warm-ivory"
       />
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-        <Reveal className="overflow-hidden rounded-[28px] border border-[#e7dfd0] bg-white shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
-          <div className="bg-[#121a2d] px-6 py-8 text-center text-white sm:px-10 sm:py-10">
+        <Reveal className="landing-glass-panel overflow-hidden rounded-[30px]">
+          <div className="bg-[linear-gradient(180deg,rgba(255,255,255,0.54)_0%,rgba(255,255,255,0.18)_100%)] px-6 py-8 text-center sm:px-10 sm:py-10">
             <p className="text-[2.9rem] font-bold tracking-[0.04em] text-[#f7c85f] sm:text-[4rem]">
               {content.title}
             </p>
-            <p className="mt-2 text-lg text-white/80 sm:text-[1.05rem]">
+            <p className="mt-2 text-lg text-[#52627b] sm:text-[1.05rem]">
               {content.subtitle}
             </p>
           </div>
 
-          <div className="bg-white">
+          <div className="bg-transparent">
             {content.items.map((entry, index) => (
               <Reveal delay={index * 0.04} direction="right" distance={28} duration={1.02} key={entry.question}>
-                <div className="border-b border-[#ece7dd] last:border-b-0">
+                <div className="border-b border-white/60 last:border-b-0">
                   <button
                     aria-controls={`faq-panel-${index}`}
                     aria-expanded={openIndex === index}
                     className={`flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[1.05rem] font-medium transition duration-300 sm:px-7 sm:text-[1.15rem] ${
                       openIndex === index
-                        ? "bg-[#121a2d] text-[#f6c85d]"
-                        : "text-[#1f2937] hover:bg-[#fbfaf7]"
+                        ? "bg-[linear-gradient(135deg,#e3f4fd_0%,rgba(227,244,253,0.86)_100%)] text-[#0f3f67]"
+                        : "text-[#1f2937] hover:bg-white/42"
                     }`}
                     onClick={() => setOpenIndex((current) => (current === index ? -1 : index))}
                     type="button"
@@ -52,7 +52,7 @@ export function FaqSection({ content }: FaqSectionProps) {
                     <motion.span
                       animate={{ rotate: openIndex === index ? 180 : 0 }}
                       className={`inline-flex h-8 w-8 shrink-0 items-center justify-center ${
-                        openIndex === index ? "text-[#f6c85d]" : "text-[#1f2937]"
+                        openIndex === index ? "text-[#0f3f67]" : "text-[#1f2937]"
                       }`}
                       transition={{ duration: 0.22 }}
                     >
@@ -70,7 +70,7 @@ export function FaqSection({ content }: FaqSectionProps) {
                         initial={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                       >
-                        <div className="bg-[#fbfaf7] px-6 pb-5 pt-4 text-[0.98rem] leading-8 text-[#5b6474] sm:px-7">
+                        <div className="bg-white/34 px-6 pb-5 pt-4 text-[0.98rem] leading-8 text-[#5b6474] backdrop-blur-sm sm:px-7">
                           {entry.answer}
                         </div>
                       </motion.div>

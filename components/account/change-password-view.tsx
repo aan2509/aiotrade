@@ -56,7 +56,7 @@ function PasswordField({
       </Label>
       <Input
         autoComplete={autoComplete}
-        className={`border-[var(--member-row-border)] bg-[var(--member-soft-button-bg)] text-[var(--member-text-primary)] placeholder:text-[var(--member-text-muted)] ${error ? "border-rose-300 focus-visible:ring-rose-400/30" : ""}`}
+        className={`member-row-surface text-[var(--member-text-primary)] placeholder:text-[var(--member-text-muted)] ${error ? "border-rose-300 focus-visible:ring-rose-400/30" : ""}`}
         id={id}
         name={name}
         placeholder={placeholder}

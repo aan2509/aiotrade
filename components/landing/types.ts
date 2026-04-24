@@ -11,6 +11,7 @@ export type LandingPageUIProps = {
   previewMode?: boolean;
   signupCtaExternal?: boolean;
   signupCtaHref?: string;
+  whatsappHref?: string | null;
 };
 
 export type BackgroundPaletteKey =
@@ -141,6 +142,15 @@ export type PricingContent = {
   plans: PricingPlanContent[];
 };
 
+export type VideoSectionContent = {
+  background: SectionBackgroundConfig;
+  description: string;
+  embedUrl: string;
+  eyebrow: string;
+  isVisible: boolean;
+  title: string;
+};
+
 export type FaqContent = {
   background: SectionBackgroundConfig;
   title: string;
@@ -183,6 +193,35 @@ export type BlogContent = {
   items: BlogArticleContent[];
 };
 
+export type BannerAdsContent = {
+  background: SectionBackgroundConfig;
+  buttonLabel: string;
+  description: string;
+  imageAssetId?: string;
+  imageAlt?: string;
+  imageUrl?: string;
+  isVisible: boolean;
+  title: string;
+  whatsappNumber?: string;
+};
+
+export type TestimonialItemContent = {
+  imageAssetId?: string;
+  imageAlt?: string;
+  imageUrl?: string;
+  name: string;
+  quote: string;
+  role: string;
+};
+
+export type TestimonialContent = {
+  background: SectionBackgroundConfig;
+  eyebrow: string;
+  subtitle: string;
+  title: string;
+  items: TestimonialItemContent[];
+};
+
 export type FooterLink = {
   label: string;
   href: string;
@@ -212,8 +251,11 @@ export type HomepageContent = {
   overview: OverviewContent;
   benefits: BenefitsContent;
   pricing: PricingContent;
+  video: VideoSectionContent;
   faq: FaqContent;
   guide: GuideContent;
+  testimonial: TestimonialContent;
   blog: BlogContent;
+  bannerAds: BannerAdsContent;
   footer: FooterContent;
 };

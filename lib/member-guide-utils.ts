@@ -67,6 +67,46 @@ export function normalizeMemberGuideVideoUrl(value: string | null | undefined) {
   return null;
 }
 
+export function buildAutoplayEmbedUrl(value: string | null | undefined, autoplay: boolean) {
+  const normalized = normalizeMemberGuideVideoUrl(value);
+
+  if (!normalized) {
+    return null;
+  }
+
+  try {
+    const url = new URL(normalized);
+    url.searchParams.set("playsinline", "1");
+
+    if (url.hostname.includes("youtube")) {
+      url.searchParams.set("rel", "0");
+      url.searchParams.set("modestbranding", "1");
+      url.searchParams.set("enablejsapi", "1");
+      if (autoplay) {
+        url.searchParams.set("autoplay", "1");
+        url.searchParams.set("mute", "1");
+      } else {
+        url.searchParams.delete("autoplay");
+        url.searchParams.delete("mute");
+      }
+    }
+
+    if (url.hostname.includes("vimeo")) {
+      if (autoplay) {
+        url.searchParams.set("autoplay", "1");
+        url.searchParams.set("muted", "1");
+      } else {
+        url.searchParams.delete("autoplay");
+        url.searchParams.delete("muted");
+      }
+    }
+
+    return url.toString();
+  } catch {
+    return normalized;
+  }
+}
+
 export function normalizeMemberGuideFileUrl(value: string | null | undefined) {
   const url = normalizeUrl(value);
 

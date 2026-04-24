@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default async function DashboardGuidesPage() {
-  redirect("/dashboard/guides/activation");
+  redirect("/dashboard/guides/start");
 }

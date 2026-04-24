@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { sectionBackgroundSchema } from "@/lib/homepage-backgrounds";
+import { normalizeMemberGuideVideoUrl } from "@/lib/member-guide-utils";
 import { requireAdminProfile } from "@/lib/auth";
 import { updateHomepageContentSection } from "@/lib/homepage-content";
 
@@ -85,6 +86,23 @@ const pricingSchema = z.object({
   ),
 });
 
+const videoSectionSchema = z.object({
+  background: sectionBackgroundSchema,
+  description: z.string().min(1),
+  embedUrl: z.string().min(1),
+  eyebrow: z.string().min(1),
+  isVisible: z.boolean(),
+  title: z.string().min(1),
+}).superRefine((value, ctx) => {
+  if (!normalizeMemberGuideVideoUrl(value.embedUrl)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Link video belum valid untuk di-embed.",
+      path: ["embedUrl"],
+    });
+  }
+});
+
 const faqSchema = z.object({
   background: sectionBackgroundSchema,
   title: z.string().min(1),
@@ -111,6 +129,23 @@ const guideSchema = z.object({
   ),
 });
 
+const testimonialSchema = z.object({
+  background: sectionBackgroundSchema,
+  eyebrow: z.string().min(1),
+  subtitle: z.string().min(1),
+  title: z.string().min(1),
+  items: z.array(
+    z.object({
+      imageAssetId: z.string().optional(),
+      imageAlt: z.string().optional(),
+      imageUrl: z.string().optional(),
+      name: z.string().min(1),
+      quote: z.string().min(1),
+      role: z.string().min(1),
+    }),
+  ).min(1),
+});
+
 const blogSchema = z.object({
   background: sectionBackgroundSchema,
   title: z.string().min(1),
@@ -121,6 +156,18 @@ const blogSchema = z.object({
       label: z.string().min(1),
     }),
   ),
+});
+
+const bannerAdsSchema = z.object({
+  background: sectionBackgroundSchema,
+  buttonLabel: z.string().min(1),
+  description: z.string().min(1),
+  imageAssetId: z.string().optional(),
+  imageAlt: z.string().optional(),
+  imageUrl: z.string().optional(),
+  isVisible: z.boolean(),
+  title: z.string().min(1),
+  whatsappNumber: z.string().optional(),
 });
 
 const footerSchema = z.object({
@@ -222,6 +269,29 @@ export async function updatePricingSectionAction(formData: FormData) {
   redirectToSection("pricing", "saved");
 }
 
+export async function updateVideoSectionAction(formData: FormData) {
+  await requireAdminProfile();
+
+  const parsed = videoSectionSchema.safeParse({
+    background: readBackground(formData),
+    description: readString(formData, "description"),
+    embedUrl: readString(formData, "embedUrl"),
+    eyebrow: readString(formData, "eyebrow"),
+    isVisible: readString(formData, "isVisible") === "true",
+    title: readString(formData, "title"),
+  });
+
+  if (!parsed.success) {
+    redirectToSection("video", "error");
+  }
+
+  await updateHomepageContentSection("video", {
+    ...parsed.data,
+    embedUrl: normalizeMemberGuideVideoUrl(parsed.data.embedUrl) ?? parsed.data.embedUrl,
+  });
+  redirectToSection("video", "saved");
+}
+
 export async function updateFaqSectionAction(formData: FormData) {
   await requireAdminProfile();
   const itemCount = readCount(formData, "itemCount");
@@ -268,6 +338,33 @@ export async function updateGuideSectionAction(formData: FormData) {
   redirectToSection("guide", "saved");
 }
 
+export async function updateTestimonialSectionAction(formData: FormData) {
+  await requireAdminProfile();
+  const itemCount = readCount(formData, "itemCount");
+
+  const parsed = testimonialSchema.safeParse({
+    background: readBackground(formData),
+    eyebrow: readString(formData, "eyebrow"),
+    subtitle: readString(formData, "subtitle"),
+    title: readString(formData, "title"),
+    items: Array.from({ length: itemCount }, (_, index) => ({
+      imageAssetId: readString(formData, `item-${index}-imageAssetId`) || undefined,
+      imageAlt: readString(formData, `item-${index}-imageAlt`) || undefined,
+      imageUrl: readString(formData, `item-${index}-imageUrl`) || undefined,
+      name: readString(formData, `item-${index}-name`),
+      quote: readString(formData, `item-${index}-quote`),
+      role: readString(formData, `item-${index}-role`),
+    })),
+  });
+
+  if (!parsed.success) {
+    redirectToSection("testimonial", "error");
+  }
+
+  await updateHomepageContentSection("testimonial", parsed.data);
+  redirectToSection("testimonial", "saved");
+}
+
 export async function updateBlogSectionAction(formData: FormData) {
   await requireAdminProfile();
   const itemCount = readCount(formData, "itemCount");
@@ -288,6 +385,29 @@ export async function updateBlogSectionAction(formData: FormData) {
 
   await updateHomepageContentSection("blog", parsed.data);
   redirectToSection("blog", "saved");
+}
+
+export async function updateBannerAdsSectionAction(formData: FormData) {
+  await requireAdminProfile();
+
+  const parsed = bannerAdsSchema.safeParse({
+    background: readBackground(formData),
+    buttonLabel: readString(formData, "buttonLabel"),
+    description: readString(formData, "description"),
+    imageAssetId: readString(formData, "imageAssetId") || undefined,
+    imageAlt: readString(formData, "imageAlt") || undefined,
+    imageUrl: readString(formData, "imageUrl") || undefined,
+    isVisible: readString(formData, "isVisible") === "true",
+    title: readString(formData, "title"),
+    whatsappNumber: readString(formData, "whatsappNumber") || undefined,
+  });
+
+  if (!parsed.success) {
+    redirectToSection("bannerAds", "error");
+  }
+
+  await updateHomepageContentSection("bannerAds", parsed.data);
+  redirectToSection("bannerAds", "saved");
 }
 
 export async function updateFooterSectionAction(formData: FormData) {

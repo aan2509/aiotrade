@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 
 const DEFAULT_CLOUDINARY_FOLDER = "aiotrade/homepage";
 const DEFAULT_MEMBER_GUIDE_FOLDER = "aiotrade/member-guides";
+const DEFAULT_PUBLIC_GUIDE_FOLDER = "aiotrade/public-guides";
 
 export function getCloudinaryConfig() {
   return {
@@ -13,6 +14,8 @@ export function getCloudinaryConfig() {
     folder: process.env.CLOUDINARY_HOMEPAGE_FOLDER ?? DEFAULT_CLOUDINARY_FOLDER,
     memberGuideFolder:
       process.env.CLOUDINARY_MEMBER_GUIDE_FOLDER ?? DEFAULT_MEMBER_GUIDE_FOLDER,
+    publicGuideFolder:
+      process.env.CLOUDINARY_PUBLIC_GUIDE_FOLDER ?? DEFAULT_PUBLIC_GUIDE_FOLDER,
   };
 }
 

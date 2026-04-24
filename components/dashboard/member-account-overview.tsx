@@ -1,5 +1,6 @@
 import { Link2, Mail, MessageCircle, UserRound, Users } from "lucide-react";
 import { requireCurrentProfile } from "@/lib/auth";
+import { extractMemberIdFromReferralLink } from "@/lib/member-id";
 import {
   memberGlassPanelClass,
   memberGlassRowClass,
@@ -13,6 +14,8 @@ import {
 type CurrentProfile = Awaited<ReturnType<typeof requireCurrentProfile>>;
 
 export function MemberAccountOverview({ profile }: { profile: CurrentProfile }) {
+  const memberId = extractMemberIdFromReferralLink(profile.referralLink);
+
   return (
     <div className="space-y-6 px-4 py-6 sm:px-5 lg:px-6 lg:py-8">
       <MemberPageHeader
@@ -94,8 +97,9 @@ export function MemberAccountOverview({ profile }: { profile: CurrentProfile }) 
               <Link2 className="h-4 w-4" />
             </span>
             <div className="min-w-0">
-              <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>Link Referral</p>
-              <p className={`mt-2 break-all text-lg font-semibold ${memberTextPrimaryClass}`}>{profile.referralLink ?? "-"}</p>
+              <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>Member ID</p>
+              <p className={`mt-2 font-mono text-lg font-semibold ${memberTextPrimaryClass}`}>{memberId ?? "-"}</p>
+              <p className={`mt-2 break-all text-sm ${memberTextSecondaryClass}`}>{profile.referralLink ?? "-"}</p>
             </div>
           </div>
         </div>

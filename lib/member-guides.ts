@@ -97,7 +97,7 @@ function toMemberGuidePost(post: MemberGuidePostRecord): MemberGuidePost {
     throw new Error(`Unknown member guide type: ${post.type}`);
   }
 
-  if (post.section !== "activation" && post.section !== "bot_settings" && post.section !== "files") {
+  if (post.section !== "start" && post.section !== "activation" && post.section !== "bot_settings" && post.section !== "files") {
     throw new Error(`Unknown member guide section: ${post.section}`);
   }
 

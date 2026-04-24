@@ -1,8 +1,12 @@
 import Link from "next/link";
 import {
+  ArrowUpRight,
   BookOpen,
+  CalendarRange,
+  CheckCircle2,
   CreditCard,
   FileText,
+  Infinity,
   Link2,
   PlayCircle,
   Settings2,
@@ -13,10 +17,12 @@ import {
 } from "lucide-react";
 import { requireCurrentProfile } from "@/lib/auth";
 import { getMemberDashboardStats } from "@/lib/member-dashboard-stats";
+import { getMemberSubscription } from "@/lib/member-subscription";
 import {
   memberGlassPanelClass,
   memberIconSurfaceClass,
   MemberPageHeader,
+  memberSolidButtonClass,
   memberTextMutedClass,
   memberTextPrimaryClass,
   memberTextSecondaryClass,
@@ -39,7 +45,7 @@ const quickLinks = [
     title: "Akun",
   },
   {
-    description: "Masuk ke panduan video untuk aktivasi bot, pengaturan bot, dan file PDF member.",
+    description: "Masuk ke panduan video untuk mulai, setup bot, materi lanjutan, dan file PDF member.",
     href: "/dashboard/guides/activation",
     icon: BookOpen,
     label: "Lihat panduan",
@@ -54,12 +60,33 @@ const quickLinks = [
   },
 ] as const;
 
+function formatMembershipDate(value: Date | null) {
+  if (!value) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "long",
+  }).format(value);
+}
+
+function formatPlanDuration(durationMonths: number, isLifetime: boolean) {
+  if (isLifetime) {
+    return "Lifetime";
+  }
+
+  return `${durationMonths} bulan`;
+}
+
 export default async function DashboardPage() {
   const profile = await requireCurrentProfile();
-  const stats = await getMemberDashboardStats({
-    isLpActive: profile.isLpActive,
-    username: profile.username,
-  });
+  const [stats, membership] = await Promise.all([
+    getMemberDashboardStats({
+      isLpActive: profile.isLpActive,
+      username: profile.username,
+    }),
+    getMemberSubscription(profile.id),
+  ]);
 
   const statCards: MemberStatCard[] = [
     {
@@ -88,6 +115,10 @@ export default async function DashboardPage() {
       valueIcon: FileText,
     },
   ];
+
+  const subscriptionToneClassName = membership?.isLifetime
+    ? "bg-[linear-gradient(135deg,rgba(56,189,248,0.14)_0%,rgba(255,255,255,0)_42%,rgba(139,92,246,0.12)_100%)]"
+    : "bg-[linear-gradient(135deg,rgba(16,185,129,0.12)_0%,rgba(255,255,255,0)_42%,rgba(245,158,11,0.12)_100%)]";
 
   return (
     <main className="flex-1 px-4 py-6 sm:px-5 lg:px-6 lg:py-8">
@@ -119,7 +150,7 @@ export default async function DashboardPage() {
 
               return (
                 <div
-                  className="rounded-[24px] border border-[var(--member-row-border)] bg-[var(--member-row-bg)] px-5 py-5 shadow-[var(--member-row-shadow)]"
+                  className="member-row-surface rounded-[24px] px-5 py-5"
                   key={item.label}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -142,6 +173,140 @@ export default async function DashboardPage() {
           </div>
         </section>
 
+        <section className={`relative overflow-hidden px-6 py-6 sm:px-7 sm:py-7 ${memberGlassPanelClass}`}>
+          <div className={`pointer-events-none absolute inset-0 ${subscriptionToneClassName}`} />
+          <div className="relative">
+            <div className="flex items-start gap-3">
+              <span className={memberIconSurfaceClass}>
+                <CreditCard className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className={`text-[1.5rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>Langganan aktif</h2>
+                <p className={`mt-1 text-sm leading-7 ${memberTextSecondaryClass}`}>
+                  Ringkasan paket member yang sedang berjalan di akun ini, lengkap dengan durasi dan masa aksesnya.
+                </p>
+              </div>
+            </div>
+
+            {membership ? (
+              <div className="mt-6 grid gap-4 lg:grid-cols-[1.35fr_0.9fr]">
+                <article className="member-row-surface overflow-hidden rounded-[26px] px-5 py-5 sm:px-6 sm:py-6">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                          Aktif
+                        </span>
+                        {membership.isLifetime ? (
+                          <span className="inline-flex items-center gap-2 rounded-full bg-sky-500/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
+                            <Infinity className="h-3.5 w-3.5" />
+                            Lifetime
+                          </span>
+                        ) : null}
+                      </div>
+                      <h3 className={`mt-4 text-[1.7rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>
+                        {membership.planLabel}
+                      </h3>
+                      <p className={`mt-2 max-w-2xl text-sm leading-7 ${memberTextSecondaryClass}`}>
+                        Paket ini mengikuti transaksi yang benar-benar dipakai saat akun dibuat, jadi informasi durasi
+                        dan masa berlaku tidak lagi memakai angka global yang sama untuk semua member.
+                      </p>
+                    </div>
+
+                    <Link
+                      className={`${memberSolidButtonClass} h-11 px-4`}
+                      href="/dashboard/subscription"
+                    >
+                      Detail langganan
+                      <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+
+                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-[22px] bg-white/55 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+                      <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
+                        Durasi paket
+                      </p>
+                      <div className={`mt-3 inline-flex items-center gap-2 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                        {membership.isLifetime ? <Infinity className="h-4 w-4" /> : <CalendarRange className="h-4 w-4" />}
+                        {formatPlanDuration(membership.durationMonths, membership.isLifetime)}
+                      </div>
+                    </div>
+                    <div className="rounded-[22px] bg-white/55 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+                      <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
+                        Mulai aktif
+                      </p>
+                      <p className={`mt-3 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                        {formatMembershipDate(membership.startedAt)}
+                      </p>
+                    </div>
+                    <div className="rounded-[22px] bg-white/55 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+                      <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
+                        {membership.isLifetime ? "Masa akses" : "Berlaku sampai"}
+                      </p>
+                      <p className={`mt-3 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                        {membership.isLifetime ? "Seumur hidup" : formatMembershipDate(membership.expiresAt)}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="member-row-surface rounded-[26px] px-5 py-5 sm:px-6 sm:py-6">
+                  <div className="flex items-start gap-3">
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[rgba(227,244,253,0.96)] text-sky-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.52)]">
+                      <CreditCard className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <p className={`text-lg font-semibold ${memberTextPrimaryClass}`}>Status membership</p>
+                      <p className={`mt-2 text-sm leading-7 ${memberTextSecondaryClass}`}>
+                        {membership.isLifetime
+                          ? "Akun ini memakai paket lifetime, jadi akses member tetap aktif tanpa tanggal akhir."
+                          : "Akun ini memakai paket berjangka. Anda bisa memantau tanggal berlaku langsung dari dashboard tanpa pindah menu."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 space-y-3">
+                    <div className="rounded-[22px] bg-white/55 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+                      <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
+                        Paket
+                      </p>
+                      <p className={`mt-3 text-lg font-semibold ${memberTextPrimaryClass}`}>{membership.planLabel}</p>
+                    </div>
+                    <div className="rounded-[22px] bg-white/55 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+                      <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
+                        Referensi pembayaran
+                      </p>
+                      <p className={`mt-3 break-all font-mono text-sm font-semibold ${memberTextPrimaryClass}`}>
+                        {membership.paymentReferenceId ?? "-"}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            ) : (
+              <div className="member-row-surface mt-6 rounded-[26px] px-5 py-5 sm:px-6 sm:py-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h3 className={`text-[1.35rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>
+                      Belum ada data langganan
+                    </h3>
+                    <p className={`mt-2 max-w-2xl text-sm leading-7 ${memberTextSecondaryClass}`}>
+                      Saat ini akun Anda belum memiliki membership yang tercatat. Data paket akan muncul otomatis di sini
+                      setelah pendaftaran dan pembayaran selesai.
+                    </p>
+                  </div>
+                  <Link className={`${memberSolidButtonClass} h-11 px-4`} href="/dashboard/subscription">
+                    Buka menu langganan
+                    <ArrowUpRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
         <section className={`px-6 py-6 sm:px-7 sm:py-7 ${memberGlassPanelClass}`}>
           <div className="flex items-start gap-3">
             <span className={memberIconSurfaceClass}>
@@ -161,11 +326,11 @@ export default async function DashboardPage() {
 
               return (
                 <Link
-                  className="group rounded-[24px] border border-[var(--member-row-border)] bg-[var(--member-row-bg)] px-5 py-5 shadow-[var(--member-row-shadow)] transition duration-300 hover:-translate-y-0.5 hover:bg-[var(--member-row-hover-bg)]"
+                  className="member-row-surface member-row-surface-hover group rounded-[24px] px-5 py-5 transition duration-300 hover:-translate-y-0.5"
                   href={item.href}
                   key={item.href}
                 >
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--member-icon-surface)] text-[var(--member-icon-foreground)] transition group-hover:bg-[var(--member-sidebar-active-bg)] group-hover:text-[var(--member-sidebar-active-text)]">
+                  <span className="member-icon-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl transition group-hover:text-[var(--member-sidebar-active-text)]" style={{ background: "var(--member-icon-surface)" }}>
                     <Icon className="h-5 w-5" />
                   </span>
                   <h3 className={`mt-4 text-[1.2rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{item.title}</h3>

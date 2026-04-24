@@ -4,8 +4,17 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { ensureEnvAdmin } from "@/lib/admin-bootstrap";
 import { createUserSession, hashPassword } from "@/lib/auth";
+import {
+  buildMemberReferralLink,
+  generateMemberId,
+  isValidMemberId,
+  normalizeMemberId,
+} from "@/lib/member-id";
+import { upsertMemberSubscription } from "@/lib/member-subscription";
 import { prisma } from "@/lib/prisma";
-import { normalizeReferralLink } from "@/lib/referral-links";
+import { getPaymentGatewaySettings } from "@/lib/payment-gateway-settings";
+import { parseReferralUsername } from "@/lib/referral";
+import { markSignupPaymentConsumed, verifyPaidSignupPayment } from "@/lib/signup-payment";
 import { isReservedUsername, normalizeUsername } from "@/lib/username-rules";
 
 const usernameSchema = z
@@ -26,35 +35,32 @@ const whatsappSchema = z
   .transform((value) => value.replace(/[()\-\s]/g, ""))
   .refine((value) => /^\+?[0-9]{9,16}$/.test(value), "Enter a valid WhatsApp number.");
 
-const referralLinkSchema = z
-  .string()
-  .trim()
-  .min(1, "Enter your referral link.")
-  .transform((value, ctx) => {
-    const normalizedValue = normalizeReferralLink(value);
+const referredBySchema = z.string().trim().transform((value, ctx) => {
+  if (!value) {
+    return null;
+  }
 
-    if (!normalizedValue) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Enter a valid referral link.",
-      });
+  const normalizedValue = parseReferralUsername(value);
 
-      return z.NEVER;
-    }
+  if (!normalizedValue) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Referral link is no longer valid.",
+    });
 
-    return normalizedValue;
-  });
+    return z.NEVER;
+  }
+
+  return normalizedValue;
+});
 
 const signUpSchema = z.object({
   email: z.string().trim().email("Enter a valid email address.").transform((value) => value.toLowerCase()),
   password: z.string().min(8, "Password must be at least 8 characters."),
   passwordConfirmation: z.string().min(1, "Repeat your password."),
-  referralLink: referralLinkSchema,
   whatsapp: whatsappSchema,
   username: usernameSchema,
-  referredBy: z
-    .union([usernameSchema, z.literal("")])
-    .transform((value) => value || null),
+  referredBy: referredBySchema,
 }).refine((value) => value.password === value.passwordConfirmation, {
   path: ["passwordConfirmation"],
   message: "Passwords do not match.",
@@ -67,14 +73,13 @@ export type SignupActionState = {
     email?: string;
     password?: string;
     passwordConfirmation?: string;
-    referralLink?: string;
     whatsapp?: string;
     username?: string;
     referredBy?: string;
   };
   formValues?: {
     email?: string;
-    referralLink?: string;
+    memberId?: string;
     username?: string;
     whatsapp?: string;
   };
@@ -159,6 +164,42 @@ async function createProfileRecord(input: {
   }
 }
 
+async function referralLinkExists(referralLink: string) {
+  const existingProfile = await prisma.profile.findFirst({
+    where: {
+      referralLink,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return Boolean(existingProfile);
+}
+
+async function resolveAvailableMemberId(candidate: FormDataEntryValue | null) {
+  const normalizedCandidate = normalizeMemberId(typeof candidate === "string" ? candidate : "");
+
+  if (isValidMemberId(normalizedCandidate)) {
+    const candidateLink = buildMemberReferralLink(normalizedCandidate);
+
+    if (!(await referralLinkExists(candidateLink))) {
+      return normalizedCandidate;
+    }
+  }
+
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    const generatedId = generateMemberId();
+    const generatedLink = buildMemberReferralLink(generatedId);
+
+    if (!(await referralLinkExists(generatedLink))) {
+      return generatedId;
+    }
+  }
+
+  throw new Error("Unable to generate a unique member ID right now.");
+}
+
 export async function signUpAction(
   _prevState: SignupActionState,
   formData: FormData,
@@ -169,7 +210,6 @@ export async function signUpAction(
     email: formData.get("email"),
     password: formData.get("password"),
     passwordConfirmation: formData.get("passwordConfirmation"),
-    referralLink: formData.get("referralLink"),
     whatsapp: formData.get("whatsapp"),
     username: formData.get("username"),
     referredBy: formData.get("referredBy"),
@@ -178,7 +218,7 @@ export async function signUpAction(
   if (!parsed.success) {
     const fieldErrors = parsed.error.flatten().fieldErrors;
     const email = formData.get("email");
-    const referralLink = formData.get("referralLink");
+    const memberId = formData.get("memberId");
     const username = formData.get("username");
     const whatsapp = formData.get("whatsapp");
 
@@ -189,21 +229,30 @@ export async function signUpAction(
         email: fieldErrors.email?.[0],
         password: fieldErrors.password?.[0],
         passwordConfirmation: fieldErrors.passwordConfirmation?.[0],
-        referralLink: fieldErrors.referralLink?.[0],
         whatsapp: fieldErrors.whatsapp?.[0],
         username: fieldErrors.username?.[0],
         referredBy: fieldErrors.referredBy?.[0],
       },
       formValues: {
         email: typeof email === "string" ? email : "",
-        referralLink: typeof referralLink === "string" ? referralLink : "",
+        memberId: typeof memberId === "string" ? normalizeMemberId(memberId) : "",
         username: typeof username === "string" ? username : "",
         whatsapp: typeof whatsapp === "string" ? whatsapp : "",
       },
     };
   }
 
-  const { email, password, referralLink, username, referredBy, whatsapp } = parsed.data;
+  const { email, password, username, referredBy, whatsapp } = parsed.data;
+  const memberId = await resolveAvailableMemberId(formData.get("memberId"));
+  const referralLink = buildMemberReferralLink(memberId);
+  const paymentSettings = await getPaymentGatewaySettings();
+  const paymentReferenceId = String(formData.get("paymentReferenceId") ?? "").trim();
+  const selectedPlanId = String(formData.get("selectedPlanId") ?? "").trim();
+  let selectedPlan =
+    paymentSettings.subscriptionPlans.find((plan) => plan.id === selectedPlanId) ??
+    paymentSettings.subscriptionPlans.find((plan) => plan.id === paymentSettings.defaultPlanId) ??
+    paymentSettings.subscriptionPlans[0];
+  let verifiedPayment: Awaited<ReturnType<typeof verifyPaidSignupPayment>> | null = null;
 
   const existingProfile = await prisma.profile.findFirst({
     where: {
@@ -224,7 +273,7 @@ export async function signUpAction(
       },
       formValues: {
         email,
-        referralLink,
+        memberId,
         username,
         whatsapp,
       },
@@ -240,7 +289,7 @@ export async function signUpAction(
       },
       formValues: {
         email,
-        referralLink,
+        memberId,
         username,
         whatsapp,
       },
@@ -264,12 +313,67 @@ export async function signUpAction(
         fieldErrors: {},
         formValues: {
           email,
-          referralLink,
+          memberId,
           username,
           whatsapp,
         },
       };
     }
+  }
+
+  if (paymentSettings.isEnabled) {
+    if (!paymentReferenceId) {
+      return {
+        status: "error",
+        message: "Selesaikan pembayaran pendaftaran terlebih dahulu.",
+        fieldErrors: {},
+        formValues: {
+          email,
+          memberId,
+          username,
+          whatsapp,
+        },
+      };
+    }
+
+    verifiedPayment = await verifyPaidSignupPayment(paymentReferenceId);
+
+    if (!verifiedPayment) {
+      return {
+        status: "error",
+        message: "Pembayaran belum terverifikasi. Selesaikan pembayaran lalu cek statusnya lagi.",
+        fieldErrors: {},
+        formValues: {
+          email,
+          memberId,
+          username,
+          whatsapp,
+        },
+      };
+    }
+
+    if (
+      !selectedPlan ||
+      verifiedPayment.amount !== selectedPlan.price ||
+      verifiedPayment.customerEmail.toLowerCase() !== email.toLowerCase() ||
+      verifiedPayment.customerName !== username
+    ) {
+      return {
+        status: "error",
+        message: "Data pembayaran tidak cocok dengan form pendaftaran yang sedang Anda kirim.",
+        fieldErrors: {},
+        formValues: {
+          email,
+          memberId,
+          username,
+          whatsapp,
+        },
+      };
+    }
+
+    selectedPlan =
+      paymentSettings.subscriptionPlans.find((plan) => plan.id === verifiedPayment?.planId) ??
+      selectedPlan;
   }
 
   try {
@@ -282,12 +386,24 @@ export async function signUpAction(
       whatsapp,
     });
 
+    if (selectedPlan) {
+      await upsertMemberSubscription({
+        paymentReferenceId: verifiedPayment?.referenceId ?? paymentReferenceId ?? null,
+        plan: selectedPlan,
+        profileId: profile.id,
+      });
+    }
+
     await ensureEnvAdmin({
       email,
       id: profile.id,
       isAdmin: false,
       username,
     });
+
+    if (paymentSettings.isEnabled && paymentReferenceId) {
+      await markSignupPaymentConsumed(paymentReferenceId);
+    }
 
     await createUserSession(profile.id);
   } catch (error) {
@@ -301,7 +417,7 @@ export async function signUpAction(
         },
         formValues: {
           email,
-          referralLink,
+          memberId,
           username,
           whatsapp,
         },
@@ -314,7 +430,7 @@ export async function signUpAction(
       fieldErrors: {},
       formValues: {
         email,
-        referralLink,
+        memberId,
         username,
         whatsapp,
       },

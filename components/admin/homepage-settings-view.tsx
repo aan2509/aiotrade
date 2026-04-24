@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  PlusCircle,
   Monitor,
   Smartphone,
+  Trash2,
 } from "lucide-react";
 import {
   updateBenefitsSectionAction,
@@ -11,10 +13,13 @@ import {
   updateFaqSectionAction,
   updateFooterSectionAction,
   updateGuideSectionAction,
-  updateHeroSectionAction,
   updateOverviewSectionAction,
   updatePricingSectionAction,
+  updateBannerAdsSectionAction,
+  updateTestimonialSectionAction,
+  updateVideoSectionAction,
 } from "@/app/(protected)/admin/actions";
+import { HomepageAssetPicker } from "@/components/admin/homepage-asset-picker";
 import { HomepageBackgroundEditor } from "@/components/admin/homepage-background-editor";
 import type { HomepageAsset, HomepageContent } from "@/components/landing/types";
 import { Alert } from "@/components/ui/alert";
@@ -278,63 +283,10 @@ export function HomepageSettingsView({
           </CardHeader>
         </Card>
 
-        <Card className="scroll-mt-24" id="hero-section">
-          <CardHeader>
-            <CardTitle>Hero Section</CardTitle>
-            <CardDescription>Atur hero utama, CTA, dan background section pembuka.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <SectionAlert currentSection={section} label="Hero section" section="hero" status={status} />
-            <form action={updateHeroSectionAction} className="space-y-5">
-              <div className="grid gap-4 md:grid-cols-2">
-                <TextField
-                  label="Eyebrow"
-                  name="eyebrow"
-                  onChange={(value) => updateSection("hero", { eyebrow: value })}
-                  value={draft.hero.eyebrow}
-                />
-                <TextField
-                  label="Label Tombol"
-                  name="ctaLabel"
-                  onChange={(value) => updateSection("hero", { ctaLabel: value })}
-                  value={draft.hero.ctaLabel}
-                />
-                <TextField
-                  label="Title Biru"
-                  name="titleBlue"
-                  onChange={(value) => updateSection("hero", { titleBlue: value })}
-                  value={draft.hero.titleBlue}
-                />
-                <TextField
-                  label="Title Putih"
-                  name="titleWhite"
-                  onChange={(value) => updateSection("hero", { titleWhite: value })}
-                  value={draft.hero.titleWhite}
-                />
-              </div>
-              <TextAreaField
-                label="Subtitle"
-                name="subtitle"
-                onChange={(value) => updateSection("hero", { subtitle: value })}
-                rows={3}
-                value={draft.hero.subtitle}
-              />
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
-                onChange={(background) => updateSection("hero", { background })}
-                value={draft.hero.background}
-              />
-              <Button type="submit">Simpan Hero Section</Button>
-            </form>
-          </CardContent>
-        </Card>
-
         <Card className="scroll-mt-24" id="overview-section">
           <CardHeader>
             <CardTitle>Overview Section</CardTitle>
-            <CardDescription>Atur headline overview, deskripsi, CTA, dan background.</CardDescription>
+            <CardDescription>Atur section pembuka homepage, deskripsi, CTA, dan background.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <SectionAlert currentSection={section} label="Overview section" section="overview" status={status} />
@@ -572,6 +524,63 @@ export function HomepageSettingsView({
           </CardContent>
         </Card>
 
+        <Card className="scroll-mt-24" id="video-section">
+          <CardHeader>
+            <CardTitle>Video Section</CardTitle>
+            <CardDescription>Atur section video embed yang tampil setelah pricing section.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SectionAlert currentSection={section} label="Video section" section="video" status={status} />
+            <form action={updateVideoSectionAction} className="space-y-5">
+              <input name="isVisible" type="hidden" value={String(draft.video.isVisible)} />
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextField
+                  label="Eyebrow"
+                  name="eyebrow"
+                  onChange={(value) => updateSection("video", { eyebrow: value })}
+                  value={draft.video.eyebrow}
+                />
+                <TextField
+                  label="Judul"
+                  name="title"
+                  onChange={(value) => updateSection("video", { title: value })}
+                  value={draft.video.title}
+                />
+              </div>
+              <TextAreaField
+                label="Deskripsi"
+                name="description"
+                onChange={(value) => updateSection("video", { description: value })}
+                rows={4}
+                value={draft.video.description}
+              />
+              <TextField
+                label="Link Embed Video"
+                name="embedUrl"
+                onChange={(value) => updateSection("video", { embedUrl: value })}
+                value={draft.video.embedUrl}
+              />
+              <label className="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3">
+                <input
+                  checked={draft.video.isVisible}
+                  className="h-4 w-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-600"
+                  onChange={(event) => updateSection("video", { isVisible: event.target.checked })}
+                  type="checkbox"
+                />
+                <span className="text-sm font-medium text-stone-900">Tampilkan video section di homepage</span>
+              </label>
+              <HomepageBackgroundEditor
+                assets={library}
+                cloudinaryEnabled={cloudinaryEnabled}
+                onAssetsChange={setLibrary}
+                onChange={(background) => updateSection("video", { background })}
+                value={draft.video.background}
+              />
+              <Button type="submit">Simpan Video Section</Button>
+            </form>
+          </CardContent>
+        </Card>
+
         <Card className="scroll-mt-24" id="faq-section">
           <CardHeader>
             <CardTitle>FAQ Section</CardTitle>
@@ -750,6 +759,207 @@ export function HomepageSettingsView({
           </CardContent>
         </Card>
 
+        <Card className="scroll-mt-24" id="testimonial-section">
+          <CardHeader>
+            <CardTitle>Testimoni Section</CardTitle>
+            <CardDescription>Atur slider foto testimonial yang tampil setelah guide section.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SectionAlert currentSection={section} label="Testimoni section" section="testimonial" status={status} />
+            <form action={updateTestimonialSectionAction} className="space-y-5">
+              <input name="itemCount" type="hidden" value={draft.testimonial.items.length} />
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextField
+                  label="Eyebrow"
+                  name="eyebrow"
+                  onChange={(value) => updateSection("testimonial", { eyebrow: value })}
+                  value={draft.testimonial.eyebrow}
+                />
+                <TextField
+                  label="Judul"
+                  name="title"
+                  onChange={(value) => updateSection("testimonial", { title: value })}
+                  value={draft.testimonial.title}
+                />
+              </div>
+              <TextAreaField
+                label="Subjudul"
+                name="subtitle"
+                onChange={(value) => updateSection("testimonial", { subtitle: value })}
+                rows={3}
+                value={draft.testimonial.subtitle}
+              />
+              <HomepageBackgroundEditor
+                assets={library}
+                cloudinaryEnabled={cloudinaryEnabled}
+                onAssetsChange={setLibrary}
+                onChange={(background) => updateSection("testimonial", { background })}
+                value={draft.testimonial.background}
+              />
+
+              <div className="space-y-4">
+                {draft.testimonial.items.map((item, index) => (
+                  <div className="rounded-xl border border-stone-200 bg-stone-50 p-4" key={`${item.name}-${index}`}>
+                    <input name={`item-${index}-imageAssetId`} type="hidden" value={item.imageAssetId ?? ""} />
+                    <input name={`item-${index}-imageUrl`} type="hidden" value={item.imageUrl ?? ""} />
+
+                    <div className="flex items-center justify-between gap-4">
+                      <p className="text-sm font-semibold text-stone-900">Testimoni {index + 1}</p>
+                      {draft.testimonial.items.length > 1 ? (
+                        <Button
+                          onClick={() =>
+                            setDraft((current) => ({
+                              ...current,
+                              testimonial: {
+                                ...current.testimonial,
+                                items: current.testimonial.items.filter((_, entryIndex) => entryIndex !== index),
+                              },
+                            }))
+                          }
+                          size="sm"
+                          type="button"
+                          variant="outline"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Hapus
+                        </Button>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+                      <div className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <TextField
+                            label="Nama"
+                            name={`item-${index}-name`}
+                            onChange={(value) =>
+                              setDraft((current) => ({
+                                ...current,
+                                testimonial: {
+                                  ...current.testimonial,
+                                  items: current.testimonial.items.map((entry, entryIndex) =>
+                                    entryIndex === index ? { ...entry, name: value } : entry,
+                                  ),
+                                },
+                              }))
+                            }
+                            value={item.name}
+                          />
+                          <TextField
+                            label="Role"
+                            name={`item-${index}-role`}
+                            onChange={(value) =>
+                              setDraft((current) => ({
+                                ...current,
+                                testimonial: {
+                                  ...current.testimonial,
+                                  items: current.testimonial.items.map((entry, entryIndex) =>
+                                    entryIndex === index ? { ...entry, role: value } : entry,
+                                  ),
+                                },
+                              }))
+                            }
+                            value={item.role}
+                          />
+                        </div>
+
+                        <TextField
+                          label="Alt Foto"
+                          name={`item-${index}-imageAlt`}
+                          onChange={(value) =>
+                            setDraft((current) => ({
+                              ...current,
+                              testimonial: {
+                                ...current.testimonial,
+                                items: current.testimonial.items.map((entry, entryIndex) =>
+                                  entryIndex === index ? { ...entry, imageAlt: value } : entry,
+                                ),
+                              },
+                            }))
+                          }
+                          value={item.imageAlt ?? ""}
+                        />
+
+                        <TextAreaField
+                          label="Quote"
+                          name={`item-${index}-quote`}
+                          onChange={(value) =>
+                            setDraft((current) => ({
+                              ...current,
+                              testimonial: {
+                                ...current.testimonial,
+                                items: current.testimonial.items.map((entry, entryIndex) =>
+                                  entryIndex === index ? { ...entry, quote: value } : entry,
+                                ),
+                              },
+                            }))
+                          }
+                          rows={5}
+                          value={item.quote}
+                        />
+                      </div>
+
+                      <HomepageAssetPicker
+                        assets={library}
+                        cloudinaryEnabled={cloudinaryEnabled}
+                        label="Foto Testimoni"
+                        onAssetsChange={setLibrary}
+                        onChange={(value) =>
+                          setDraft((current) => ({
+                            ...current,
+                            testimonial: {
+                              ...current.testimonial,
+                              items: current.testimonial.items.map((entry, entryIndex) =>
+                                entryIndex === index
+                                  ? {
+                                      ...entry,
+                                      imageAssetId: value.assetId,
+                                      imageUrl: value.imageUrl,
+                                    }
+                                  : entry,
+                              ),
+                            },
+                          }))
+                        }
+                        value={{
+                          assetId: item.imageAssetId,
+                          imageUrl: item.imageUrl,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                onClick={() =>
+                  setDraft((current) => ({
+                    ...current,
+                    testimonial: {
+                      ...current.testimonial,
+                      items: [
+                        ...current.testimonial.items,
+                        {
+                          name: "Member Baru",
+                          quote: "Tulis pengalaman singkat member di sini.",
+                          role: "Komunitas AIOTrade",
+                        },
+                      ],
+                    },
+                  }))
+                }
+                type="button"
+                variant="outline"
+              >
+                <PlusCircle className="h-4 w-4" />
+                Tambah Testimoni
+              </Button>
+
+              <Button type="submit">Simpan Testimoni Section</Button>
+            </form>
+          </CardContent>
+        </Card>
+
         <Card className="scroll-mt-24" id="blog-section">
           <CardHeader>
             <CardTitle>Blog Section</CardTitle>
@@ -831,6 +1041,88 @@ export function HomepageSettingsView({
                 ))}
               </div>
               <Button type="submit">Simpan Blog Section</Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card className="scroll-mt-24" id="banner-ads-section">
+          <CardHeader>
+            <CardTitle>Banner Ads Section</CardTitle>
+            <CardDescription>Atur banner promosi memanjang yang tampil setelah blog section.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SectionAlert currentSection={section} label="Banner ads section" section="bannerAds" status={status} />
+            <form action={updateBannerAdsSectionAction} className="space-y-5">
+              <input name="imageAssetId" type="hidden" value={draft.bannerAds.imageAssetId ?? ""} />
+              <input name="imageUrl" type="hidden" value={draft.bannerAds.imageUrl ?? ""} />
+              <input name="isVisible" type="hidden" value={String(draft.bannerAds.isVisible)} />
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextField
+                  label="Judul"
+                  name="title"
+                  onChange={(value) => updateSection("bannerAds", { title: value })}
+                  value={draft.bannerAds.title}
+                />
+                <TextField
+                  label="Label Tombol"
+                  name="buttonLabel"
+                  onChange={(value) => updateSection("bannerAds", { buttonLabel: value })}
+                  value={draft.bannerAds.buttonLabel}
+                />
+              </div>
+              <TextAreaField
+                label="Deskripsi"
+                name="description"
+                onChange={(value) => updateSection("bannerAds", { description: value })}
+                rows={3}
+                value={draft.bannerAds.description}
+              />
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextField
+                  label="Nomor WhatsApp Admin"
+                  name="whatsappNumber"
+                  onChange={(value) => updateSection("bannerAds", { whatsappNumber: value })}
+                  value={draft.bannerAds.whatsappNumber ?? ""}
+                />
+                <TextField
+                  label="Alt Banner"
+                  name="imageAlt"
+                  onChange={(value) => updateSection("bannerAds", { imageAlt: value })}
+                  value={draft.bannerAds.imageAlt ?? ""}
+                />
+              </div>
+              <label className="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3">
+                <input
+                  checked={draft.bannerAds.isVisible}
+                  className="h-4 w-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-600"
+                  onChange={(event) => updateSection("bannerAds", { isVisible: event.target.checked })}
+                  type="checkbox"
+                />
+                <span className="text-sm font-medium text-stone-900">Tampilkan banner ads section di homepage</span>
+              </label>
+              <HomepageBackgroundEditor
+                assets={library}
+                cloudinaryEnabled={cloudinaryEnabled}
+                onAssetsChange={setLibrary}
+                onChange={(background) => updateSection("bannerAds", { background })}
+                value={draft.bannerAds.background}
+              />
+              <HomepageAssetPicker
+                assets={library}
+                cloudinaryEnabled={cloudinaryEnabled}
+                label="Banner Kaos"
+                onAssetsChange={setLibrary}
+                onChange={(value) => updateSection("bannerAds", { imageAssetId: value.assetId, imageUrl: value.imageUrl })}
+                previewAspectClassName="aspect-[21/8]"
+                value={{
+                  assetId: draft.bannerAds.imageAssetId,
+                  imageUrl: draft.bannerAds.imageUrl,
+                }}
+              />
+              <p className="text-xs leading-6 text-stone-500">
+                Placeholder banner disiapkan dengan rasio memanjang agar tetap rapi di desktop dan mobile.
+              </p>
+              <Button type="submit">Simpan Banner Ads Section</Button>
             </form>
           </CardContent>
         </Card>

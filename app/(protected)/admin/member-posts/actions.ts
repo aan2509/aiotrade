@@ -20,7 +20,7 @@ const memberGuideSchema = z
     guideId: nullableString,
     isPublished: z.string().transform((value) => value === "true"),
     publishedAt: nullableString,
-    section: z.enum(["activation", "bot_settings", "files"]),
+    section: z.enum(["start", "activation", "bot_settings", "files"]),
     sortOrder: z.coerce.number().int().min(0).max(9999),
     title: z.string().trim().min(4, "Judul panduan minimal 4 karakter."),
   })

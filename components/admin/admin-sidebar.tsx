@@ -5,6 +5,7 @@ import { useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   ChevronDown,
+  CreditCard,
   KeyRound,
   LayoutDashboard,
   LogOut,
@@ -17,19 +18,23 @@ import { logoutAction } from "@/app/(protected)/account/actions";
 import { cn } from "@/lib/utils";
 
 const homepageItems = [
-  { href: "/admin?section=hero#hero-section", label: "Hero Section", section: "hero" },
   { href: "/admin?section=overview#overview-section", label: "Overview Section", section: "overview" },
   { href: "/admin?section=benefits#benefits-section", label: "Benefit Section", section: "benefits" },
   { href: "/admin?section=pricing#pricing-section", label: "Pricing Section", section: "pricing" },
+  { href: "/admin?section=video#video-section", label: "Video Section", section: "video" },
   { href: "/admin?section=faq#faq-section", label: "FAQ Section", section: "faq" },
   { href: "/admin?section=guide#guide-section", label: "Guide Section", section: "guide" },
+  { href: "/admin?section=testimonial#testimonial-section", label: "Testimoni Section", section: "testimonial" },
   { href: "/admin?section=blog#blog-section", label: "Blog Section", section: "blog" },
+  { href: "/admin?section=bannerAds#banner-ads-section", label: "Banner Ads Section", section: "bannerAds" },
   { href: "/admin?section=footer#footer-section", label: "Footer Section", section: "footer" },
 ] as const;
 
 const postItems = [
   { href: "/admin/posts", label: "Composer Post" },
   { href: "/admin/posts/published", label: "Post Published" },
+  { href: "/admin/posts/pdfs", label: "Posting PDF" },
+  { href: "/admin/posts/pdfs/published", label: "PDF Published" },
 ] as const;
 
 const memberPostItems = [
@@ -50,10 +55,13 @@ export function AdminSidebar({ pathname, username }: AdminSidebarProps) {
   const isPostsRoute = resolvedPathname.startsWith("/admin/posts");
   const isPostComposerRoute = resolvedPathname === "/admin/posts";
   const isPublishedPostsRoute = resolvedPathname === "/admin/posts/published";
+  const isPdfComposerRoute = resolvedPathname === "/admin/posts/pdfs";
+  const isPdfPublishedRoute = resolvedPathname === "/admin/posts/pdfs/published";
   const isMemberPostsRoute = resolvedPathname.startsWith("/admin/member-posts");
   const isMemberPostComposerRoute = resolvedPathname === "/admin/member-posts";
   const isMemberPublishedPostsRoute = resolvedPathname === "/admin/member-posts/published";
   const isResetPasswordRoute = resolvedPathname === "/admin/reset-password";
+  const isPaymentsRoute = resolvedPathname === "/admin/payments";
   const isSeoRoute = resolvedPathname === "/admin/seo";
   const isUsersRoute = resolvedPathname === "/admin/users";
   const [homepageExpanded, setHomepageExpanded] = useState(isHomepageRoute);
@@ -91,6 +99,19 @@ export function AdminSidebar({ pathname, username }: AdminSidebarProps) {
           >
             <Users className="h-4 w-4" />
             User Management
+          </Link>
+
+          <Link
+            className={cn(
+              "flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition",
+              isPaymentsRoute
+                ? "border-stone-900 bg-stone-900 text-white"
+                : "border-stone-200 bg-stone-50/80 text-stone-800 hover:bg-stone-100",
+            )}
+            href="/admin/payments"
+          >
+            <CreditCard className="h-4 w-4" />
+            Payment Settings
           </Link>
 
           
@@ -185,7 +206,9 @@ export function AdminSidebar({ pathname, username }: AdminSidebarProps) {
                   {postItems.map((item) => {
                     const active =
                       (item.href === "/admin/posts" && isPostComposerRoute) ||
-                      (item.href === "/admin/posts/published" && isPublishedPostsRoute);
+                      (item.href === "/admin/posts/published" && isPublishedPostsRoute) ||
+                      (item.href === "/admin/posts/pdfs" && isPdfComposerRoute) ||
+                      (item.href === "/admin/posts/pdfs/published" && isPdfPublishedRoute);
 
                     return (
                       <Link
