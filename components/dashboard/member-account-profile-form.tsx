@@ -149,12 +149,12 @@ export function MemberAccountProfileForm({
           label={labels.memberId}
         >
           <Input
-            autoCapitalize="characters"
+            autoCapitalize="none"
             className="member-row-surface font-mono text-[var(--member-text-primary)] placeholder:text-[var(--member-text-muted)]"
             id="profileMemberId"
             maxLength={8}
             name="memberId"
-            onChange={(event) => setMemberId(event.target.value.replace(/\s+/g, "").toUpperCase())}
+            onChange={(event) => setMemberId(event.target.value.replace(/\s+/g, ""))}
             placeholder={labels.memberIdPlaceholder}
             required
             spellCheck={false}

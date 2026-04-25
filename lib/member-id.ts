@@ -1,13 +1,11 @@
 const MEMBER_ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const MEMBER_ID_VALIDATION_PATTERN = /^[A-Z0-9]{8}$/;
+const MEMBER_ID_VALIDATION_PATTERN = /^[A-Za-z0-9]{8}$/;
 const MEMBER_ID_LENGTH = 8;
 
 export const MEMBER_REFERRAL_LINK_PREFIX = "https://aiotrade.co/?r=";
 
 export function normalizeMemberId(value: string | null | undefined) {
-  return String(value ?? "")
-    .trim()
-    .toUpperCase();
+  return String(value ?? "").trim();
 }
 
 export function isValidMemberId(value: string | null | undefined) {

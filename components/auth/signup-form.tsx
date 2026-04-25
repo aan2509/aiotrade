@@ -238,7 +238,7 @@ export function SignupForm({
 
   const normalizedUsername = username.trim().toLowerCase();
   const normalizedEmail = email.trim().toLowerCase();
-  const normalizedMemberId = memberId.trim().toUpperCase();
+  const normalizedMemberId = memberId.trim();
   const normalizedWhatsapp = whatsapp.trim();
 
   const usernameLocalIssue = useMemo(() => {
@@ -778,13 +778,13 @@ export function SignupForm({
               {labels.memberId}
             </Label>
             <Input
-              autoCapitalize="characters"
+              autoCapitalize="none"
               className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
               id="memberId"
               maxLength={8}
               name="memberId"
               onChange={(event) => {
-                setMemberId(event.target.value.replace(/\s+/g, "").toUpperCase());
+                setMemberId(event.target.value.replace(/\s+/g, ""));
               }}
               placeholder={labels.memberIdPlaceholder}
               required
