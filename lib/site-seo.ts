@@ -200,16 +200,17 @@ export async function updateSiteSeoSettings(value: SiteSeoSettings) {
 }
 
 export function buildRootMetadata(seo: SiteSeoSettings): Metadata {
+  const fallbackIconUrl = "/favicon-default.ico";
+  const faviconRouteUrl = "/favicon.ico";
+
   return {
     applicationName: seo.siteName,
     description: seo.homeDescription,
-    icons: seo.faviconUrl
-      ? {
-          apple: [{ url: seo.faviconUrl }],
-          icon: [{ url: seo.faviconUrl }],
-          shortcut: [seo.faviconUrl],
-        }
-      : undefined,
+    icons: {
+      apple: [{ url: seo.faviconUrl ?? fallbackIconUrl }],
+      icon: [{ url: faviconRouteUrl }],
+      shortcut: [faviconRouteUrl],
+    },
     metadataBase: getMetadataBase(seo.siteUrl),
     title: {
       default: seo.homeTitle,
