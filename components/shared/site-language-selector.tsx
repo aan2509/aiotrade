@@ -37,19 +37,19 @@ const LANGUAGE_UI_COPY: Record<"id" | "en", LanguageUiCopy> = {
   en: {
     selectorDescription: "Choose your website language",
     selectorTitle: "Language",
-    sheetDescription: "The website will be translated automatically",
+    sheetDescription: "The website will be translated",
     sheetTitle: "Choose language",
     waitLabel: "Please wait a moment",
-    waitingDescription: "The page is being translated and re-rendered",
+    waitingDescription: "The page is being translated",
     waitingTitle: "Switching language",
   },
   id: {
     selectorDescription: "Pilih bahasa tampilan website",
     selectorTitle: "Bahasa",
-    sheetDescription: "Tampilan website akan diterjemahkan otomatis",
+    sheetDescription: "Website akan diterjemahkan.",
     sheetTitle: "Pilih bahasa",
     waitLabel: "Mohon tunggu sebentar",
-    waitingDescription: "Halaman sedang diterjemahkan dan dirender ulang",
+    waitingDescription: "Halaman sedang diterjemahkan",
     waitingTitle: "Mengganti bahasa",
   },
 };

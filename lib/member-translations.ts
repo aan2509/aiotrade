@@ -5,7 +5,15 @@ import { defaultMemberShellLabels } from "@/lib/member-shell-labels";
 import type { SiteLanguage } from "@/lib/site-language";
 import { translateRecordStrings, translateStructuredStrings } from "@/lib/translatex";
 
-function mergeDeep<T>(base: T, patch: Partial<T>): T {
+type DeepPartial<T> = T extends (...args: never[]) => unknown
+  ? T
+  : T extends readonly (infer U)[]
+    ? DeepPartial<U>[]
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T;
+
+function mergeDeep<T>(base: T, patch: DeepPartial<T>): T {
   if (Array.isArray(base) || Array.isArray(patch)) {
     return (patch as T) ?? base;
   }

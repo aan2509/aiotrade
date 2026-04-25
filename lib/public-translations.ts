@@ -5,11 +5,19 @@ import type { PublicGuidePdfPost } from "@/lib/public-guide-types";
 import { type SiteLanguage } from "@/lib/site-language";
 import { translateStructuredStrings } from "@/lib/translatex";
 
+type DeepPartial<T> = T extends (...args: never[]) => unknown
+  ? T
+  : T extends readonly (infer U)[]
+    ? DeepPartial<U>[]
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T;
+
 function hasPathSegment(path: Array<number | string>, segment: string) {
   return path.some((part) => String(part) === segment);
 }
 
-function mergeDeep<T>(base: T, patch: Partial<T>): T {
+function mergeDeep<T>(base: T, patch: DeepPartial<T>): T {
   if (Array.isArray(base) || Array.isArray(patch)) {
     return (patch as T) ?? base;
   }
