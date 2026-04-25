@@ -3,6 +3,7 @@
 import { LogIn } from "lucide-react";
 import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import type { PricingContent } from "@/components/landing/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/ui/reveal";
@@ -15,6 +16,8 @@ type PricingSectionProps = {
 };
 
 export function PricingSection({ content, ctaExternal = false, ctaHref }: PricingSectionProps) {
+  const lightMotion = useLightLandingMotion();
+
   return (
     <section className="relative overflow-hidden py-20 sm:py-24" id="harga">
       <SectionBackgroundLayer
@@ -24,10 +27,10 @@ export function PricingSection({ content, ctaExternal = false, ctaHref }: Pricin
         fallbackPreset="warm-ivory"
       />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--landing-accent-gold)_14%,transparent)_0%,transparent_100%)]" />
-      <div className="pointer-events-none absolute left-[-10%] top-16 h-64 w-64 rounded-full blur-[110px]" style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 14%, transparent)" }} />
-      <div className="pointer-events-none absolute bottom-8 right-[-6%] h-72 w-72 rounded-full blur-[120px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
+      <div className="pointer-events-none absolute left-[-10%] top-16 h-44 w-44 rounded-full blur-[72px] sm:h-56 sm:w-56 sm:blur-[88px]" style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 14%, transparent)" }} />
+      <div className="pointer-events-none absolute bottom-8 right-[-6%] h-48 w-48 rounded-full blur-[76px] sm:h-64 sm:w-64 sm:blur-[92px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-        <Reveal className="mx-auto max-w-4xl text-center">
+        <Reveal className="mx-auto max-w-4xl text-center" distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.72 : 1.12}>
           <p className="text-[0.98rem] font-semibold tracking-[-0.015em] text-[var(--landing-accent-blue)] sm:text-[1.75rem] lg:text-[2.05rem]">
             {content.eyebrow}
           </p>
@@ -42,9 +45,9 @@ export function PricingSection({ content, ctaExternal = false, ctaHref }: Pricin
               className={cn(plan.emphasis ? "lg:-my-6" : undefined)}
               delay={index * 0.08}
               direction="right"
-              distance={52}
-              duration={1.28}
-              hover
+              distance={lightMotion ? 20 : 40}
+              duration={lightMotion ? 0.8 : 1.08}
+              hover={!lightMotion}
               key={plan.name}
             >
               <Card

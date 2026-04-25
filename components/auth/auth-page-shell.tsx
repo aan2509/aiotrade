@@ -3,23 +3,31 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import heroImage from "@/bahan foto/hero.jpg";
+import { SiteLanguageSelector } from "@/components/shared/site-language-selector";
+import type { SiteLanguage, SiteLanguageOption } from "@/lib/site-language";
 
 type AuthPageShellProps = {
   badge: ReactNode;
-  title: string;
+  children: ReactNode;
+  currentLanguage?: SiteLanguage;
   description: string;
+  languageOptions?: SiteLanguageOption[];
   sideBadge: string;
   sideTitle: string;
-  children: ReactNode;
+  title: string;
+  backLabel?: string;
 };
 
 export function AuthPageShell({
   badge,
-  title,
+  backLabel = "Kembali ke halaman utama",
+  children,
+  currentLanguage = "id",
   description,
+  languageOptions = [],
   sideBadge,
   sideTitle,
-  children,
+  title,
 }: AuthPageShellProps) {
   return (
     <main className="flex flex-1 bg-[#08111f]">
@@ -51,13 +59,21 @@ export function AuthPageShell({
 
         <section className="flex items-center justify-center px-6 py-12 sm:px-8 lg:px-10">
           <div className="w-full max-w-xl">
-            <Link
-              className="mb-6 inline-flex items-center gap-2 text-sm text-white/70 transition hover:text-white"
-              href="/"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Kembali ke halaman utama
-            </Link>
+            <div className="mb-6 flex items-center justify-between gap-3">
+              <Link
+                className="inline-flex items-center gap-2 text-sm text-white/70 transition hover:text-white"
+                href="/"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                {backLabel}
+              </Link>
+
+              <SiteLanguageSelector
+                currentLanguage={currentLanguage}
+                languages={languageOptions}
+                variant="landing"
+              />
+            </div>
 
             <div className="rounded-lg border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,250,252,0.96)_100%)] p-6 shadow-[0_24px_60px_rgba(2,8,23,0.38)] sm:p-8">
               <div className="space-y-2">

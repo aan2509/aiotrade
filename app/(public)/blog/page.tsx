@@ -1,11 +1,15 @@
+import { cookies } from "next/headers";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { estimateReadingTime, formatBlogDate } from "@/lib/blog-helpers";
 import { getPublishedBlogPosts } from "@/lib/blog-posts";
+import { SiteLanguageSelector } from "@/components/shared/site-language-selector";
 import { getSiteSeoSettings } from "@/lib/site-seo";
 import { landingImages } from "@/components/landing/data";
+import { parseSiteLanguage, SITE_LANGUAGE_COOKIE } from "@/lib/site-language";
+import { getSupportedSiteLanguages, translateRecordStrings, translateStructuredStrings } from "@/lib/translatex";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSiteSeoSettings();
@@ -23,8 +27,34 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BlogPage() {
-  const posts = await getPublishedBlogPosts();
-  const [featuredPost, ...restPosts] = posts;
+  const cookieStore = await cookies();
+  const currentLanguage = parseSiteLanguage(cookieStore.get(SITE_LANGUAGE_COOKIE)?.value);
+  const [posts, languageOptions, copy] = await Promise.all([
+    getPublishedBlogPosts(),
+    getSupportedSiteLanguages(),
+    translateRecordStrings({
+      record: {
+        backHome: "Kembali ke beranda",
+        empty: "Belum ada postingan yang dipublish.",
+        featuredTag: "Utama",
+        heroEyebrow: "AIOTrade Newsroom",
+        heroTitle: "Insight market, Update crypto, and Crypto News",
+        readArticle: "Baca artikel",
+        readMinutes: "menit baca",
+      },
+      targetLanguage: currentLanguage,
+    }),
+  ]);
+  const translatedPosts = await translateStructuredStrings({
+    shouldTranslate: (path) => {
+      const last = String(path[path.length - 1] ?? "");
+
+      return ["category", "excerpt", "title"].includes(last);
+    },
+    targetLanguage: currentLanguage,
+    value: posts,
+  });
+  const [featuredPost, ...restPosts] = translatedPosts;
 
   return (
     <main className="min-h-screen bg-[#f5f2eb] text-stone-950">
@@ -39,16 +69,24 @@ export default async function BlogPage() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.76)_0%,rgba(4,8,16,0.9)_100%)]" />
         <div className="relative mx-auto max-w-7xl">
-          <Link
-            className="inline-flex items-center gap-2 text-sm font-medium text-white/72 transition hover:text-white"
-            href="/"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali ke beranda
-          </Link>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#10a7ff]">AIOTrade Newsroom</p>
+          <div className="flex items-center justify-between gap-4">
+            <Link
+              className="inline-flex items-center gap-2 text-sm font-medium text-white/72 transition hover:text-white"
+              href="/"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {copy.backHome}
+            </Link>
+
+            <SiteLanguageSelector
+              currentLanguage={currentLanguage}
+              languages={languageOptions}
+              variant="landing"
+            />
+          </div>
+          <p className="mt-6 text-sm font-semibold uppercase tracking-[0.28em] text-[#10a7ff]">{copy.heroEyebrow}</p>
           <h1 className="mt-5 max-w-4xl text-[3.2rem] font-semibold leading-[0.92] tracking-[-0.05em] text-white sm:text-[5.4rem]">
-            Insight market, Update crypto, and Crypto News
+            {copy.heroTitle}
           </h1>
         </div>
       </section>
@@ -75,21 +113,21 @@ export default async function BlogPage() {
                 {featuredPost.category}
               </span>
               <p className="mt-5 text-sm text-stone-500">
-                {formatBlogDate(featuredPost.publishedAt)} • {estimateReadingTime(featuredPost.content)} menit baca
+                {formatBlogDate(featuredPost.publishedAt)} • {estimateReadingTime(featuredPost.content)} {copy.readMinutes}
               </p>
               <h2 className="mt-3 text-[2.2rem] font-semibold leading-[1.02] tracking-[-0.045em] text-stone-950 sm:text-[3rem]">
                 {featuredPost.title}
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-8 text-stone-600">{featuredPost.excerpt}</p>
               <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.08em] text-[#1b74df]">
-                Baca artikel
+                {copy.readArticle}
                 <ArrowRight className="h-4 w-4" />
               </span>
             </div>
           </Link>
         ) : (
           <div className="rounded-[28px] border border-dashed border-stone-300 bg-white px-8 py-16 text-center text-stone-500">
-            Belum ada postingan yang dipublish.
+            {copy.empty}
           </div>
         )}
 
@@ -118,7 +156,7 @@ export default async function BlogPage() {
                   </h3>
                   <p className="text-sm leading-7 text-stone-600">{post.excerpt}</p>
                   <p className="text-xs text-stone-500">
-                    {formatBlogDate(post.publishedAt)} • {estimateReadingTime(post.content)} menit baca
+                    {formatBlogDate(post.publishedAt)} • {estimateReadingTime(post.content)} {copy.readMinutes}
                   </p>
                 </div>
               </Link>

@@ -38,8 +38,8 @@ export function FooterSection({
         fallbackPreset="dark-slate-cinematic"
       />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--landing-accent-blue)_10%,transparent)_0%,transparent_34%)]" />
-      <div className="pointer-events-none absolute bottom-[-5rem] left-[-3rem] h-64 w-64 rounded-full blur-[110px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
-      <div className="pointer-events-none absolute right-[-4rem] top-[-2rem] h-56 w-56 rounded-full blur-[105px]" style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 8%, transparent)" }} />
+      <div className="pointer-events-none absolute bottom-[-5rem] left-[-3rem] h-44 w-44 rounded-full blur-[74px] sm:h-56 sm:w-56 sm:blur-[88px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
+      <div className="pointer-events-none absolute right-[-4rem] top-[-2rem] h-40 w-40 rounded-full blur-[70px] sm:h-52 sm:w-52 sm:blur-[84px]" style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 8%, transparent)" }} />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <div className="grid gap-12 lg:grid-cols-[1.45fr_0.72fr_0.52fr] lg:gap-14">

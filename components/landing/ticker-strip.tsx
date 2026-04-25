@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import type { TickerItem } from "@/components/landing/types";
 import { fallbackTickerItems, getTickerInitials } from "@/lib/market";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import { Reveal } from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ const duplicatedFallbackItems = [...fallbackTickerItems, ...fallbackTickerItems]
 
 export function TickerStrip({ className, previewMode = false }: TickerStripProps) {
   const prefersReducedMotion = useReducedMotion();
+  const lightMotion = useLightLandingMotion();
   const [items, setItems] = useState<TickerItem[]>(fallbackTickerItems);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export function TickerStrip({ className, previewMode = false }: TickerStripProps
     void loadTicker();
     const intervalId = window.setInterval(() => {
       void loadTicker();
-    }, 20000);
+    }, 30000);
 
     return () => {
       isMounted = false;
@@ -75,18 +77,20 @@ export function TickerStrip({ className, previewMode = false }: TickerStripProps
       ]
         .filter(Boolean)
         .join(" ")}
+      distance={lightMotion ? 12 : 24}
+      duration={lightMotion ? 0.68 : 1.12}
     >
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-[linear-gradient(90deg,var(--landing-panel-bg)_0%,rgba(255,255,255,0)_100%)]" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-[linear-gradient(270deg,var(--landing-panel-bg)_0%,rgba(255,255,255,0)_100%)]" />
 
       <motion.div
-        animate={prefersReducedMotion ? { x: "0%" } : { x: ["0%", "-50%"] }}
+        animate={prefersReducedMotion || lightMotion ? { x: "0%" } : { x: ["0%", "-50%"] }}
         className="flex w-max items-stretch gap-3 px-3 sm:gap-4 sm:px-5 lg:px-6"
         transition={
-          prefersReducedMotion
+          prefersReducedMotion || lightMotion
             ? undefined
             : {
-                duration: 24,
+                duration: 34,
                 ease: "linear",
                 repeat: Number.POSITIVE_INFINITY,
               }

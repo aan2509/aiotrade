@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import type { TestimonialContent } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
@@ -22,12 +23,13 @@ function getInitials(name: string) {
 }
 
 export function TestimonialSection({ content }: TestimonialSectionProps) {
+  const lightMotion = useLightLandingMotion();
   const items = useMemo(() => content.items.filter((item) => item.name && item.quote && item.role), [content.items]);
   const [activeIndex, setActiveIndex] = useState(0);
   const normalizedActiveIndex = items.length ? activeIndex % items.length : 0;
 
   useEffect(() => {
-    if (items.length <= 1) {
+    if (items.length <= 1 || lightMotion) {
       return;
     }
 
@@ -38,7 +40,7 @@ export function TestimonialSection({ content }: TestimonialSectionProps) {
     return () => {
       window.clearInterval(timer);
     };
-  }, [items.length]);
+  }, [items.length, lightMotion]);
 
   if (!items.length) {
     return null;
@@ -55,11 +57,11 @@ export function TestimonialSection({ content }: TestimonialSectionProps) {
         fallbackPreset="warm-ivory"
       />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(255,200,74,0.10)_0%,rgba(255,200,74,0)_100%)]" />
-      <div className="pointer-events-none absolute left-[-8%] top-10 h-64 w-64 rounded-full bg-[#7ab2ff]/12 blur-[110px]" />
-      <div className="pointer-events-none absolute bottom-0 right-[-5%] h-72 w-72 rounded-full bg-[#ffd972]/16 blur-[120px]" />
+      <div className="pointer-events-none absolute left-[-8%] top-10 h-48 w-48 rounded-full bg-[#7ab2ff]/12 blur-[76px] sm:h-60 sm:w-60 sm:blur-[92px]" />
+      <div className="pointer-events-none absolute bottom-0 right-[-5%] h-52 w-52 rounded-full bg-[#ffd972]/16 blur-[80px] sm:h-64 sm:w-64 sm:blur-[96px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-        <Reveal className="mx-auto max-w-4xl text-center">
+        <Reveal className="mx-auto max-w-4xl text-center" distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.72 : 1.12}>
           <p className="text-[0.96rem] font-semibold tracking-[-0.02em] text-[var(--landing-accent-blue)] sm:text-[1.18rem] lg:text-[1.3rem]">
             {content.eyebrow}
           </p>
@@ -75,7 +77,8 @@ export function TestimonialSection({ content }: TestimonialSectionProps) {
           <Reveal
             className="landing-glass-card overflow-hidden rounded-[30px]"
             direction="right"
-            distance={40}
+            distance={lightMotion ? 18 : 32}
+            duration={lightMotion ? 0.78 : 1.02}
           >
             <div className="relative aspect-[4/5] overflow-hidden bg-[linear-gradient(135deg,#eef5ff_0%,#f8fafc_54%,#fff8e9_100%)]">
               {activeItem.imageUrl ? (
@@ -101,7 +104,8 @@ export function TestimonialSection({ content }: TestimonialSectionProps) {
             className="landing-glass-card rounded-[30px] p-6 sm:p-8"
             delay={0.08}
             direction="right"
-            distance={48}
+            distance={lightMotion ? 20 : 36}
+            duration={lightMotion ? 0.78 : 1.02}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#eef5ff] text-[#1b74df]">

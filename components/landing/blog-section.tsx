@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { landingImages } from "@/components/landing/data";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import type { BlogContent, BlogPreviewItem } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -14,6 +15,7 @@ type BlogSectionProps = {
 };
 
 export function BlogSection({ content, posts }: BlogSectionProps) {
+  const lightMotion = useLightLandingMotion();
   const fallbackItems: BlogPreviewItem[] = content.items.map((item, index) => ({
     category: item.label,
     excerpt: item.description,
@@ -33,10 +35,10 @@ export function BlogSection({ content, posts }: BlogSectionProps) {
         fallbackPreset="warm-ivory"
       />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[linear-gradient(180deg,rgba(246,190,79,0.08)_0%,rgba(246,190,79,0)_100%)]" />
-      <div className="pointer-events-none absolute left-[-8%] top-14 h-56 w-56 rounded-full bg-[#f4cf73]/14 blur-[95px]" />
-      <div className="pointer-events-none absolute bottom-0 right-[-5%] h-60 w-60 rounded-full bg-[#75b9ff]/8 blur-[105px]" />
+      <div className="pointer-events-none absolute left-[-8%] top-14 h-44 w-44 rounded-full bg-[#f4cf73]/14 blur-[70px] sm:h-52 sm:w-52 sm:blur-[84px]" />
+      <div className="pointer-events-none absolute bottom-0 right-[-5%] h-48 w-48 rounded-full bg-[#75b9ff]/8 blur-[74px] sm:h-56 sm:w-56 sm:blur-[88px]" />
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-        <Reveal className="text-center lg:text-left">
+        <Reveal className="text-center lg:text-left" distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.72 : 1.12}>
           <h2 className="text-[2.35rem] font-semibold leading-none tracking-[-0.05em] text-[var(--landing-accent-gold)] sm:text-[3.35rem] lg:text-[4.3rem]">
             {content.title}
           </h2>
@@ -48,9 +50,9 @@ export function BlogSection({ content, posts }: BlogSectionProps) {
               className="landing-glass-card landing-glass-card-hover overflow-hidden rounded-[28px]"
               delay={index * 0.08}
               direction="right"
-              distance={42}
-              duration={1.2}
-              hover
+              distance={lightMotion ? 18 : 34}
+              duration={lightMotion ? 0.78 : 1.04}
+              hover={!lightMotion}
               key={article.title}
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-[#0d1728]">

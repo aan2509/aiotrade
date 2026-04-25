@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { features } from "@/components/landing/data";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import { Reveal } from "@/components/ui/reveal";
 import type { BenefitsContent } from "@/components/landing/types";
 
@@ -13,33 +13,23 @@ type BenefitsSectionProps = {
 
 export function BenefitsSection({ content }: BenefitsSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const prefersReducedMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-  const backgroundY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [-34, 36]);
-  const backgroundScale = useTransform(
-    scrollYProgress,
-    [0, 1],
-    prefersReducedMotion ? [1, 1] : [1.06, 1.12],
-  );
+  const lightMotion = useLightLandingMotion();
 
   return (
     <section className="relative overflow-hidden py-20 text-[var(--landing-text-primary)] sm:py-24" ref={sectionRef}>
-      <motion.div className="absolute inset-0" style={{ scale: backgroundScale, y: backgroundY }}>
+      <div className="absolute inset-0">
         <SectionBackgroundLayer
           config={content.background}
           fallbackOverlayColor="#070a12"
           fallbackOverlayOpacity={74}
           fallbackPreset="dark-slate-cinematic"
         />
-      </motion.div>
-      <div className="absolute left-[-6%] top-10 h-56 w-56 rounded-full blur-[110px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
-      <div className="absolute bottom-0 right-[-8%] h-64 w-64 rounded-full blur-[120px]" style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 10%, transparent)" }} />
+      </div>
+      <div className="absolute left-[-6%] top-10 h-40 w-40 rounded-full blur-[72px] sm:h-52 sm:w-52 sm:blur-[88px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
+      <div className="absolute bottom-0 right-[-8%] h-48 w-48 rounded-full blur-[78px] sm:h-60 sm:w-60 sm:blur-[92px]" style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 10%, transparent)" }} />
 
       <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-        <Reveal className="mx-auto max-w-5xl text-center">
+        <Reveal className="mx-auto max-w-5xl text-center" distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.72 : 1.12}>
           <p className="text-lg font-semibold text-[var(--landing-accent-gold)] sm:text-[2.2rem]">
             {content.heading}
           </p>
@@ -57,9 +47,9 @@ export function BenefitsSection({ content }: BenefitsSectionProps) {
                 className="landing-glass-dark-panel rounded-[24px] px-6 py-8 text-center sm:px-7"
                 delay={index * 0.08}
                 direction="right"
-                distance={38}
-                duration={1.18}
-                hover
+                distance={lightMotion ? 18 : 32}
+                duration={lightMotion ? 0.76 : 1.02}
+                hover={!lightMotion}
                 key={feature.title}
               >
                 <span className="inline-flex h-16 w-16 items-center justify-center text-[#ffbf00]">

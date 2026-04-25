@@ -1,51 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import type { VideoSectionContent } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
-import { buildAutoplayEmbedUrl, normalizeMemberGuideVideoUrl } from "@/lib/member-guide-utils";
+import { normalizeMemberGuideVideoUrl } from "@/lib/member-guide-utils";
 
 type VideoSectionProps = {
   content: VideoSectionContent;
 };
 
 export function VideoSection({ content }: VideoSectionProps) {
-  const frameRef = useRef<HTMLDivElement | null>(null);
-  const [isInView, setIsInView] = useState(false);
+  const lightMotion = useLightLandingMotion();
 
   const normalizedEmbedUrl = useMemo(
     () => normalizeMemberGuideVideoUrl(content.embedUrl),
     [content.embedUrl],
   );
-  const iframeSrc = useMemo(
-    () => buildAutoplayEmbedUrl(content.embedUrl, isInView),
-    [content.embedUrl, isInView],
-  );
-
-  useEffect(() => {
-    const node = frameRef.current;
-
-    if (!node || !normalizedEmbedUrl) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsInView(entry?.isIntersecting ?? false);
-      },
-      {
-        rootMargin: "0px 0px -12% 0px",
-        threshold: 0.55,
-      },
-    );
-
-    observer.observe(node);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [normalizedEmbedUrl]);
 
   if (!content.isVisible || !normalizedEmbedUrl) {
     return null;
@@ -60,11 +32,11 @@ export function VideoSection({ content }: VideoSectionProps) {
         fallbackPreset="dark-slate-cinematic"
       />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,color-mix(in_srgb,var(--landing-accent-blue)_10%,transparent),transparent_34%)]" />
-      <div className="pointer-events-none absolute left-[-10%] top-20 h-72 w-72 rounded-full blur-[120px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
-      <div className="pointer-events-none absolute bottom-0 right-[-8%] h-72 w-72 rounded-full blur-[120px]" style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 10%, transparent)" }} />
+      <div className="pointer-events-none absolute left-[-10%] top-20 h-48 w-48 rounded-full blur-[76px] sm:h-60 sm:w-60 sm:blur-[92px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
+      <div className="pointer-events-none absolute bottom-0 right-[-8%] h-48 w-48 rounded-full blur-[76px] sm:h-60 sm:w-60 sm:blur-[92px]" style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 10%, transparent)" }} />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-        <Reveal className="mx-auto max-w-4xl text-center">
+        <Reveal className="mx-auto max-w-4xl text-center" distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.72 : 1.12}>
           <p className="text-[0.96rem] font-semibold tracking-[-0.02em] text-[var(--landing-accent-blue)] sm:text-[1.18rem] lg:text-[1.3rem]">
             {content.eyebrow}
           </p>
@@ -76,19 +48,16 @@ export function VideoSection({ content }: VideoSectionProps) {
           </p>
         </Reveal>
 
-        <Reveal className="mt-12" delay={0.08} direction="right" distance={42}>
+        <Reveal className="mt-12" delay={0.08} direction="right" distance={lightMotion ? 18 : 34} duration={lightMotion ? 0.76 : 1.04}>
           <div className="landing-glass-dark-panel overflow-hidden rounded-[30px]">
             <div className="p-4 sm:p-6">
-              <div
-                className="relative overflow-hidden rounded-[26px] border border-[var(--landing-dark-panel-border)] bg-[var(--landing-page-bg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_22px_48px_rgba(2,6,23,0.28)]"
-                ref={frameRef}
-              >
+              <div className="relative overflow-hidden rounded-[26px] border border-[var(--landing-dark-panel-border)] bg-[var(--landing-page-bg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_22px_48px_rgba(2,6,23,0.28)]">
                 <div className="aspect-video">
                   <iframe
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="h-full w-full"
-                    src={iframeSrc ?? normalizedEmbedUrl}
+                    loading="lazy"
+                    src={normalizedEmbedUrl}
                     title={content.title}
                   />
                 </div>

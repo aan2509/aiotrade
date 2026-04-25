@@ -3,11 +3,12 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { LogIn } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { landingImages, partnerLogos } from "@/components/landing/data";
 import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
 import { TickerStrip } from "@/components/landing/ticker-strip";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import { Reveal } from "@/components/ui/reveal";
 import type { OverviewContent } from "@/components/landing/types";
 
@@ -28,12 +29,7 @@ export function OverviewSection({
 }: OverviewSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-  const leftChartY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [-26, 24]);
-  const rightChartY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [0, 0] : [18, -22]);
+  const lightMotion = useLightLandingMotion();
 
   return (
     <section className="relative text-[var(--landing-text-primary)]" id="fitur" ref={sectionRef}>
@@ -44,21 +40,21 @@ export function OverviewSection({
           fallbackOverlayOpacity={74}
           fallbackPreset="dark-slate-cinematic"
         />
-        <motion.div
-          className="absolute left-[-10%] top-12 h-64 w-64 rounded-full blur-[120px]"
-          style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 12%, transparent)", y: leftChartY }}
+        <div
+          className="absolute left-[-10%] top-12 h-44 w-44 rounded-full blur-[72px] sm:h-56 sm:w-56 sm:blur-[92px]"
+          style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 12%, transparent)" }}
         />
-        <motion.div
-          className="absolute bottom-0 right-[-8%] h-72 w-72 rounded-full blur-[130px]"
-          style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 12%, transparent)", y: rightChartY }}
+        <div
+          className="absolute bottom-0 right-[-8%] h-48 w-48 rounded-full blur-[76px] sm:h-64 sm:w-64 sm:blur-[96px]"
+          style={{ background: "color-mix(in srgb, var(--landing-accent-gold) 12%, transparent)" }}
         />
       </div>
 
       <motion.div
         animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
         className="relative mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-8 sm:pb-14 sm:pt-10 lg:px-10 lg:pt-12"
-        initial={prefersReducedMotion ? false : { opacity: 1, y: 14 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        initial={prefersReducedMotion ? false : { opacity: 1, y: lightMotion ? 8 : 14 }}
+        transition={{ duration: lightMotion ? 0.45 : 0.7, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="landing-glass-panel relative overflow-hidden rounded-[34px] px-4 py-6 sm:px-8 sm:py-9 lg:px-10 lg:py-10">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--landing-accent-blue)_10%,transparent),transparent_42%),radial-gradient(circle_at_bottom_right,color-mix(in_srgb,var(--landing-accent-gold)_10%,transparent),transparent_42%)]" />
@@ -79,7 +75,7 @@ export function OverviewSection({
             </div>
 
             <div className="relative mx-auto flex w-full max-w-[24rem] flex-col items-center text-center lg:max-w-none lg:items-start lg:text-left">
-              <Reveal className="w-full" delay={0.02} stable>
+              <Reveal className="w-full" delay={0.02} distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.7 : 1.12} stable>
                 <div className="mx-auto w-full max-w-[22rem] sm:max-w-[30rem] lg:mx-0 lg:max-w-[34rem]">
                   <div className="flex justify-center lg:justify-start">
                     <Image
@@ -98,19 +94,21 @@ export function OverviewSection({
 
               <Reveal
                 className="relative mt-8 w-full max-w-[22rem] overflow-hidden rounded-[24px] sm:mt-10 sm:max-w-none"
-                delay={0.14}
+                delay={lightMotion ? 0.08 : 0.14}
+                distance={lightMotion ? 14 : 24}
+                duration={lightMotion ? 0.72 : 1.12}
                 stable
               >
                 <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-[linear-gradient(90deg,var(--landing-surface-bg)_0%,rgba(255,255,255,0)_100%)] sm:w-14" />
                 <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-[linear-gradient(270deg,var(--landing-surface-bg)_0%,rgba(255,255,255,0)_100%)] sm:w-14" />
                 <motion.div
-                  animate={prefersReducedMotion ? { x: "0%" } : { x: ["0%", "-50%"] }}
+                  animate={prefersReducedMotion || lightMotion ? { x: "0%" } : { x: ["0%", "-50%"] }}
                   className="flex w-max items-stretch gap-3 py-1"
                   transition={
-                    prefersReducedMotion
+                    prefersReducedMotion || lightMotion
                       ? undefined
                       : {
-                          duration: 18,
+                          duration: 28,
                           ease: "linear",
                           repeat: Number.POSITIVE_INFINITY,
                         }
@@ -133,7 +131,9 @@ export function OverviewSection({
 
               <Reveal
                 className="mt-8 flex w-full justify-center sm:mt-10 lg:justify-start"
-                delay={0.18}
+                delay={lightMotion ? 0.12 : 0.18}
+                distance={lightMotion ? 14 : 24}
+                duration={lightMotion ? 0.72 : 1.12}
                 stable
               >
                 <LandingCtaButton

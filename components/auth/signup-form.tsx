@@ -36,6 +36,42 @@ import { getUsernameValidationMessage } from "@/lib/username-rules";
 
 type SignupFormProps = {
   initialMemberId: string;
+  labels?: {
+    accountReady: string;
+    backToLogin: string;
+    createAccount: string;
+    createPayment: string;
+    createPaymentAgain: string;
+    createPaymentPending: string;
+    email: string;
+    emailPlaceholder: string;
+    invitedSaved: string;
+    memberId: string;
+    password: string;
+    passwordCheckDescriptionEmpty: string;
+    passwordCheckDescriptionMatch: string;
+    passwordCheckDescriptionStrong: string;
+    passwordCheckTitle: string;
+    passwordConfirmation: string;
+    passwordConfirmationPlaceholder: string;
+    passwordLengthLabel: string;
+    passwordPlaceholder: string;
+    payment: string;
+    paymentMethod: string;
+    paymentStepDescription: string;
+    paymentStepTitle: string;
+    signupLocked: string;
+    subscriptionDuration: string;
+    username: string;
+    usernamePlaceholder: string;
+    usernameStatusAvailable: string;
+    usernameStatusChecking: string;
+    usernameStatusError: string;
+    usernameStatusGuidance: string;
+    usernameStatusTaken: string;
+    whatsapp: string;
+    whatsappPlaceholder: string;
+  };
   paymentSettings: PublicSignupPaymentSettings;
   referredBy: string | null;
 };
@@ -66,6 +102,43 @@ const initialSignupState: SignupActionState = {
   status: "idle",
   message: null,
   fieldErrors: {},
+};
+
+const defaultLabels = {
+  accountReady: "Sudah punya akun?",
+  backToLogin: "Masuk di sini",
+  createAccount: "Buat akun",
+  createPayment: "Buat pembayaran",
+  createPaymentAgain: "Buat ulang pembayaran",
+  createPaymentPending: "Sedang membuat akun...",
+  email: "Email",
+  emailPlaceholder: "you@example.com",
+  invitedSaved: "Undangan sudah tersimpan",
+  memberId: "Member ID",
+  password: "Password",
+  passwordCheckDescriptionEmpty: "Mulai ketik password untuk melihat kekuatannya.",
+  passwordCheckDescriptionMatch: "Password sudah cocok dan siap dipakai.",
+  passwordCheckDescriptionStrong: "Tambahkan kombinasi yang lebih beragam agar password lebih kuat.",
+  passwordCheckTitle: "Cek password Anda",
+  passwordConfirmation: "Ulangi Password",
+  passwordConfirmationPlaceholder: "Ketik ulang password",
+  passwordLengthLabel: "karakter",
+  passwordPlaceholder: "Minimal 8 karakter",
+  payment: "Payment",
+  paymentMethod: "Metode pembayaran",
+  paymentStepDescription: "Lengkapi form dan buat pembayaran.",
+  paymentStepTitle: "Langkah pembayaran",
+  signupLocked: "Selesaikan pembayaran dulu",
+  subscriptionDuration: "Pilih durasi langganan",
+  username: "Username",
+  usernamePlaceholder: "yourname",
+  usernameStatusAvailable: "Username ini masih tersedia.",
+  usernameStatusChecking: "Sedang memeriksa username...",
+  usernameStatusError: "Belum bisa memeriksa username sekarang.",
+  usernameStatusGuidance: "Pakai 3-24 huruf kecil, angka, atau underscore.",
+  usernameStatusTaken: "Username ini sudah dipakai.",
+  whatsapp: "Nomor WhatsApp",
+  whatsappPlaceholder: "+6281234567890",
 };
 
 function ChecklistItem({
@@ -124,7 +197,12 @@ function getServerHydrationSnapshot() {
   return false;
 }
 
-export function SignupForm({ initialMemberId, paymentSettings, referredBy }: SignupFormProps) {
+export function SignupForm({
+  initialMemberId,
+  labels = defaultLabels,
+  paymentSettings,
+  referredBy,
+}: SignupFormProps) {
   const [state, formAction] = useActionState(signUpAction, initialSignupState);
   const fieldErrors = state?.fieldErrors ?? {};
   const hasHydrated = useSyncExternalStore(
@@ -179,7 +257,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
       setUsernameAvailability({
         status: "checking",
         value: normalizedUsername,
-        message: "Sedang memeriksa username...",
+        message: labels.usernameStatusChecking,
       });
 
       try {
@@ -200,7 +278,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           setUsernameAvailability({
             status: "error",
             value: normalizedUsername,
-            message: payload.message ?? "Belum bisa memeriksa username sekarang.",
+            message: payload.message ?? labels.usernameStatusError,
           });
 
           return;
@@ -211,7 +289,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           value: normalizedUsername,
           message:
             payload.message ??
-            (payload.available ? "Username ini masih tersedia." : "Username ini sudah dipakai."),
+            (payload.available ? labels.usernameStatusAvailable : labels.usernameStatusTaken),
         });
       } catch {
         if (controller.signal.aborted) {
@@ -221,7 +299,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
         setUsernameAvailability({
           status: "error",
           value: normalizedUsername,
-          message: "Belum bisa memeriksa username sekarang.",
+          message: labels.usernameStatusError,
         });
       }
     }, 350);
@@ -236,7 +314,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
     if (!normalizedUsername) {
       return {
         tone: "neutral" as const,
-        message: "Pakai 3-24 huruf kecil, angka, atau underscore.",
+        message: labels.usernameStatusGuidance,
       };
     }
 
@@ -250,7 +328,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
     if (usernameAvailability.value !== normalizedUsername) {
       return {
         tone: "checking" as const,
-        message: "Sedang memeriksa username...",
+        message: labels.usernameStatusChecking,
       };
     }
 
@@ -277,9 +355,9 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
 
     return {
       tone: "checking" as const,
-      message: "Sedang memeriksa username...",
+      message: labels.usernameStatusChecking,
     };
-  }, [normalizedUsername, usernameAvailability, usernameLocalIssue]);
+  }, [labels.usernameStatusChecking, labels.usernameStatusGuidance, normalizedUsername, usernameAvailability, usernameLocalIssue]);
 
   const passwordMetrics = useMemo(() => {
     const length = password.length;
@@ -551,7 +629,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
         <Alert className="flex items-start gap-3 border-sky-200 bg-sky-50/90 text-sky-800">
           <UserRound className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
-            <p className="font-medium text-sky-950">Undangan sudah tersimpan</p>
+            <p className="font-medium text-sky-950">{labels.invitedSaved}</p>
             
           </div>
         </Alert>
@@ -586,7 +664,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           <AuthFieldShell error={fieldErrors.username}>
             <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="username">
               <AtSign className="h-4 w-4 text-sky-500" />
-              Username
+              {labels.username}
             </Label>
             <Input
               autoCapitalize="none"
@@ -598,7 +676,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
                 clearPaymentFlow("Data form berubah. Buat ulang pembayaran agar datanya tetap sinkron.");
                 setUsername(event.target.value);
               }}
-              placeholder="yourname"
+              placeholder={labels.usernamePlaceholder}
               required
               spellCheck={false}
               type="text"
@@ -642,7 +720,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           <AuthFieldShell error={fieldErrors.email}>
             <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="email">
               <Mail className="h-4 w-4 text-sky-500" />
-              Email
+              {labels.email}
             </Label>
             <Input
               autoComplete="email"
@@ -653,7 +731,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
                 clearPaymentFlow("Data form berubah. Buat ulang pembayaran agar datanya tetap sinkron.");
                 setEmail(event.target.value);
               }}
-              placeholder="you@example.com"
+              placeholder={labels.emailPlaceholder}
               required
               type="email"
               value={email}
@@ -666,7 +744,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           <AuthFieldShell error={fieldErrors.whatsapp}>
             <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="whatsapp">
               <MessageCircleMore className="h-4 w-4 text-sky-500" />
-              Nomor WhatsApp
+              {labels.whatsapp}
             </Label>
             <Input
               autoComplete="tel"
@@ -677,7 +755,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
                 clearPaymentFlow("Data form berubah. Buat ulang pembayaran agar datanya tetap sinkron.");
                 setWhatsapp(event.target.value);
               }}
-              placeholder="+6281234567890"
+              placeholder={labels.whatsappPlaceholder}
               required
               type="tel"
               value={whatsapp}
@@ -690,7 +768,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           <AuthFieldShell>
             <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="memberId">
               <Hash className="h-4 w-4 text-sky-500" />
-              Member ID
+              {labels.memberId}
             </Label>
             <Input
               className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
@@ -707,7 +785,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           <AuthFieldShell error={fieldErrors.password}>
             <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="password">
               <KeyRound className="h-4 w-4 text-sky-500" />
-              Password
+              {labels.password}
             </Label>
             <Input
               autoComplete="new-password"
@@ -716,7 +794,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
               minLength={8}
               name="password"
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Minimal 8 karakter"
+              placeholder={labels.passwordPlaceholder}
               required
               type="password"
               value={password}
@@ -732,7 +810,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
               htmlFor="passwordConfirmation"
             >
               <ShieldCheck className="h-4 w-4 text-sky-500" />
-              Ulangi Password
+              {labels.passwordConfirmation}
             </Label>
             <Input
               autoComplete="new-password"
@@ -740,7 +818,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
               id="passwordConfirmation"
               name="passwordConfirmation"
               onChange={(event) => setPasswordConfirmation(event.target.value)}
-              placeholder="Ketik ulang password"
+              placeholder={labels.passwordConfirmationPlaceholder}
               required
               type="password"
               value={passwordConfirmation}
@@ -754,9 +832,9 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
 
       <div className="rounded-lg border border-slate-200 bg-slate-50/80 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm font-medium text-slate-700">Cek password Anda</p>
+          <p className="text-sm font-medium text-slate-700">{labels.passwordCheckTitle}</p>
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-500">{passwordMetrics.length} karakter</span>
+            <span className="text-slate-500">{passwordMetrics.length} {labels.passwordLengthLabel}</span>
             <span className={cn("rounded-full px-2.5 py-1 text-xs font-medium", passwordMetrics.level.tone)}>
               {passwordMetrics.level.label}
             </span>
@@ -775,10 +853,10 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
         </div>
         <div className="mt-3 text-sm text-slate-500">
           {passwordMetrics.length === 0
-            ? "Mulai ketik password untuk melihat kekuatannya."
+            ? labels.passwordCheckDescriptionEmpty
             : passwordMetrics.matches
-              ? "Password sudah cocok dan siap dipakai."
-              : "Tambahkan kombinasi yang lebih beragam agar password lebih kuat."}
+              ? labels.passwordCheckDescriptionMatch
+              : labels.passwordCheckDescriptionStrong}
         </div>
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
           {passwordMetrics.checks.map((item) => (
@@ -793,7 +871,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
             <div>
               <p className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
                 <CreditCard className="h-3.5 w-3.5" />
-                Payment
+                {labels.payment}
               </p>
               <h3 className="mt-4 text-lg font-semibold text-slate-950">
                 {selectedPlan?.label ?? paymentSettings.priceLabel}
@@ -810,7 +888,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           </div>
 
           <div className="mt-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Pilih durasi langganan</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{labels.subscriptionDuration}</p>
             <div className="mt-3 grid gap-3">
               {paymentSettings.plans.map((plan) => {
                 const selected = selectedPlan?.id === plan.id;
@@ -858,7 +936,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
           </div>
 
           <div className="mt-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Metode pembayaran</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{labels.paymentMethod}</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {paymentSettings.activeChannels.map((channel) => {
                 const Icon = paymentChannelIcon(channel.type);
@@ -915,9 +993,9 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
             <div className="rounded-2xl bg-white/60 p-1">
               <div className="flex flex-col gap-3 rounded-2xl bg-white/80 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Langkah pembayaran</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{labels.paymentStepTitle}</p>
                 <p className="mt-1 text-sm text-slate-600">
-                  Lengkapi form dan buat pembayaran.
+                  {labels.paymentStepDescription}
                 </p>
               </div>
               <Button
@@ -931,7 +1009,7 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
                 ) : (
                   <CreditCard className="h-4 w-4" />
                 )}
-                {paymentFlow.referenceId ? "Buat ulang pembayaran" : "Buat pembayaran"}
+                {paymentFlow.referenceId ? labels.createPaymentAgain : labels.createPayment}
               </Button>
             </div>
             </div>
@@ -1084,18 +1162,18 @@ export function SignupForm({ initialMemberId, paymentSettings, referredBy }: Sig
       <SubmitButton
         className="h-12 w-full rounded-lg bg-sky-500 text-base font-semibold text-white shadow-[0_16px_30px_rgba(14,165,233,0.22)] hover:bg-sky-600"
         disabled={isUsernameBlocked || isSignupLocked}
-        pendingText="Sedang membuat akun..."
+        pendingText={labels.createPaymentPending}
       >
-        {isSignupLocked ? "Selesaikan pembayaran dulu" : "Buat akun"}
+        {isSignupLocked ? labels.signupLocked : labels.createAccount}
       </SubmitButton>
 
       <p className="text-center text-sm text-slate-600">
-        Sudah punya akun?{" "}
+        {labels.accountReady}{" "}
         <Link
           className="font-medium text-slate-950 underline decoration-slate-300 underline-offset-4"
           href="/login"
         >
-          Masuk di sini
+          {labels.backToLogin}
         </Link>
       </p>
     </form>

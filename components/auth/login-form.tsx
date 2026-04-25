@@ -17,11 +17,37 @@ const initialLoginState: LoginActionState = {
 };
 
 type LoginFormProps = {
+  labels?: {
+    email: string;
+    emailPlaceholder: string;
+    helperBody: string;
+    helperTitle: string;
+    loginButton: string;
+    loginPending: string;
+    noAccount: string;
+    password: string;
+    passwordPlaceholder: string;
+    signupLink: string;
+  };
   showSignupLink?: boolean;
   signupHref?: string;
 };
 
+const defaultLabels = {
+  email: "Email",
+  emailPlaceholder: "you@example.com",
+  helperBody: "Pakai email yang sama seperti saat daftar agar Anda bisa masuk tanpa repot.",
+  helperTitle: "Siap lanjut",
+  loginButton: "Masuk",
+  loginPending: "Sedang masuk...",
+  noAccount: "Belum punya akun?",
+  password: "Password",
+  passwordPlaceholder: "Masukkan password Anda",
+  signupLink: "Daftar di sini",
+};
+
 export function LoginForm({
+  labels = defaultLabels,
   showSignupLink = true,
   signupHref = "/signup",
 }: LoginFormProps) {
@@ -45,7 +71,7 @@ export function LoginForm({
           <AuthFieldShell error={fieldErrors.email}>
             <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="email">
               <Mail className="h-4 w-4 text-sky-500" />
-              Email
+              {labels.email}
             </Label>
             <Input
               autoComplete="email"
@@ -53,7 +79,7 @@ export function LoginForm({
               defaultValue={state.formValues?.email ?? ""}
               id="email"
               name="email"
-              placeholder="you@example.com"
+              placeholder={labels.emailPlaceholder}
               required
               type="email"
             />
@@ -65,14 +91,14 @@ export function LoginForm({
           <AuthFieldShell error={fieldErrors.password}>
             <Label className="mb-2 inline-flex items-center gap-2 text-slate-700" htmlFor="password">
               <KeyRound className="h-4 w-4 text-sky-500" />
-              Password
+              {labels.password}
             </Label>
             <Input
               autoComplete="current-password"
               className="border-0 bg-transparent px-0 text-base shadow-none focus:ring-0"
               id="password"
               name="password"
-              placeholder="Masukkan password Anda"
+              placeholder={labels.passwordPlaceholder}
               required
               type="password"
             />
@@ -84,27 +110,27 @@ export function LoginForm({
       </div>
 
       <div className="rounded-lg border border-slate-200 bg-slate-50/80 p-4">
-        <p className="text-sm font-medium text-slate-700">Siap lanjut</p>
+        <p className="text-sm font-medium text-slate-700">{labels.helperTitle}</p>
         <p className="mt-2 text-sm leading-7 text-slate-500">
-          Pakai email yang sama seperti saat daftar agar Anda bisa masuk tanpa repot.
+          {labels.helperBody}
         </p>
       </div>
 
       <SubmitButton
         className="h-12 w-full rounded-lg bg-sky-500 text-base font-semibold text-white shadow-[0_16px_30px_rgba(14,165,233,0.22)] hover:bg-sky-600"
-        pendingText="Sedang masuk..."
+        pendingText={labels.loginPending}
       >
-        Masuk
+        {labels.loginButton}
       </SubmitButton>
 
       {showSignupLink ? (
         <p className="text-center text-sm text-slate-600">
-          Belum punya akun?{" "}
+          {labels.noAccount}{" "}
           <Link
             className="font-medium text-slate-950 underline decoration-slate-300 underline-offset-4"
             href={signupHref}
           >
-            Daftar di sini
+            {labels.signupLink}
           </Link>
         </p>
       ) : null}

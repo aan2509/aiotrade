@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import type { GuideContent } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -11,6 +12,8 @@ type GuideSectionProps = {
 };
 
 export function GuideSection({ content }: GuideSectionProps) {
+  const lightMotion = useLightLandingMotion();
+
   return (
     <section className="relative overflow-hidden py-20" id="panduan">
       <SectionBackgroundLayer
@@ -20,10 +23,10 @@ export function GuideSection({ content }: GuideSectionProps) {
         fallbackPreset="sky-blue-accent"
       />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(37,99,235,0.05)_0%,rgba(37,99,235,0)_100%)]" />
-      <div className="pointer-events-none absolute left-[-5%] top-24 h-52 w-52 rounded-full bg-[#76a9ff]/10 blur-[96px]" />
-      <div className="pointer-events-none absolute bottom-0 right-[-8%] h-64 w-64 rounded-full bg-[#ffd673]/16 blur-[120px]" />
+      <div className="pointer-events-none absolute left-[-5%] top-24 h-40 w-40 rounded-full bg-[#76a9ff]/10 blur-[70px] sm:h-48 sm:w-48 sm:blur-[86px]" />
+      <div className="pointer-events-none absolute bottom-0 right-[-8%] h-48 w-48 rounded-full bg-[#ffd673]/16 blur-[76px] sm:h-60 sm:w-60 sm:blur-[92px]" />
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-        <Reveal className="mx-auto max-w-4xl text-center">
+        <Reveal className="mx-auto max-w-4xl text-center" distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.72 : 1.12}>
           <p className="text-[0.96rem] font-semibold tracking-[-0.02em] text-[var(--landing-accent-blue)] sm:text-[1.18rem] lg:text-[1.3rem]">
             {content.eyebrow}
           </p>
@@ -38,9 +41,9 @@ export function GuideSection({ content }: GuideSectionProps) {
               className="landing-glass-card landing-glass-card-hover rounded-[28px] px-7 py-9 text-center"
               delay={index * 0.08}
               direction="right"
-              distance={40}
-              duration={1.18}
-              hover
+              distance={lightMotion ? 18 : 32}
+              duration={lightMotion ? 0.78 : 1.02}
+              hover={!lightMotion}
               key={step.number}
             >
               <p className="text-[3.15rem] font-bold leading-none tracking-[-0.05em] text-[var(--landing-accent-blue)] sm:text-[3.8rem] lg:text-[4.7rem]">
@@ -56,7 +59,7 @@ export function GuideSection({ content }: GuideSectionProps) {
           ))}
         </div>
 
-        <Reveal className="mt-10 flex justify-center" delay={0.16}>
+        <Reveal className="mt-10 flex justify-center" delay={0.12} distance={lightMotion ? 12 : 24} duration={lightMotion ? 0.7 : 1}>
           <Link
             className="landing-glass-button inline-flex min-h-12 items-center justify-center gap-2 rounded-[16px] px-6 text-[0.96rem] font-medium text-[var(--landing-accent-blue)] transition duration-300 hover:-translate-y-0.5 sm:text-[1.02rem] lg:text-[1.05rem]"
             href="/guide"

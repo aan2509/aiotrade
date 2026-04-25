@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import type { FaqContent } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -12,6 +13,7 @@ type FaqSectionProps = {
 };
 
 export function FaqSection({ content }: FaqSectionProps) {
+  const lightMotion = useLightLandingMotion();
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
@@ -23,7 +25,7 @@ export function FaqSection({ content }: FaqSectionProps) {
         fallbackPreset="warm-ivory"
       />
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-        <Reveal className="landing-glass-panel faq-panel-shell overflow-hidden rounded-[30px]">
+        <Reveal className="landing-glass-panel faq-panel-shell overflow-hidden rounded-[30px]" distance={lightMotion ? 14 : 24} duration={lightMotion ? 0.72 : 1.12}>
           <div className="faq-panel-head px-6 py-8 text-center sm:px-10 sm:py-10">
             <p className="faq-panel-title text-[2.3rem] font-bold tracking-[0.04em] text-[var(--landing-accent-gold)] sm:text-[3.2rem] lg:text-[4rem]">
               {content.title}
@@ -35,7 +37,7 @@ export function FaqSection({ content }: FaqSectionProps) {
 
           <div className="bg-transparent">
             {content.items.map((entry, index) => (
-              <Reveal delay={index * 0.04} direction="right" distance={28} duration={1.02} key={entry.question}>
+              <Reveal delay={index * 0.03} direction="right" distance={lightMotion ? 12 : 20} duration={lightMotion ? 0.64 : 0.9} key={entry.question}>
                 <div className="faq-accordion-row border-b border-white/60 last:border-b-0">
                   <button
                     aria-controls={`faq-panel-${index}`}

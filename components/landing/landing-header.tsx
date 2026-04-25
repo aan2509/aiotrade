@@ -6,6 +6,7 @@ import { motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer
 import { navItems } from "@/components/landing/data";
 import { LandingThemeToggle } from "@/components/landing/landing-theme-toggle";
 import { SiteLanguageSelector } from "@/components/shared/site-language-selector";
+import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import type { LandingTheme } from "@/lib/landing-theme";
 import type { NavItem } from "@/components/landing/types";
 import type { SiteLanguage, SiteLanguageOption } from "@/lib/site-language";
@@ -30,6 +31,7 @@ export function LandingHeader({
 }: LandingHeaderProps) {
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
+  const lightMotion = useLightLandingMotion();
   const { scrollY } = useScroll();
   const [activeHref, setActiveHref] = useState(headerItems[0]?.href ?? "#fitur");
   const [isPinned, setIsPinned] = useState(false);
@@ -122,16 +124,16 @@ export function LandingHeader({
     <div className="relative z-40 h-[106px] sm:h-[70px]" ref={anchorRef}>
       <header
         className={cn(
-          "landing-header-shell left-0 right-0 z-40 w-full backdrop-blur-2xl transition duration-300",
+          "landing-header-shell left-0 right-0 z-40 w-full backdrop-blur-lg transition duration-300 sm:backdrop-blur-2xl",
           previewMode ? "absolute top-0" : isPinned ? "fixed top-0" : "absolute top-0",
-          !previewMode && isScrolled && "landing-header-shell-scrolled shadow-[0_16px_42px_rgba(0,0,0,0.36)]",
+          !previewMode && isScrolled && "landing-header-shell-scrolled shadow-[0_12px_30px_rgba(0,0,0,0.28)] sm:shadow-[0_16px_42px_rgba(0,0,0,0.36)]",
         )}
       >
         <motion.div
           animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
           className="relative mx-auto flex min-h-[106px] w-full max-w-7xl items-center justify-center px-3 py-2 sm:min-h-[70px] sm:px-8 sm:py-0 lg:px-10"
-          initial={prefersReducedMotion ? false : { opacity: 0, y: -18 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: lightMotion ? -8 : -18 }}
+          transition={{ duration: lightMotion ? 0.35 : 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <nav
@@ -155,7 +157,7 @@ export function LandingHeader({
                   <div className="flex items-center gap-2 sm:gap-6" key={item.href}>
                     {index > 0 ? <span className="landing-header-divider">|</span> : null}
                     <motion.div
-                      whileHover={prefersReducedMotion ? undefined : { y: -1.5 }}
+                      whileHover={prefersReducedMotion || lightMotion ? undefined : { y: -1 }}
                       whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                     >
                       <Link
