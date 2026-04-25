@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { estimateReadingTime, formatBlogDate } from "@/lib/blog-helpers";
 import { getPublishedBlogPosts } from "@/lib/blog-posts";
 import { SiteLanguageSelector } from "@/components/shared/site-language-selector";
+import { PrefetchedLink } from "@/components/shared/prefetched-link";
 import { getSiteSeoSettings } from "@/lib/site-seo";
 import { landingImages } from "@/components/landing/data";
 import { parseSiteLanguage, SITE_LANGUAGE_COOKIE } from "@/lib/site-language";
@@ -70,13 +70,13 @@ export default async function BlogPage() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.76)_0%,rgba(4,8,16,0.9)_100%)]" />
         <div className="relative mx-auto max-w-7xl">
           <div className="flex items-center justify-between gap-4">
-            <Link
+            <PrefetchedLink
               className="inline-flex items-center gap-2 text-sm font-medium text-white/72 transition hover:text-white"
               href="/"
             >
               <ArrowLeft className="h-4 w-4" />
               {copy.backHome}
-            </Link>
+            </PrefetchedLink>
 
             <SiteLanguageSelector
               currentLanguage={currentLanguage}
@@ -93,8 +93,8 @@ export default async function BlogPage() {
 
       <section className="mx-auto max-w-7xl px-6 py-14 sm:px-8 lg:px-10">
         {featuredPost ? (
-          <Link
-            className="grid overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-[0_22px_60px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1 lg:grid-cols-[1.1fr_0.9fr]"
+          <PrefetchedLink
+            className="grid overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-[0_22px_60px_rgba(15,23,42,0.08)] touch-manipulation transition duration-300 hover:-translate-y-1 lg:grid-cols-[1.1fr_0.9fr]"
             href={`/blog/${featuredPost.slug}`}
           >
             <div className="relative min-h-[320px] bg-[#0f1728]">
@@ -124,7 +124,7 @@ export default async function BlogPage() {
                 <ArrowRight className="h-4 w-4" />
               </span>
             </div>
-          </Link>
+          </PrefetchedLink>
         ) : (
           <div className="rounded-[28px] border border-dashed border-stone-300 bg-white px-8 py-16 text-center text-stone-500">
             {copy.empty}
@@ -134,8 +134,8 @@ export default async function BlogPage() {
         {restPosts.length ? (
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {restPosts.map((post) => (
-              <Link
-                className="overflow-hidden rounded-[24px] border border-stone-200 bg-white shadow-[0_18px_44px_rgba(15,23,42,0.07)] transition duration-300 hover:-translate-y-1"
+              <PrefetchedLink
+                className="overflow-hidden rounded-[24px] border border-stone-200 bg-white shadow-[0_18px_44px_rgba(15,23,42,0.07)] touch-manipulation transition duration-300 hover:-translate-y-1"
                 href={`/blog/${post.slug}`}
                 key={post.id}
               >
@@ -159,7 +159,7 @@ export default async function BlogPage() {
                     {formatBlogDate(post.publishedAt)} • {estimateReadingTime(post.content)} {copy.readMinutes}
                   </p>
                 </div>
-              </Link>
+              </PrefetchedLink>
             ))}
           </div>
         ) : null}

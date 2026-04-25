@@ -200,7 +200,9 @@ export function SiteLanguageSelector({
   const activeLanguage =
     languages.find((language) => language.language === (effectivePendingLanguage ?? currentLanguage)) ??
     languages[0];
-  const activeDisplay = activeLanguage ? getLanguageDisplay(activeLanguage) : null;
+  const activeCodeLabel = getLanguageCodeLabel(
+    (effectivePendingLanguage ?? activeLanguage?.language ?? currentLanguage) || "id",
+  );
   const uiCopy = getUiCopy(currentLanguage);
   const canUseDom = typeof window !== "undefined" && typeof document !== "undefined";
 
@@ -286,7 +288,7 @@ export function SiteLanguageSelector({
         aria-haspopup="listbox"
         aria-label={uiCopy.selectorTitle}
         className={cn(
-          "relative inline-flex h-10 min-w-[152px] items-center gap-2 overflow-hidden rounded-2xl border pl-3 pr-10 backdrop-blur-xl transition duration-300",
+          "relative inline-flex h-10 min-w-[84px] items-center gap-2 overflow-hidden rounded-2xl border pl-2.5 pr-8 backdrop-blur-xl transition duration-300",
           variant === "landing"
             ? "border-white/14 bg-white/8 text-[var(--landing-header-text)] shadow-[0_10px_28px_rgba(15,23,42,0.12)] hover:bg-white/12"
             : "border-[var(--member-row-border)] bg-[var(--member-soft-button-bg)] text-[var(--member-text-primary)] shadow-[var(--member-soft-button-shadow)] hover:bg-[var(--member-soft-button-hover-bg)]",
@@ -297,12 +299,12 @@ export function SiteLanguageSelector({
         ref={triggerRef}
         type="button"
       >
-        <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/12 text-[0.85rem]">
+        <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/12 text-[0.95rem]">
           {getLanguageFlag(effectivePendingLanguage ?? currentLanguage)}
         </span>
         <span className="min-w-0 text-left">
-          <span className="block truncate text-[0.86rem] font-semibold leading-none">
-            {activeDisplay?.primary ?? activeLanguage?.name ?? "Language"}
+          <span className="block truncate text-[0.8rem] font-semibold uppercase leading-none tracking-[0.16em]">
+            {activeCodeLabel}
           </span>
         </span>
         {isPending || effectivePendingLanguage ? (

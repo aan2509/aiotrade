@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { sanitizeArticleHtml } from "@/lib/article-sanitizer";
@@ -11,6 +10,7 @@ import {
   getPublishedBlogPosts,
 } from "@/lib/blog-posts";
 import { landingImages } from "@/components/landing/data";
+import { PrefetchedLink } from "@/components/shared/prefetched-link";
 
 type BlogArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -53,13 +53,13 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,16,0.72)_0%,rgba(4,8,16,0.92)_100%)]" />
         <div className="relative mx-auto max-w-5xl">
-          <Link
+          <PrefetchedLink
             className="inline-flex items-center gap-2 text-sm font-medium text-white/72 transition hover:text-white"
             href="/blog"
           >
             <ArrowLeft className="h-4 w-4" />
             Kembali ke blog
-          </Link>
+          </PrefetchedLink>
           <span className="mt-8 inline-flex rounded-full bg-[#f6be4f]/18 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#ffd67d]">
             {post.category}
           </span>
@@ -106,14 +106,14 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
           <div className="rounded-[24px] border border-stone-200 bg-white p-6 shadow-[0_18px_44px_rgba(15,23,42,0.06)]">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-2xl font-semibold tracking-[-0.03em] text-stone-950">Berita lain</h2>
-              <Link className="text-sm font-semibold text-[#1b74df]" href="/blog">
+              <PrefetchedLink className="text-sm font-semibold text-[#1b74df]" href="/blog">
                 Semua post
-              </Link>
+              </PrefetchedLink>
             </div>
             <div className="mt-5 space-y-4">
               {relatedPosts.map((item) => (
-                <Link
-                  className="block rounded-2xl border border-stone-200 px-4 py-4 transition hover:border-stone-300 hover:bg-stone-50"
+                <PrefetchedLink
+                  className="block rounded-2xl border border-stone-200 px-4 py-4 touch-manipulation transition hover:border-stone-300 hover:bg-stone-50"
                   href={`/blog/${item.slug}`}
                   key={item.id}
                 >
@@ -126,7 +126,7 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
                     Baca
                     <ArrowRight className="h-4 w-4" />
                   </span>
-                </Link>
+                </PrefetchedLink>
               ))}
               {!relatedPosts.length ? (
                 <p className="text-sm text-stone-500">Belum ada artikel lain yang dipublish.</p>

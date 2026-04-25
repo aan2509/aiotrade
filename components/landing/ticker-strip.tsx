@@ -84,13 +84,13 @@ export function TickerStrip({ className, previewMode = false }: TickerStripProps
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-[linear-gradient(270deg,var(--landing-panel-bg)_0%,rgba(255,255,255,0)_100%)]" />
 
       <motion.div
-        animate={prefersReducedMotion || lightMotion ? { x: "0%" } : { x: ["0%", "-50%"] }}
+        animate={prefersReducedMotion ? { x: "0%" } : { x: ["0%", "-50%"] }}
         className="flex w-max items-stretch gap-3 px-3 sm:gap-4 sm:px-5 lg:px-6"
         transition={
-          prefersReducedMotion || lightMotion
+          prefersReducedMotion
             ? undefined
             : {
-                duration: 34,
+                duration: lightMotion ? 40 : 34,
                 ease: "linear",
                 repeat: Number.POSITIVE_INFINITY,
               }
