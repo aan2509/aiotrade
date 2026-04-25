@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
+import type { ButtonPaletteKey } from "@/components/landing/types";
 import { cn } from "@/lib/utils";
 
 type LandingCtaButtonProps = {
@@ -12,8 +13,13 @@ type LandingCtaButtonProps = {
   icon: LucideIcon;
   className?: string;
   external?: boolean;
+  palette?: ButtonPaletteKey;
   size?: "default" | "compact";
 };
+
+export function getLandingButtonPaletteClass(palette: ButtonPaletteKey) {
+  return palette === "glass-default" ? undefined : `landing-button-palette-${palette}`;
+}
 
 export function LandingCtaButton({
   href,
@@ -21,6 +27,7 @@ export function LandingCtaButton({
   icon: Icon,
   className,
   external = false,
+  palette = "glass-default",
   size = "default",
 }: LandingCtaButtonProps) {
   const router = useRouter();
@@ -41,6 +48,7 @@ export function LandingCtaButton({
     size === "default"
       ? "min-h-12 px-6 py-3 text-base font-semibold sm:min-h-14 sm:px-8 sm:py-4 sm:text-lg"
       : "min-h-11 px-5 py-2.5 text-[0.98rem] font-semibold sm:min-h-12 sm:px-6 sm:text-base",
+    getLandingButtonPaletteClass(palette),
     className,
   );
 

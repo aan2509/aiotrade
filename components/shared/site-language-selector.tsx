@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 import { Check, ChevronDown, Globe2, LoaderCircle } from "lucide-react";
@@ -32,6 +33,25 @@ type PanelPosition = {
   top: number;
   width: number;
 };
+
+const MEMBER_PORTAL_VAR_NAMES = [
+  "--member-text-primary",
+  "--member-text-secondary",
+  "--member-text-muted",
+  "--member-language-panel-bg",
+  "--member-language-panel-border",
+  "--member-language-panel-shadow",
+  "--member-language-divider",
+  "--member-language-head-icon-bg",
+  "--member-language-head-icon-text",
+  "--member-language-flag-bg",
+  "--member-language-flag-shadow",
+  "--member-language-row-hover-bg",
+  "--member-language-row-active-bg",
+  "--member-language-row-active-shadow",
+  "--member-language-badge-bg",
+  "--member-language-badge-text",
+] as const;
 
 const LANGUAGE_UI_COPY: Record<"id" | "en", LanguageUiCopy> = {
   en: {
@@ -181,6 +201,37 @@ function buildDesktopPanelPosition(trigger: HTMLElement): PanelPosition {
   };
 }
 
+function readScopedCssVariables(element: HTMLElement | null, names: readonly string[]) {
+  if (!element || typeof window === "undefined") {
+    return undefined;
+  }
+
+  const themeScope = element.closest(".member-theme-scope, .landing-theme-scope");
+
+  if (!(themeScope instanceof HTMLElement)) {
+    return undefined;
+  }
+
+  const computed = window.getComputedStyle(themeScope);
+  const nextStyle: CSSProperties = {};
+
+  for (const name of names) {
+    const value = computed.getPropertyValue(name).trim();
+
+    if (value) {
+      nextStyle[name] = value;
+    }
+  }
+
+  const theme = themeScope.getAttribute("data-theme");
+
+  if (theme) {
+    nextStyle.colorScheme = theme === "dark" ? "dark" : "light";
+  }
+
+  return nextStyle;
+}
+
 export function SiteLanguageSelector({
   currentLanguage,
   languages,
@@ -191,6 +242,7 @@ export function SiteLanguageSelector({
   const [pendingLanguage, setPendingLanguage] = useState<SiteLanguage | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [desktopPanelPosition, setDesktopPanelPosition] = useState<PanelPosition | null>(null);
+  const [memberPortalStyle, setMemberPortalStyle] = useState<CSSProperties | undefined>(undefined);
   const selectorRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const desktopPanelRef = useRef<HTMLDivElement | null>(null);
@@ -222,6 +274,10 @@ export function SiteLanguageSelector({
       }
 
       setDesktopPanelPosition(buildDesktopPanelPosition(triggerRef.current));
+
+      if (variant === "member") {
+        setMemberPortalStyle(readScopedCssVariables(triggerRef.current, MEMBER_PORTAL_VAR_NAMES));
+      }
     }
 
     syncDesktopPosition();
@@ -232,7 +288,7 @@ export function SiteLanguageSelector({
       window.removeEventListener("resize", syncDesktopPosition);
       window.removeEventListener("scroll", syncDesktopPosition, true);
     };
-  }, [isOpen]);
+  }, [isOpen, variant]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -340,23 +396,24 @@ export function SiteLanguageSelector({
                 "pointer-events-auto fixed overflow-hidden rounded-[26px] border backdrop-blur-2xl transition duration-200",
                 variant === "landing"
                   ? "border-white/14 bg-[rgba(10,18,34,0.92)] text-white shadow-[0_28px_60px_rgba(2,6,23,0.34)]"
-                  : "border-[var(--member-row-border)] bg-[var(--member-panel-bg)] text-[var(--member-text-primary)] shadow-[0_28px_60px_rgba(15,23,42,0.18)]",
+                  : "member-language-panel text-[var(--member-text-primary)]",
               )}
               ref={desktopPanelRef}
               style={{
                 left: desktopPanelPosition.left,
                 top: desktopPanelPosition.top,
                 width: desktopPanelPosition.width,
+                ...(variant === "member" ? memberPortalStyle : undefined),
               }}
             >
-              <div className="border-b border-white/8 px-4 py-3">
+              <div className={cn("px-4 py-3", variant === "landing" ? "border-b border-white/8" : "member-language-divider border-b")}>
                 <div className="flex items-center gap-3">
                   <span
                     className={cn(
                       "inline-flex h-10 w-10 items-center justify-center rounded-2xl",
                       variant === "landing"
                         ? "bg-white/10 text-white"
-                        : "bg-[var(--member-soft-button-hover-bg)] text-[var(--member-text-primary)]",
+                        : "member-language-head-icon",
                     )}
                   >
                     <Globe2 className="h-4 w-4" />
@@ -387,16 +444,23 @@ export function SiteLanguageSelector({
                         active
                           ? variant === "landing"
                             ? "bg-white/10 text-white"
-                            : "bg-[var(--member-soft-button-hover-bg)] text-[var(--member-text-primary)]"
+                            : "member-language-row-active text-[var(--member-text-primary)]"
                           : variant === "landing"
                             ? "text-white/86 hover:bg-white/6"
-                            : "text-[var(--member-text-secondary)] hover:bg-[var(--member-soft-button-bg)] hover:text-[var(--member-text-primary)]",
+                            : "member-language-row-hover text-[var(--member-text-secondary)] hover:text-[var(--member-text-primary)]",
                       )}
                       key={language.language}
                       onClick={() => handleChange(language.language)}
                       type="button"
                     >
-                      <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-[1.1rem] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
+                      <span
+                        className={cn(
+                          "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-[1.1rem]",
+                          variant === "landing"
+                            ? "bg-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                            : "member-language-flag",
+                        )}
+                      >
                         {getLanguageFlag(language.language)}
                       </span>
                       <span className="min-w-0 flex-1">
@@ -413,7 +477,7 @@ export function SiteLanguageSelector({
                       <span
                         className={cn(
                           "rounded-full px-2 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em]",
-                          variant === "landing" ? "bg-white/8 text-white/62" : "bg-white/10 text-[var(--member-text-muted)]",
+                          variant === "landing" ? "bg-white/8 text-white/62" : "member-language-badge",
                         )}
                       >
                         {getLanguageCodeLabel(language.language)}
@@ -441,20 +505,21 @@ export function SiteLanguageSelector({
                 "w-full overflow-hidden rounded-[28px] border backdrop-blur-2xl",
                 variant === "landing"
                   ? "border-white/14 bg-[rgba(10,18,34,0.96)] text-white shadow-[0_28px_60px_rgba(2,6,23,0.38)]"
-                  : "border-[var(--member-row-border)] bg-[var(--member-panel-bg)] text-[var(--member-text-primary)] shadow-[0_28px_60px_rgba(15,23,42,0.18)]",
+                  : "member-language-panel text-[var(--member-text-primary)]",
               )}
               onClick={(event) => event.stopPropagation()}
               ref={mobileSheetRef}
+              style={variant === "member" ? memberPortalStyle : undefined}
             >
-              <div className="border-b border-white/8 px-4 py-4">
-                <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-white/16" />
+              <div className={cn("px-4 py-4", variant === "landing" ? "border-b border-white/8" : "member-language-divider border-b")}>
+                <div className={cn("mx-auto mb-3 h-1.5 w-12 rounded-full", variant === "landing" ? "bg-white/16" : "bg-[var(--member-language-divider)]")} />
                 <div className="flex items-center gap-3">
                   <span
                     className={cn(
                       "inline-flex h-11 w-11 items-center justify-center rounded-2xl",
                       variant === "landing"
                         ? "bg-white/10 text-white"
-                        : "bg-[var(--member-soft-button-hover-bg)] text-[var(--member-text-primary)]",
+                        : "member-language-head-icon",
                     )}
                   >
                     <Globe2 className="h-4 w-4" />
@@ -485,16 +550,23 @@ export function SiteLanguageSelector({
                         active
                           ? variant === "landing"
                             ? "bg-white/10 text-white"
-                            : "bg-[var(--member-soft-button-hover-bg)] text-[var(--member-text-primary)]"
+                            : "member-language-row-active text-[var(--member-text-primary)]"
                           : variant === "landing"
                             ? "text-white/86 hover:bg-white/6"
-                            : "text-[var(--member-text-secondary)] hover:bg-[var(--member-soft-button-bg)] hover:text-[var(--member-text-primary)]",
+                            : "member-language-row-hover text-[var(--member-text-secondary)] hover:text-[var(--member-text-primary)]",
                       )}
                       key={`mobile-${language.language}`}
                       onClick={() => handleChange(language.language)}
                       type="button"
                     >
-                      <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-[1.1rem] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
+                      <span
+                        className={cn(
+                          "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-[1.1rem]",
+                          variant === "landing"
+                            ? "bg-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                            : "member-language-flag",
+                        )}
+                      >
                         {getLanguageFlag(language.language)}
                       </span>
                       <span className="min-w-0 flex-1">
@@ -511,7 +583,7 @@ export function SiteLanguageSelector({
                       <span
                         className={cn(
                           "rounded-full px-2 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.16em]",
-                          variant === "landing" ? "bg-white/8 text-white/62" : "bg-white/10 text-[var(--member-text-muted)]",
+                          variant === "landing" ? "bg-white/8 text-white/62" : "member-language-badge",
                         )}
                       >
                         {getLanguageCodeLabel(language.language)}

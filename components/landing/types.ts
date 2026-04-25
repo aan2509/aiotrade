@@ -112,12 +112,27 @@ export type HeroContent = {
   ctaLabel: string;
 };
 
+export type LogoSizeConfig = {
+  mobileWidth: number;
+  desktopWidth: number;
+};
+
+export type ButtonPaletteKey =
+  | "glass-default"
+  | "brand-blue"
+  | "sky"
+  | "emerald"
+  | "gold"
+  | "midnight";
+
 export type OverviewContent = {
   background: SectionBackgroundConfig;
   titleBlue: string;
   titleWhite: string;
   description: string;
   ctaLabel: string;
+  buttonPalette: ButtonPaletteKey;
+  logoSize: LogoSizeConfig;
 };
 
 export type BenefitItemContent = {
@@ -145,6 +160,7 @@ export type PricingContent = {
   eyebrow: string;
   title: string;
   buttonLabel: string;
+  buttonPalette: ButtonPaletteKey;
   plans: PricingPlanContent[];
 };
 
@@ -175,6 +191,7 @@ export type GuideContent = {
   eyebrow: string;
   title: string;
   buttonLabel: string;
+  buttonPalette: ButtonPaletteKey;
   steps: GuideStepContent[];
 };
 
@@ -238,6 +255,7 @@ export type FooterContent = {
   description: string;
   copyright: string;
   guideLinks: FooterLink[];
+  logoSize: LogoSizeConfig;
 };
 
 export type HomepageAsset = {

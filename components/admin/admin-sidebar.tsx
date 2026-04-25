@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   ChevronDown,
@@ -18,17 +18,17 @@ import { logoutAction } from "@/app/(protected)/account/actions";
 import { cn } from "@/lib/utils";
 
 const homepageItems = [
-  { href: "/admin?section=overview#overview-section", label: "Overview Section", section: "overview" },
-  { href: "/admin?section=benefits#benefits-section", label: "Benefit Section", section: "benefits" },
-  { href: "/admin?section=pricing#pricing-section", label: "Pricing Section", section: "pricing" },
-  { href: "/admin?section=video#video-section", label: "Video Section", section: "video" },
-  { href: "/admin?section=faq#faq-section", label: "FAQ Section", section: "faq" },
-  { href: "/admin?section=guide#guide-section", label: "Guide Section", section: "guide" },
-  { href: "/admin?section=testimonial#testimonial-section", label: "Testimoni Section", section: "testimonial" },
-  { href: "/admin?section=blog#blog-section", label: "Blog Section", section: "blog" },
-  { href: "/admin?section=bannerAds#banner-ads-section", label: "Banner Ads Section", section: "bannerAds" },
-  { href: "/admin?section=registerContact#register-contact-section", label: "Register Contact", section: "registerContact" },
-  { href: "/admin?section=footer#footer-section", label: "Footer Section", section: "footer" },
+  { href: "/admin#overview-section", id: "overview-section", label: "Overview Section", section: "overview" },
+  { href: "/admin#benefits-section", id: "benefits-section", label: "Benefit Section", section: "benefits" },
+  { href: "/admin#pricing-section", id: "pricing-section", label: "Pricing Section", section: "pricing" },
+  { href: "/admin#video-section", id: "video-section", label: "Video Section", section: "video" },
+  { href: "/admin#faq-section", id: "faq-section", label: "FAQ Section", section: "faq" },
+  { href: "/admin#guide-section", id: "guide-section", label: "Guide Section", section: "guide" },
+  { href: "/admin#testimonial-section", id: "testimonial-section", label: "Testimoni Section", section: "testimonial" },
+  { href: "/admin#blog-section", id: "blog-section", label: "Blog Section", section: "blog" },
+  { href: "/admin#banner-ads-section", id: "banner-ads-section", label: "Banner Ads Section", section: "bannerAds" },
+  { href: "/admin#register-contact-section", id: "register-contact-section", label: "Register Contact", section: "registerContact" },
+  { href: "/admin#footer-section", id: "footer-section", label: "Footer Section", section: "footer" },
 ] as const;
 
 const postItems = [
@@ -68,9 +68,88 @@ export function AdminSidebar({ pathname, username }: AdminSidebarProps) {
   const [homepageExpanded, setHomepageExpanded] = useState(isHomepageRoute);
   const [postsExpanded, setPostsExpanded] = useState(isPostsRoute);
   const [memberPostsExpanded, setMemberPostsExpanded] = useState(isMemberPostsRoute);
+  const [activeHomepageSection, setActiveHomepageSection] = useState(currentHomepageSection);
   const homepageOpen = isHomepageRoute || homepageExpanded;
   const postsOpen = isPostsRoute || postsExpanded;
   const memberPostsOpen = isMemberPostsRoute || memberPostsExpanded;
+
+  const homepageSectionIds = useMemo(
+    () => homepageItems.map((item) => item.id),
+    [],
+  );
+
+  useEffect(() => {
+    if (!isHomepageRoute) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setActiveHomepageSection((current) => current ?? currentHomepageSection);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [currentHomepageSection, isHomepageRoute]);
+
+  useEffect(() => {
+    if (!isHomepageRoute || typeof window === "undefined") {
+      return;
+    }
+
+    const sections = homepageSectionIds
+      .map((id) => document.getElementById(id))
+      .filter((element): element is HTMLElement => Boolean(element));
+
+    if (!sections.length) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        const nextVisible = visibleEntries[0];
+
+        if (!nextVisible?.target.id) {
+          return;
+        }
+
+        const matchedItem = homepageItems.find((item) => item.id === nextVisible.target.id);
+
+        if (!matchedItem) {
+          return;
+        }
+
+        setActiveHomepageSection(matchedItem.section);
+      },
+      {
+        root: null,
+        rootMargin: "-22% 0px -58% 0px",
+        threshold: [0.1, 0.25, 0.4, 0.6],
+      },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [homepageSectionIds, isHomepageRoute]);
+
+  function scrollToHomepageSection(sectionId: string, sectionKey: string) {
+    const target = document.getElementById(sectionId);
+
+    if (!target) {
+      return;
+    }
+
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    setActiveHomepageSection(sectionKey);
+    window.history.replaceState(null, "", `#${sectionId}`);
+  }
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-stone-200 bg-white shadow-sm">
@@ -264,29 +343,50 @@ export function AdminSidebar({ pathname, username }: AdminSidebarProps) {
                 <div className="space-y-1 px-2 pb-2">
                   <Link
                     className={cn(
-                      "block rounded-lg px-3 py-2 text-sm font-medium transition",
-                      isHomepageRoute && !currentHomepageSection
-                        ? "bg-white text-stone-950 shadow-sm"
+                      "relative block rounded-lg px-3 py-2 text-sm font-medium transition",
+                      isHomepageRoute && !activeHomepageSection
+                        ? "bg-white text-stone-950 shadow-sm ring-1 ring-sky-200/90 before:absolute before:bottom-2 before:left-0 before:top-2 before:w-1 before:rounded-r-full before:bg-sky-500"
                         : "text-stone-600 hover:bg-white hover:text-stone-950",
                     )}
                     href="/admin"
+                    onClick={(event) => {
+                      if (!isHomepageRoute) {
+                        return;
+                      }
+
+                      event.preventDefault();
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      setActiveHomepageSection(null);
+                      window.history.replaceState(null, "", "/admin");
+                    }}
                   >
                     Semua Section
                   </Link>
-                  {homepageItems.map((item) => (
-                    <Link
-                      className={cn(
-                        "block rounded-lg px-3 py-2 text-sm font-medium transition",
-                        isHomepageRoute && currentHomepageSection === item.section
-                          ? "bg-white text-stone-950 shadow-sm"
-                          : "text-stone-600 hover:bg-white hover:text-stone-950",
-                      )}
-                      href={item.href}
-                      key={item.href}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
+                  {homepageItems.map((item) =>
+                    isHomepageRoute ? (
+                      <button
+                        className={cn(
+                          "relative block w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition",
+                          activeHomepageSection === item.section
+                            ? "bg-white text-stone-950 shadow-sm ring-1 ring-sky-200/90 before:absolute before:bottom-2 before:left-0 before:top-2 before:w-1 before:rounded-r-full before:bg-sky-500"
+                            : "text-stone-600 hover:bg-white hover:text-stone-950",
+                        )}
+                        key={item.id}
+                        onClick={() => scrollToHomepageSection(item.id, item.section)}
+                        type="button"
+                      >
+                        {item.label}
+                      </button>
+                    ) : (
+                      <Link
+                        className="block rounded-lg px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-white hover:text-stone-950"
+                        href={item.href}
+                        key={item.id}
+                      >
+                        {item.label}
+                      </Link>
+                    ),
+                  )}
                 </div>
               </div>
             </div>

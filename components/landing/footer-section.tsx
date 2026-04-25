@@ -9,6 +9,12 @@ import type { FooterContent, NavItem } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
 import type { SiteLanguage } from "@/lib/site-language";
 
+function buildResponsiveLogoWidth(mobileWidth: number, desktopWidth: number) {
+  return {
+    width: `min(100%, clamp(${mobileWidth}px, 18vw, ${desktopWidth}px))`,
+  };
+}
+
 type FooterSectionProps = {
   content: FooterContent;
   ctaExternal?: boolean;
@@ -46,8 +52,12 @@ export function FooterSection({
           <Reveal className="mx-auto max-w-[36rem] text-center lg:mx-0 lg:text-left">
             <Link className="inline-flex items-center justify-center lg:justify-start" href="#top">
               <LandingThemeLogo
-                className="mx-auto w-[176px] lg:mx-0 sm:w-[208px]"
+                className="mx-auto lg:mx-0"
                 sizes="(max-width: 640px) 176px, 208px"
+                style={buildResponsiveLogoWidth(
+                  content.logoSize.mobileWidth,
+                  content.logoSize.desktopWidth,
+                )}
               />
             </Link>
             <p className="mt-5 max-w-[35rem] text-[1.02rem] leading-[1.72] text-[var(--landing-text-secondary)] sm:text-[1.06rem]">

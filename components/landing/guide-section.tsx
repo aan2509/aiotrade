@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { BookOpen } from "lucide-react";
+import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
 import { useLightLandingMotion } from "@/components/landing/use-light-landing-motion";
 import type { GuideContent } from "@/components/landing/types";
@@ -60,14 +60,13 @@ export function GuideSection({ content }: GuideSectionProps) {
         </div>
 
         <Reveal className="mt-10 flex justify-center" delay={0.12} distance={lightMotion ? 12 : 24} duration={lightMotion ? 0.7 : 1}>
-          <Link
-            className="landing-glass-button inline-flex min-h-12 touch-manipulation items-center justify-center gap-2 rounded-[16px] px-6 text-[0.96rem] font-medium text-[var(--landing-accent-blue)] transition duration-300 active:scale-[0.985] hover:-translate-y-0.5 sm:text-[1.02rem] lg:text-[1.05rem]"
+          <LandingCtaButton
+            className="landing-guide-cta"
             href="/guide"
-            prefetch
-          >
-            <BookOpen className="pointer-events-none h-4 w-4" />
-            {content.buttonLabel}
-          </Link>
+            icon={BookOpen}
+            label={content.buttonLabel}
+            palette={content.buttonPalette}
+          />
         </Reveal>
       </div>
     </section>

@@ -42,6 +42,19 @@ function redirectToSection(section: string, status: "saved" | "error"): never {
   redirect(`/admin?section=${encodeURIComponent(section)}&status=${status}`);
 }
 
+function readPaletteOnlyBackground(formData: FormData) {
+  return {
+    ...readBackground(formData),
+    image: {
+      assetId: undefined,
+      imageUrl: undefined,
+      overlayColor: undefined,
+      overlayOpacity: 58,
+    },
+    mode: "palette" as const,
+  };
+}
+
 const heroSchema = z.object({
   background: sectionBackgroundSchema,
   eyebrow: z.string().min(1),
@@ -57,6 +70,14 @@ const overviewSchema = z.object({
   titleWhite: z.string().min(1),
   description: z.string().min(1),
   ctaLabel: z.string().min(1),
+  buttonPalette: z.enum(["glass-default", "brand-blue", "sky", "emerald", "gold", "midnight"]),
+  logoSize: z.object({
+    mobileWidth: z.number().int().min(150).max(320),
+    desktopWidth: z.number().int().min(150).max(420),
+  }).refine((value) => value.desktopWidth >= value.mobileWidth, {
+    message: "Ukuran desktop harus lebih besar atau sama dengan mobile.",
+    path: ["desktopWidth"],
+  }),
 });
 
 const benefitsSchema = z.object({
@@ -76,6 +97,7 @@ const pricingSchema = z.object({
   eyebrow: z.string().min(1),
   title: z.string().min(1),
   buttonLabel: z.string().min(1),
+  buttonPalette: z.enum(["glass-default", "brand-blue", "sky", "emerald", "gold", "midnight"]),
   plans: z.array(
     z.object({
       name: z.string().min(1),
@@ -121,6 +143,7 @@ const guideSchema = z.object({
   eyebrow: z.string().min(1),
   title: z.string().min(1),
   buttonLabel: z.string().min(1),
+  buttonPalette: z.enum(["glass-default", "brand-blue", "sky", "emerald", "gold", "midnight"]),
   steps: z.array(
     z.object({
       number: z.string().min(1),
@@ -181,6 +204,13 @@ const footerSchema = z.object({
       href: z.string().min(1),
     }),
   ),
+  logoSize: z.object({
+    mobileWidth: z.number().int().min(150).max(260),
+    desktopWidth: z.number().int().min(150).max(320),
+  }).refine((value) => value.desktopWidth >= value.mobileWidth, {
+    message: "Ukuran desktop harus lebih besar atau sama dengan mobile.",
+    path: ["desktopWidth"],
+  }),
 });
 
 const registerReferralWhatsappSchema = z.object({
@@ -211,11 +241,16 @@ export async function updateOverviewSectionAction(formData: FormData) {
   await requireAdminProfile();
 
   const parsed = overviewSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     titleBlue: readString(formData, "titleBlue"),
     titleWhite: readString(formData, "titleWhite"),
     description: readString(formData, "description"),
     ctaLabel: readString(formData, "ctaLabel"),
+    buttonPalette: readString(formData, "buttonPalette") || "glass-default",
+    logoSize: {
+      mobileWidth: readNumber(formData, "logoMobileWidth") ?? 188,
+      desktopWidth: readNumber(formData, "logoDesktopWidth") ?? 274,
+    },
   });
 
   if (!parsed.success) {
@@ -231,7 +266,7 @@ export async function updateBenefitsSectionAction(formData: FormData) {
   const itemCount = readCount(formData, "itemCount");
 
   const parsed = benefitsSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     heading: readString(formData, "heading"),
     description: readString(formData, "description"),
     items: Array.from({ length: itemCount }, (_, index) => ({
@@ -253,10 +288,11 @@ export async function updatePricingSectionAction(formData: FormData) {
   const planCount = readCount(formData, "planCount");
 
   const parsed = pricingSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     eyebrow: readString(formData, "eyebrow"),
     title: readString(formData, "title"),
     buttonLabel: readString(formData, "buttonLabel"),
+    buttonPalette: readString(formData, "buttonPalette"),
     plans: Array.from({ length: planCount }, (_, index) => ({
       name: readString(formData, `plan-${index}-name`),
       price: readString(formData, `plan-${index}-price`),
@@ -278,7 +314,7 @@ export async function updateVideoSectionAction(formData: FormData) {
   await requireAdminProfile();
 
   const parsed = videoSectionSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     description: readString(formData, "description"),
     embedUrl: readString(formData, "embedUrl"),
     eyebrow: readString(formData, "eyebrow"),
@@ -302,7 +338,7 @@ export async function updateFaqSectionAction(formData: FormData) {
   const itemCount = readCount(formData, "itemCount");
 
   const parsed = faqSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     title: readString(formData, "title"),
     subtitle: readString(formData, "subtitle"),
     items: Array.from({ length: itemCount }, (_, index) => ({
@@ -324,10 +360,11 @@ export async function updateGuideSectionAction(formData: FormData) {
   const stepCount = readCount(formData, "stepCount");
 
   const parsed = guideSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     eyebrow: readString(formData, "eyebrow"),
     title: readString(formData, "title"),
     buttonLabel: readString(formData, "buttonLabel"),
+    buttonPalette: readString(formData, "buttonPalette"),
     steps: Array.from({ length: stepCount }, (_, index) => ({
       number: readString(formData, `step-${index}-number`),
       title: readString(formData, `step-${index}-title`),
@@ -348,7 +385,7 @@ export async function updateTestimonialSectionAction(formData: FormData) {
   const itemCount = readCount(formData, "itemCount");
 
   const parsed = testimonialSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     eyebrow: readString(formData, "eyebrow"),
     subtitle: readString(formData, "subtitle"),
     title: readString(formData, "title"),
@@ -375,7 +412,7 @@ export async function updateBlogSectionAction(formData: FormData) {
   const itemCount = readCount(formData, "itemCount");
 
   const parsed = blogSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     title: readString(formData, "title"),
     items: Array.from({ length: itemCount }, (_, index) => ({
       title: readString(formData, `item-${index}-title`),
@@ -396,7 +433,7 @@ export async function updateBannerAdsSectionAction(formData: FormData) {
   await requireAdminProfile();
 
   const parsed = bannerAdsSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     buttonLabel: readString(formData, "buttonLabel"),
     description: readString(formData, "description"),
     imageAssetId: readString(formData, "imageAssetId") || undefined,
@@ -420,13 +457,17 @@ export async function updateFooterSectionAction(formData: FormData) {
   const linkCount = readCount(formData, "linkCount");
 
   const parsed = footerSchema.safeParse({
-    background: readBackground(formData),
+    background: readPaletteOnlyBackground(formData),
     description: readString(formData, "description"),
     copyright: readString(formData, "copyright"),
     guideLinks: Array.from({ length: linkCount }, (_, index) => ({
       label: readString(formData, `link-${index}-label`),
       href: readString(formData, `link-${index}-href`),
     })),
+    logoSize: {
+      mobileWidth: readNumber(formData, "logoMobileWidth"),
+      desktopWidth: readNumber(formData, "logoDesktopWidth"),
+    },
   });
 
   if (!parsed.success) {

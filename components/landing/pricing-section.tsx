@@ -109,12 +109,13 @@ export function PricingSection({ content, ctaExternal = false, ctaHref }: Pricin
                     <LandingCtaButton
                       className={cn(
                         "landing-pricing-cta min-w-[212px]",
-                        plan.emphasis && "landing-glass-button-accent text-white",
+                        plan.emphasis && "landing-cta-emphasis",
                       )}
                       external={ctaExternal}
                       href={ctaHref}
                       icon={LogIn}
                       label={content.buttonLabel}
+                      palette={content.buttonPalette}
                       size="compact"
                     />
                   </div>

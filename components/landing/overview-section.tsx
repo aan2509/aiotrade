@@ -15,6 +15,12 @@ import type { OverviewContent } from "@/components/landing/types";
 
 const duplicatedPartnerLogos = [...partnerLogos, ...partnerLogos];
 
+function buildResponsiveLogoWidth(mobileWidth: number, desktopWidth: number) {
+  return {
+    width: `min(100%, clamp(${mobileWidth}px, 24vw, ${desktopWidth}px))`,
+  };
+}
+
 type OverviewSectionProps = {
   content: OverviewContent;
   ctaExternal?: boolean;
@@ -80,8 +86,12 @@ export function OverviewSection({
                 <div className="w-full max-w-[22rem] mx-auto sm:max-w-[31rem] lg:mx-0 lg:max-w-[35rem]">
                   <div className="flex justify-center lg:justify-start">
                     <LandingThemeLogo
-                      className="landing-overview-logo-image w-[188px] sm:w-[228px] lg:w-[274px]"
+                      className="landing-overview-logo-image"
                       sizes="(max-width: 640px) 188px, (max-width: 1024px) 228px, 274px"
+                      style={buildResponsiveLogoWidth(
+                        content.logoSize.mobileWidth,
+                        content.logoSize.desktopWidth,
+                      )}
                     />
                   </div>
                   <p className="landing-overview-description mx-auto mt-5 max-w-[21rem] text-[0.92rem] leading-[1.86] text-[var(--landing-text-secondary)] sm:mt-6 sm:max-w-[27rem] sm:text-[1.04rem] sm:leading-[1.94] lg:mx-0 lg:max-w-[31rem] lg:text-[1.12rem] lg:leading-[2]">
@@ -140,6 +150,7 @@ export function OverviewSection({
                   href={ctaHref}
                   icon={LogIn}
                   label={content.ctaLabel}
+                  palette={content.buttonPalette}
                 />
               </Reveal>
             </div>

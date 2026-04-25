@@ -27,6 +27,14 @@ const overviewSchema = z.object({
   titleWhite: z.string().min(1),
   description: z.string().min(1),
   ctaLabel: z.string().min(1),
+  buttonPalette: z.enum(["glass-default", "brand-blue", "sky", "emerald", "gold", "midnight"]),
+  logoSize: z.object({
+    mobileWidth: z.number().int().min(150).max(320),
+    desktopWidth: z.number().int().min(150).max(420),
+  }).refine((value) => value.desktopWidth >= value.mobileWidth, {
+    message: "Ukuran desktop harus lebih besar atau sama dengan mobile.",
+    path: ["desktopWidth"],
+  }),
 });
 
 const benefitItemSchema = z.object({
@@ -54,6 +62,7 @@ const pricingSchema = z.object({
   eyebrow: z.string().min(1),
   title: z.string().min(1),
   buttonLabel: z.string().min(1),
+  buttonPalette: z.enum(["glass-default", "brand-blue", "sky", "emerald", "gold", "midnight"]),
   plans: z.array(pricingPlanSchema).min(1),
 });
 
@@ -83,6 +92,7 @@ const guideSchema = z.object({
   eyebrow: z.string().min(1),
   title: z.string().min(1),
   buttonLabel: z.string().min(1),
+  buttonPalette: z.enum(["glass-default", "brand-blue", "sky", "emerald", "gold", "midnight"]),
   steps: z.array(
     z.object({
       number: z.string().min(1),
@@ -143,6 +153,13 @@ const footerSchema = z.object({
       href: z.string().min(1),
     }),
   ),
+  logoSize: z.object({
+    mobileWidth: z.number().int().min(150).max(260),
+    desktopWidth: z.number().int().min(150).max(320),
+  }).refine((value) => value.desktopWidth >= value.mobileWidth, {
+    message: "Ukuran desktop harus lebih besar atau sama dengan mobile.",
+    path: ["desktopWidth"],
+  }),
 });
 
 export const defaultHomepageContent: HomepageContent = {
@@ -165,6 +182,11 @@ export const defaultHomepageContent: HomepageContent = {
     description:
       "Alat bantu trading otomatis berbasis Artificial Intelligence (AI) yang dirancang untuk membantu pengguna menjalankan trading aset kripto di pasar spot. AIOTrade terhubung dengan Binance, Tokocrypto, dan Bitget melalui API yang aman, sehingga strategi dapat dijalankan lebih rapi, efisien, dan konsisten.",
     ctaLabel: "Daftar Sekarang",
+    buttonPalette: "glass-default",
+    logoSize: {
+      mobileWidth: 188,
+      desktopWidth: 274,
+    },
   },
   benefits: {
     background: createDefaultSectionBackground("dark-slate-cinematic", {
@@ -185,6 +207,7 @@ export const defaultHomepageContent: HomepageContent = {
     eyebrow: "Berapa Biaya Registrasi Aio Trade?",
     title: "Harga",
     buttonLabel: "Daftar Sekarang",
+    buttonPalette: "glass-default",
     plans: plans.map((plan) => ({
       name: plan.name,
       price: plan.price,
@@ -217,6 +240,7 @@ export const defaultHomepageContent: HomepageContent = {
     eyebrow: "Bagaimana Aio Trade Bekerja?",
     title: "3 Langkah Mudah",
     buttonLabel: "Selengkapnya",
+    buttonPalette: "glass-default",
     steps: steps,
   },
   testimonial: {
@@ -274,6 +298,10 @@ export const defaultHomepageContent: HomepageContent = {
       { label: "Trading Otomatis", href: "#fitur" },
       { label: "Setting Custom", href: "#panduan" },
     ],
+    logoSize: {
+      mobileWidth: 176,
+      desktopWidth: 208,
+    },
   },
 };
 

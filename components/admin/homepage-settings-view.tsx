@@ -21,14 +21,15 @@ import {
   updateVideoSectionAction,
 } from "@/app/(protected)/admin/actions";
 import { HomepageAssetPicker } from "@/components/admin/homepage-asset-picker";
-import { HomepageBackgroundEditor } from "@/components/admin/homepage-background-editor";
 import type { HomepageAsset, HomepageContent } from "@/components/landing/types";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { homepageBackgroundPresetOrder, homepageBackgroundPresets } from "@/lib/homepage-backgrounds";
 import { cn } from "@/lib/utils";
+import type { ButtonPaletteKey } from "@/components/landing/types";
 
 type HomepageSettingsViewProps = {
   assets: HomepageAsset[];
@@ -52,6 +53,171 @@ function TextField({ label, name, onChange, value }: FieldProps) {
     <div className="grid gap-2">
       <Label htmlFor={name}>{label}</Label>
       <Input id={name} name={name} onChange={(event) => onChange(event.target.value)} value={value} />
+    </div>
+  );
+}
+
+function NumberField({
+  label,
+  name,
+  onChange,
+  value,
+}: {
+  label: string;
+  name: string;
+  onChange: (value: number) => void;
+  value: number;
+}) {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={name}>{label}</Label>
+      <Input
+        id={name}
+        min={150}
+        name={name}
+        onChange={(event) => onChange(Number.parseInt(event.target.value || "0", 10) || 0)}
+        step={1}
+        type="number"
+        value={value}
+      />
+    </div>
+  );
+}
+
+const buttonPaletteOptions: Array<{
+  description: string;
+  key: ButtonPaletteKey;
+  label: string;
+  recommendation: string;
+}> = [
+  {
+    key: "glass-default",
+    label: "Glass Default",
+    description: "Tombol glass netral yang paling aman untuk semua background.",
+    recommendation: "Cocok untuk UI yang ingin tetap halus dan premium.",
+  },
+  {
+    key: "brand-blue",
+    label: "Brand Blue",
+    description: "Biru brand yang tegas dan paling aman untuk CTA utama.",
+    recommendation: "Paling cocok untuk Overview dan CTA daftar utama.",
+  },
+  {
+    key: "sky",
+    label: "Sky Blue",
+    description: "Biru muda yang terasa lebih ringan dan fresh.",
+    recommendation: "Cocok untuk Guide dan section yang lebih edukatif.",
+  },
+  {
+    key: "emerald",
+    label: "Emerald",
+    description: "Hijau terang untuk kesan action yang bersih dan positif.",
+    recommendation: "Bagus untuk tombol langkah lanjut atau aktivasi.",
+  },
+  {
+    key: "gold",
+    label: "Gold",
+    description: "Emas hangat untuk aksen promo atau penekanan harga.",
+    recommendation: "Cocok untuk Pricing jika ingin CTA lebih menonjol.",
+  },
+  {
+    key: "midnight",
+    label: "Midnight",
+    description: "Gelap elegan untuk light mode dan brand feel yang lebih formal.",
+    recommendation: "Bagus untuk footer-like tone atau style yang lebih dewasa.",
+  },
+];
+
+function SelectField({
+  label,
+  name,
+  onChange,
+  options,
+  value,
+}: {
+  label: string;
+  name: string;
+  onChange: (value: string) => void;
+  options: Array<{ label: string; value: string }>;
+  value: string;
+}) {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={name}>{label}</Label>
+      <select
+        className="h-10 rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-900 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/15"
+        id={name}
+        name={name}
+        onChange={(event) => onChange(event.target.value)}
+        value={value}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function PaletteOnlyBackgroundFields({
+  description,
+  onChange,
+  value,
+}: {
+  description: string;
+  onChange: (value: HomepageContent[keyof HomepageContent]["background"]) => void;
+  value: HomepageContent[keyof HomepageContent]["background"];
+}) {
+  return (
+    <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+      <input name="background-mode" type="hidden" value="palette" />
+      <input name="background-palette-preset" type="hidden" value={value.palette.preset} />
+      <input name="background-palette-customHex" type="hidden" value={value.palette.customHex ?? ""} />
+      <input name="background-image-assetId" type="hidden" value="" />
+      <input name="background-image-url" type="hidden" value="" />
+      <input name="background-image-overlayColor" type="hidden" value="" />
+      <input name="background-image-overlayOpacity" type="hidden" value="58" />
+
+      <p className="text-sm font-semibold text-stone-900">Tone background section</p>
+      <p className="mt-1 text-xs leading-6 text-stone-500">{description}</p>
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <SelectField
+          label="Preset warna"
+          name="backgroundPalettePreset"
+          onChange={(nextPreset) =>
+            onChange({
+              ...value,
+              mode: "palette",
+              palette: {
+                ...value.palette,
+                preset: nextPreset as typeof value.palette.preset,
+              },
+            })
+          }
+          options={homepageBackgroundPresetOrder.map((preset) => ({
+            label: homepageBackgroundPresets[preset].label,
+            value: preset,
+          }))}
+          value={value.palette.preset}
+        />
+        <TextField
+          label="Custom hex (opsional)"
+          name="backgroundPaletteCustomHex"
+          onChange={(nextHex) =>
+            onChange({
+              ...value,
+              mode: "palette",
+              palette: {
+                ...value.palette,
+                customHex: nextHex || undefined,
+              },
+            })
+          }
+          value={value.palette.customHex ?? ""}
+        />
+      </div>
     </div>
   );
 }
@@ -261,6 +427,27 @@ export function HomepageSettingsView({
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
   const [previewPreset, setPreviewPreset] = useState<PreviewPresetKey>("desktop-1440");
 
+  useEffect(() => {
+    if (!section || typeof window === "undefined") {
+      return;
+    }
+
+    const sectionId = `${section === "bannerAds" ? "banner-ads" : section === "registerContact" ? "register-contact" : section}-section`;
+    const target = document.getElementById(sectionId);
+
+    if (!target) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [section]);
+
   function updateSection<K extends keyof HomepageContent>(
     key: K,
     updates: Partial<HomepageContent[K]>,
@@ -302,8 +489,70 @@ export function HomepageSettingsView({
               <input name="titleWhite" type="hidden" value={draft.overview.titleWhite} />
               <div className="rounded-2xl border border-sky-100 bg-sky-50/80 px-4 py-3 text-sm leading-6 text-slate-700">
                 Logo overview memakai asset brand yang sama dengan footer agar tampil konsisten di
-                desktop dan mobile. Judul teks lama disimpan otomatis supaya konfigurasi homepage
-                tetap aman.
+                desktop dan mobile. Ukuran tampilnya bisa kamu atur di bawah tanpa mengganti asset
+                logo. Judul teks lama disimpan otomatis supaya konfigurasi homepage tetap aman.
+              </div>
+              <input name="background-mode" type="hidden" value="palette" />
+              <input
+                name="background-palette-preset"
+                type="hidden"
+                value={draft.overview.background.palette.preset}
+              />
+              <input
+                name="background-palette-customHex"
+                type="hidden"
+                value={draft.overview.background.palette.customHex ?? ""}
+              />
+              <input name="background-image-assetId" type="hidden" value="" />
+              <input name="background-image-url" type="hidden" value="" />
+              <input name="background-image-overlayColor" type="hidden" value="" />
+              <input name="background-image-overlayOpacity" type="hidden" value="58" />
+              <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+                <p className="text-sm font-semibold text-stone-900">Ukuran logo overview</p>
+                <div className="mt-3 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-lg border border-stone-200 bg-white px-4 py-4">
+                    <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                      <Smartphone className="h-4 w-4" />
+                      Mobile
+                    </div>
+                    <NumberField
+                      label="Lebar logo mobile (px)"
+                      name="logoMobileWidth"
+                      onChange={(value) =>
+                        updateSection("overview", {
+                          logoSize: {
+                            ...draft.overview.logoSize,
+                            mobileWidth: value,
+                          },
+                        })
+                      }
+                      value={draft.overview.logoSize.mobileWidth}
+                    />
+                  </div>
+                  <div className="rounded-lg border border-stone-200 bg-white px-4 py-4">
+                    <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                      <Monitor className="h-4 w-4" />
+                      Desktop
+                    </div>
+                    <NumberField
+                      label="Lebar logo desktop (px)"
+                      name="logoDesktopWidth"
+                      onChange={(value) =>
+                        updateSection("overview", {
+                          logoSize: {
+                            ...draft.overview.logoSize,
+                            desktopWidth: value,
+                          },
+                        })
+                      }
+                      value={draft.overview.logoSize.desktopWidth}
+                    />
+                  </div>
+                </div>
+                <p className="mt-3 text-xs leading-6 text-stone-500">
+                  Rekomendasi aman: mobile 160 - 220 px dan desktop 220 - 300 px agar hero tetap
+                  seimbang dengan phone mockup.
+                </p>
               </div>
               <TextAreaField
                 label="Deskripsi"
@@ -318,13 +567,33 @@ export function HomepageSettingsView({
                 onChange={(value) => updateSection("overview", { ctaLabel: value })}
                 value={draft.overview.ctaLabel}
               />
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
-                onChange={(background) => updateSection("overview", { background })}
-                value={draft.overview.background}
-              />
+              <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+                <SelectField
+                  label="Warna Tombol Overview"
+                  name="buttonPalette"
+                  onChange={(value) =>
+                    updateSection("overview", { buttonPalette: value as ButtonPaletteKey })
+                  }
+                  options={buttonPaletteOptions.map((option) => ({
+                    label: option.label,
+                    value: option.key,
+                  }))}
+                  value={draft.overview.buttonPalette}
+                />
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  {buttonPaletteOptions.map((option) => (
+                    <div className="rounded-lg border border-stone-200 bg-white px-3 py-3" key={option.key}>
+                      <p className="text-sm font-semibold text-stone-900">{option.label}</p>
+                      <p className="mt-1 text-xs leading-6 text-stone-500">{option.description}</p>
+                      <p className="mt-2 text-xs font-medium text-sky-700">{option.recommendation}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4 text-sm leading-6 text-stone-600">
+                Background image overview sudah tidak dipakai lagi. Section hero sekarang mengikuti
+                tone landing global agar hasil light/dark mode lebih rapi dan konsisten.
+              </div>
               <Button type="submit">Simpan Overview Section</Button>
             </form>
           </CardContent>
@@ -339,6 +608,21 @@ export function HomepageSettingsView({
             <SectionAlert currentSection={section} label="Benefit section" section="benefits" status={status} />
             <form action={updateBenefitsSectionAction} className="space-y-5">
               <input name="itemCount" type="hidden" value={draft.benefits.items.length} />
+              <input name="background-mode" type="hidden" value="palette" />
+              <input
+                name="background-palette-preset"
+                type="hidden"
+                value={draft.benefits.background.palette.preset}
+              />
+              <input
+                name="background-palette-customHex"
+                type="hidden"
+                value={draft.benefits.background.palette.customHex ?? ""}
+              />
+              <input name="background-image-assetId" type="hidden" value="" />
+              <input name="background-image-url" type="hidden" value="" />
+              <input name="background-image-overlayColor" type="hidden" value="" />
+              <input name="background-image-overlayOpacity" type="hidden" value="58" />
               <TextField
                 label="Heading"
                 name="heading"
@@ -352,10 +636,8 @@ export function HomepageSettingsView({
                 rows={3}
                 value={draft.benefits.description}
               />
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <PaletteOnlyBackgroundFields
+                description="Benefit section sekarang tidak memakai background image. Yang diatur di sini hanya tone warna dasar agar tetap selaras dengan landing page."
                 onChange={(background) => updateSection("benefits", { background })}
                 value={draft.benefits.background}
               />
@@ -435,10 +717,26 @@ export function HomepageSettingsView({
                 onChange={(value) => updateSection("pricing", { buttonLabel: value })}
                 value={draft.pricing.buttonLabel}
               />
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+                <SelectField
+                  label="Warna Tombol Pricing"
+                  name="buttonPalette"
+                  onChange={(value) =>
+                    updateSection("pricing", { buttonPalette: value as ButtonPaletteKey })
+                  }
+                  options={buttonPaletteOptions.map((option) => ({
+                    label: option.label,
+                    value: option.key,
+                  }))}
+                  value={draft.pricing.buttonPalette}
+                />
+                <p className="mt-3 text-xs leading-6 text-stone-500">
+                  Saran cepat: <strong>Brand Blue</strong> untuk CTA daftar yang aman, atau{" "}
+                  <strong>Gold</strong> kalau tombol pricing ingin terasa lebih promo.
+                </p>
+              </div>
+              <PaletteOnlyBackgroundFields
+                description="Pricing section sekarang memakai tone warna dasar saja. Background image sudah tidak dipakai agar visual landing tetap konsisten."
                 onChange={(background) => updateSection("pricing", { background })}
                 value={draft.pricing.background}
               />
@@ -569,10 +867,8 @@ export function HomepageSettingsView({
                 />
                 <span className="text-sm font-medium text-stone-900">Tampilkan video section di homepage</span>
               </label>
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <PaletteOnlyBackgroundFields
+                description="Video section sekarang mengikuti tone background landing. Background image tambahan sudah tidak dipakai."
                 onChange={(background) => updateSection("video", { background })}
                 value={draft.video.background}
               />
@@ -604,10 +900,8 @@ export function HomepageSettingsView({
                   value={draft.faq.subtitle}
                 />
               </div>
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <PaletteOnlyBackgroundFields
+                description="FAQ section sekarang hanya memakai palette background agar panel dan akordion tetap bersih."
                 onChange={(background) => updateSection("faq", { background })}
                 value={draft.faq.background}
               />
@@ -687,10 +981,26 @@ export function HomepageSettingsView({
                 onChange={(value) => updateSection("guide", { buttonLabel: value })}
                 value={draft.guide.buttonLabel}
               />
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+                <SelectField
+                  label="Warna Tombol Guide"
+                  name="buttonPalette"
+                  onChange={(value) =>
+                    updateSection("guide", { buttonPalette: value as ButtonPaletteKey })
+                  }
+                  options={buttonPaletteOptions.map((option) => ({
+                    label: option.label,
+                    value: option.key,
+                  }))}
+                  value={draft.guide.buttonPalette}
+                />
+                <p className="mt-3 text-xs leading-6 text-stone-500">
+                  Saran cepat: <strong>Sky Blue</strong> untuk nuansa edukasi yang ringan, atau{" "}
+                  <strong>Emerald</strong> untuk action yang terasa lebih jelas.
+                </p>
+              </div>
+              <PaletteOnlyBackgroundFields
+                description="Guide section sekarang memakai tone warna dasar saja. Background image sudah tidak dipakai."
                 onChange={(background) => updateSection("guide", { background })}
                 value={draft.guide.background}
               />
@@ -789,10 +1099,8 @@ export function HomepageSettingsView({
                 rows={3}
                 value={draft.testimonial.subtitle}
               />
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <PaletteOnlyBackgroundFields
+                description="Testimoni section sekarang memakai palette background. Foto testimoni tetap diatur per item di bawah."
                 onChange={(background) => updateSection("testimonial", { background })}
                 value={draft.testimonial.background}
               />
@@ -975,10 +1283,8 @@ export function HomepageSettingsView({
                 onChange={(value) => updateSection("blog", { title: value })}
                 value={draft.blog.title}
               />
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <PaletteOnlyBackgroundFields
+                description="Blog section mengikuti tone warna landing. Background image tambahan sudah tidak dipakai."
                 onChange={(background) => updateSection("blog", { background })}
                 value={draft.blog.background}
               />
@@ -1100,10 +1406,8 @@ export function HomepageSettingsView({
                 />
                 <span className="text-sm font-medium text-stone-900">Tampilkan banner ads section di homepage</span>
               </label>
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <PaletteOnlyBackgroundFields
+                description="Banner ads section memakai palette background untuk area section. Gambar banner utama tetap diatur terpisah di bawah."
                 onChange={(background) => updateSection("bannerAds", { background })}
                 value={draft.bannerAds.background}
               />
@@ -1178,6 +1482,53 @@ export function HomepageSettingsView({
             <SectionAlert currentSection={section} label="Footer section" section="footer" status={status} />
             <form action={updateFooterSectionAction} className="space-y-5">
               <input name="linkCount" type="hidden" value={draft.footer.guideLinks.length} />
+              <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-4">
+                <p className="text-sm font-semibold text-stone-900">Ukuran logo footer</p>
+                <div className="mt-3 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-lg border border-stone-200 bg-white px-4 py-4">
+                    <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                      <Smartphone className="h-4 w-4" />
+                      Mobile
+                    </div>
+                    <NumberField
+                      label="Lebar logo mobile (px)"
+                      name="logoMobileWidth"
+                      onChange={(value) =>
+                        updateSection("footer", {
+                          logoSize: {
+                            ...draft.footer.logoSize,
+                            mobileWidth: value,
+                          },
+                        })
+                      }
+                      value={draft.footer.logoSize.mobileWidth}
+                    />
+                  </div>
+                  <div className="rounded-lg border border-stone-200 bg-white px-4 py-4">
+                    <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                      <Monitor className="h-4 w-4" />
+                      Desktop
+                    </div>
+                    <NumberField
+                      label="Lebar logo desktop (px)"
+                      name="logoDesktopWidth"
+                      onChange={(value) =>
+                        updateSection("footer", {
+                          logoSize: {
+                            ...draft.footer.logoSize,
+                            desktopWidth: value,
+                          },
+                        })
+                      }
+                      value={draft.footer.logoSize.desktopWidth}
+                    />
+                  </div>
+                </div>
+                <p className="mt-3 text-xs leading-6 text-stone-500">
+                  Rekomendasi aman: mobile 160 - 200 px dan desktop 190 - 230 px supaya footer
+                  tetap rapi dan tidak terlalu dominan.
+                </p>
+              </div>
               <TextAreaField
                 label="Deskripsi Footer"
                 name="description"
@@ -1191,10 +1542,8 @@ export function HomepageSettingsView({
                 onChange={(value) => updateSection("footer", { copyright: value })}
                 value={draft.footer.copyright}
               />
-              <HomepageBackgroundEditor
-                assets={library}
-                cloudinaryEnabled={cloudinaryEnabled}
-                onAssetsChange={setLibrary}
+              <PaletteOnlyBackgroundFields
+                description="Footer sekarang memakai tone warna dasar agar konsisten dengan dark/light mode landing. Background image sudah tidak dipakai."
                 onChange={(background) => updateSection("footer", { background })}
                 value={draft.footer.background}
               />
