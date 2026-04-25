@@ -34,6 +34,8 @@ type PanelPosition = {
   width: number;
 };
 
+type ScopedCssVariableStyle = CSSProperties & Record<`--${string}`, string>;
+
 const MEMBER_PORTAL_VAR_NAMES = [
   "--member-text-primary",
   "--member-text-secondary",
@@ -51,7 +53,7 @@ const MEMBER_PORTAL_VAR_NAMES = [
   "--member-language-row-active-shadow",
   "--member-language-badge-bg",
   "--member-language-badge-text",
-] as const;
+] as const satisfies readonly `--${string}`[];
 
 const LANGUAGE_UI_COPY: Record<"id" | "en", LanguageUiCopy> = {
   en: {
@@ -201,7 +203,10 @@ function buildDesktopPanelPosition(trigger: HTMLElement): PanelPosition {
   };
 }
 
-function readScopedCssVariables(element: HTMLElement | null, names: readonly string[]) {
+function readScopedCssVariables(
+  element: HTMLElement | null,
+  names: readonly `--${string}`[],
+): ScopedCssVariableStyle | undefined {
   if (!element || typeof window === "undefined") {
     return undefined;
   }
@@ -213,7 +218,7 @@ function readScopedCssVariables(element: HTMLElement | null, names: readonly str
   }
 
   const computed = window.getComputedStyle(themeScope);
-  const nextStyle: CSSProperties = {};
+  const nextStyle: ScopedCssVariableStyle = {};
 
   for (const name of names) {
     const value = computed.getPropertyValue(name).trim();
@@ -242,7 +247,7 @@ export function SiteLanguageSelector({
   const [pendingLanguage, setPendingLanguage] = useState<SiteLanguage | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [desktopPanelPosition, setDesktopPanelPosition] = useState<PanelPosition | null>(null);
-  const [memberPortalStyle, setMemberPortalStyle] = useState<CSSProperties | undefined>(undefined);
+  const [memberPortalStyle, setMemberPortalStyle] = useState<ScopedCssVariableStyle | undefined>(undefined);
   const selectorRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const desktopPanelRef = useRef<HTMLDivElement | null>(null);
