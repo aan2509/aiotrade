@@ -58,6 +58,8 @@ type SignupFormProps = {
     passwordPlaceholder: string;
     payment: string;
     paymentMethod: string;
+    paymentRecipientLabel: string;
+    paymentRecipientName: string;
     paymentStepDescription: string;
     paymentStepTitle: string;
     signupLocked: string;
@@ -127,6 +129,8 @@ const defaultLabels = {
   passwordPlaceholder: "Minimal 8 karakter",
   payment: "Payment",
   paymentMethod: "Metode pembayaran",
+  paymentRecipientLabel: "Tujuan pembayaran atas nama",
+  paymentRecipientName: "PT LIMBUNGAN MEDIA SOLUSI",
   paymentStepDescription: "Lengkapi form dan buat pembayaran.",
   paymentStepTitle: "Langkah pembayaran",
   signupLocked: "Selesaikan pembayaran dulu",
@@ -1001,6 +1005,14 @@ export function SignupForm({
                   </button>
                 );
               })}
+            </div>
+            <div className="mt-3 rounded-2xl border border-sky-100 bg-white/75 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                {labels.paymentRecipientLabel}
+              </p>
+              <p className="mt-2 text-sm font-semibold text-slate-950">
+                {labels.paymentRecipientName}
+              </p>
             </div>
           </div>
 

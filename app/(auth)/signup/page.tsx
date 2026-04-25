@@ -83,6 +83,8 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
         passwordPlaceholder: "Minimal 8 karakter",
         payment: "Payment",
         paymentMethod: "Metode pembayaran",
+        paymentRecipientLabel: "Tujuan pembayaran atas nama",
+        paymentRecipientName: "PT LIMBUNGAN MEDIA SOLUSI",
         paymentStepDescription: "Lengkapi form dan buat pembayaran.",
         paymentStepTitle: "Langkah pembayaran",
         signupLocked: "Selesaikan pembayaran dulu",

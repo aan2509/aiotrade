@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeft, Sparkles } from "lucide-react";
-import heroImage from "@/bahan foto/hero.jpg";
+import heroImage from "@/bahan foto/hero.png";
 import { SiteLanguageSelector } from "@/components/shared/site-language-selector";
 import type { SiteLanguage, SiteLanguageOption } from "@/lib/site-language";
 
