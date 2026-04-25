@@ -42,10 +42,10 @@ export function MemberPageHeader({
           {badge}
         </div>
         <div>
-          <h1 className={`text-[2.1rem] font-semibold tracking-tight sm:text-[2.5rem] ${memberTextPrimaryClass}`}>
+          <h1 className={`text-[1.78rem] font-semibold tracking-tight sm:text-[2.2rem] lg:text-[2.5rem] ${memberTextPrimaryClass}`}>
             {title}
           </h1>
-          <p className={`mt-3 max-w-3xl text-base leading-8 ${memberTextSecondaryClass}`}>{description}</p>
+          <p className={`mt-3 max-w-3xl text-[0.96rem] leading-7 sm:text-base sm:leading-8 ${memberTextSecondaryClass}`}>{description}</p>
         </div>
       </div>
     </section>

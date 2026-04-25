@@ -3,24 +3,32 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUp } from "lucide-react";
-import { landingImages, navItems } from "@/components/landing/data";
+import { landingImages, navItems as defaultNavItems } from "@/components/landing/data";
 import { SectionBackgroundLayer } from "@/components/landing/section-background-layer";
-import type { FooterContent } from "@/components/landing/types";
+import type { FooterContent, NavItem } from "@/components/landing/types";
 import { Reveal } from "@/components/ui/reveal";
+import type { SiteLanguage } from "@/lib/site-language";
 
 type FooterSectionProps = {
   content: FooterContent;
   ctaExternal?: boolean;
   ctaHref: string;
+  currentLanguage?: SiteLanguage;
+  navItems?: NavItem[];
   previewMode?: boolean;
 };
 
 export function FooterSection({
   content,
+  currentLanguage = "id",
   ctaExternal = false,
   ctaHref,
+  navItems = defaultNavItems,
   previewMode = false,
 }: FooterSectionProps) {
+  const guideTitle = currentLanguage === "en" ? "User Guide" : "Panduan Pengguna";
+  const quickAccessTitle = currentLanguage === "en" ? "Quick Access" : "Akses Cepat";
+
   return (
     <footer className="relative overflow-hidden py-18 text-[var(--landing-text-primary)] sm:py-20">
       <SectionBackgroundLayer
@@ -54,7 +62,7 @@ export function FooterSection({
 
           <Reveal className="lg:justify-self-center lg:pt-2" delay={0.08}>
             <h3 className="text-[1.9rem] font-semibold tracking-[-0.03em] text-[var(--landing-accent-gold)]">
-              Panduan Pengguna
+              {guideTitle}
             </h3>
             <ul className="mt-5 space-y-4 text-[1.06rem] leading-none text-[var(--landing-text-secondary)]">
               {content.guideLinks.map((item) => (
@@ -74,7 +82,7 @@ export function FooterSection({
 
           <Reveal className="lg:justify-self-end lg:pt-2" delay={0.12}>
             <h3 className="text-[1.9rem] font-semibold tracking-[-0.03em] text-[var(--landing-accent-gold)]">
-              Akses Cepat
+              {quickAccessTitle}
             </h3>
             <ul className="mt-5 space-y-4 text-[1.06rem] leading-none text-[var(--landing-text-secondary)]">
               {navItems.map((item) => (

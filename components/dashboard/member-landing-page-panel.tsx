@@ -83,7 +83,7 @@ export function MemberLandingPagePanel({
             <WalletCards className="h-5 w-5" />
           </span>
           <div>
-            <h2 className={`text-[1.6rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{labels.sectionTitle}</h2>
+            <h2 className={`text-[1.34rem] font-semibold tracking-tight sm:text-[1.52rem] ${memberTextPrimaryClass}`}>{labels.sectionTitle}</h2>
             <p className={`mt-1 text-sm leading-7 ${memberTextSecondaryClass}`}>
               {labels.generateDescription}
             </p>
@@ -98,7 +98,7 @@ export function MemberLandingPagePanel({
               </span>
               <div>
                 <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>{labels.statusLabel}</p>
-                <p className={`mt-2 text-[1.35rem] font-semibold ${memberTextPrimaryClass}`}>
+                <p className={`mt-2 text-[1.12rem] font-semibold sm:text-[1.3rem] ${memberTextPrimaryClass}`}>
                   {profile.isLpActive ? labels.activeStatus : labels.inactiveStatus}
                 </p>
               </div>
@@ -113,7 +113,7 @@ export function MemberLandingPagePanel({
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-emerald-900/72">
                       {labels.landingLinkLabel}
                     </p>
-                    <p className={`mt-2 break-all text-lg font-semibold ${memberTextPrimaryClass}`}>{landingPageUrl}</p>
+                    <p className={`mt-2 break-all text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{landingPageUrl}</p>
                   </div>
                   <ArrowUpRight className="mt-1 h-5 w-5 shrink-0 text-emerald-900/70" />
                 </div>

@@ -60,13 +60,13 @@ export function TestimonialSection({ content }: TestimonialSectionProps) {
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <Reveal className="mx-auto max-w-4xl text-center">
-          <p className="text-[1.05rem] font-semibold tracking-[-0.02em] text-[var(--landing-accent-blue)] sm:text-[1.3rem]">
+          <p className="text-[0.96rem] font-semibold tracking-[-0.02em] text-[var(--landing-accent-blue)] sm:text-[1.18rem] lg:text-[1.3rem]">
             {content.eyebrow}
           </p>
-          <h2 className="mt-5 text-[3rem] font-semibold leading-none tracking-[-0.045em] text-[var(--landing-accent-gold)] sm:text-[4.45rem]">
+          <h2 className="mt-5 text-[2.35rem] font-semibold leading-none tracking-[-0.045em] text-[var(--landing-accent-gold)] sm:text-[3.45rem] lg:text-[4.45rem]">
             {content.title}
           </h2>
-          <p className="mx-auto mt-5 max-w-3xl text-[1.02rem] leading-[1.85] text-[var(--landing-text-secondary)] sm:text-[1.08rem]">
+          <p className="mx-auto mt-5 max-w-3xl text-[0.94rem] leading-[1.72] text-[var(--landing-text-secondary)] sm:text-[1.02rem] lg:text-[1.08rem]">
             {content.subtitle}
           </p>
         </Reveal>
@@ -134,12 +134,12 @@ export function TestimonialSection({ content }: TestimonialSectionProps) {
               ))}
             </div>
 
-            <blockquote className="mt-6 text-[1.28rem] leading-[1.72] tracking-[-0.025em] text-[var(--landing-text-primary)] sm:text-[1.45rem]">
+            <blockquote className="mt-6 text-[1.08rem] leading-[1.68] tracking-[-0.025em] text-[var(--landing-text-primary)] sm:text-[1.28rem] lg:text-[1.45rem]">
               &ldquo;{activeItem.quote}&rdquo;
             </blockquote>
 
             <div className="mt-7 border-t border-white/60 pt-5">
-              <p className="text-[1.2rem] font-semibold tracking-[-0.03em] text-[var(--landing-text-primary)]">{activeItem.name}</p>
+              <p className="text-[1.05rem] font-semibold tracking-[-0.03em] text-[var(--landing-text-primary)] sm:text-[1.12rem] lg:text-[1.2rem]">{activeItem.name}</p>
               <p className="mt-1 text-sm font-medium uppercase tracking-[0.18em] text-[var(--landing-text-muted)]">{activeItem.role}</p>
             </div>
 

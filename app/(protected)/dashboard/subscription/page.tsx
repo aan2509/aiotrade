@@ -105,7 +105,7 @@ export default async function DashboardSubscriptionPage() {
             <Sparkles className="h-5 w-5" />
           </span>
           <div>
-            <h2 className={`text-[1.55rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{copy.yourPackage}</h2>
+            <h2 className={`text-[1.32rem] font-semibold tracking-tight sm:text-[1.48rem] ${memberTextPrimaryClass}`}>{copy.yourPackage}</h2>
             
           </div>
         </div>
@@ -115,7 +115,7 @@ export default async function DashboardSubscriptionPage() {
             <article className={`${memberGlassRowClass} rounded-[24px] px-5 py-5 sm:px-6`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className={`text-lg font-semibold ${memberTextPrimaryClass}`}>{translatedPlanCopy?.planLabel ?? membership.planLabel}</p>
+                  <p className={`text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{translatedPlanCopy?.planLabel ?? membership.planLabel}</p>
                   <p className={`mt-2 text-sm leading-7 ${memberTextSecondaryClass}`}>{translatedPlanCopy?.description ?? activePlan.description}</p>
                 </div>
                 <span className="rounded-full bg-[rgba(227,244,253,0.96)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800">
@@ -126,20 +126,20 @@ export default async function DashboardSubscriptionPage() {
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl bg-white/55 p-4">
                   <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextSecondaryClass}`}>{copy.duration}</p>
-                  <div className={`mt-3 inline-flex items-center gap-2 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                  <div className={`mt-3 inline-flex items-center gap-2 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>
                     {membership.isLifetime ? <Infinity className="h-4 w-4" /> : <CalendarRange className="h-4 w-4" />}
                     {formatPlanDuration(membership.durationMonths, membership.isLifetime, copy)}
                   </div>
                 </div>
                 <div className="rounded-2xl bg-white/55 p-4">
                   <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextSecondaryClass}`}>{copy.startedAt}</p>
-                  <p className={`mt-3 text-lg font-semibold ${memberTextPrimaryClass}`}>{formatMembershipDate(membership.startedAt, currentLanguage)}</p>
+                  <p className={`mt-3 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{formatMembershipDate(membership.startedAt, currentLanguage)}</p>
                 </div>
                 <div className="rounded-2xl bg-white/55 p-4">
                   <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextSecondaryClass}`}>
                     {membership.isLifetime ? copy.statusAccess : copy.activeUntil}
                   </p>
-                  <p className={`mt-3 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                  <p className={`mt-3 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>
                     {membership.isLifetime ? copy.lifetime : formatMembershipDate(membership.expiresAt, currentLanguage)}
                   </p>
                 </div>
@@ -152,7 +152,7 @@ export default async function DashboardSubscriptionPage() {
                   <CheckCircle2 className="h-5 w-5" />
                 </span>
                 <div>
-                  <p className={`text-lg font-semibold ${memberTextPrimaryClass}`}>{copy.statusTitle}</p>
+                  <p className={`text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{copy.statusTitle}</p>
                   <p className={`mt-2 text-sm leading-7 ${memberTextSecondaryClass}`}>
                     {membership.isLifetime
                       ? copy.statusBodyLifetime
@@ -164,7 +164,7 @@ export default async function DashboardSubscriptionPage() {
               <div className="mt-6 grid gap-3">
                 <div className="rounded-2xl bg-white/55 p-4">
                   <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextSecondaryClass}`}>{copy.planId}</p>
-                  <p className={`mt-3 font-mono text-lg font-semibold ${memberTextPrimaryClass}`}>{membership.planId}</p>
+                  <p className={`mt-3 font-mono text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{membership.planId}</p>
                 </div>
                 <div className="rounded-2xl bg-white/55 p-4">
                   <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextSecondaryClass}`}>{copy.paymentReference}</p>
@@ -177,7 +177,7 @@ export default async function DashboardSubscriptionPage() {
           </div>
         ) : (
           <div className={`mt-6 ${memberGlassRowClass}`}>
-            <p className={`text-lg font-semibold ${memberTextPrimaryClass}`}>{copy.emptyTitle}</p>
+            <p className={`text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{copy.emptyTitle}</p>
             <p className={`mt-2 text-sm leading-7 ${memberTextSecondaryClass}`}>
               {copy.emptyBody}
             </p>

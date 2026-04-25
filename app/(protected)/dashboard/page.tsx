@@ -190,7 +190,7 @@ export default async function DashboardPage() {
               <Sparkles className="h-5 w-5" />
             </span>
             <div>
-              <h2 className={`text-[1.5rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{copy.statsTitle}</h2>
+              <h2 className={`text-[1.32rem] font-semibold tracking-tight sm:text-[1.45rem] ${memberTextPrimaryClass}`}>{copy.statsTitle}</h2>
               <p className={`mt-1 text-sm leading-7 ${memberTextSecondaryClass}`}>
                 {copy.statsBody}
               </p>
@@ -213,7 +213,7 @@ export default async function DashboardPage() {
                         {item.label}
                       </p>
                       <div className="mt-3 flex items-center gap-2">
-                        <p className={`text-[1.7rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{item.value}</p>
+                        <p className={`text-[1.5rem] font-semibold tracking-tight sm:text-[1.65rem] ${memberTextPrimaryClass}`}>{item.value}</p>
                         {ValueIcon ? <ValueIcon className="h-4 w-4 text-[var(--member-text-muted)]" /> : null}
                       </div>
                     </div>
@@ -235,7 +235,7 @@ export default async function DashboardPage() {
                 <CreditCard className="h-5 w-5" />
               </span>
               <div>
-                <h2 className={`text-[1.5rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{copy.membershipTitle}</h2>
+                <h2 className={`text-[1.32rem] font-semibold tracking-tight sm:text-[1.45rem] ${memberTextPrimaryClass}`}>{copy.membershipTitle}</h2>
                 
               </div>
             </div>
@@ -257,7 +257,7 @@ export default async function DashboardPage() {
                           </span>
                         ) : null}
                       </div>
-                      <h3 className={`mt-4 text-[1.7rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>
+                      <h3 className={`mt-4 text-[1.45rem] font-semibold tracking-tight sm:text-[1.62rem] ${memberTextPrimaryClass}`}>
                         {translatedMembershipCopy?.planLabel ?? membership.planLabel}
                       </h3>
                       <p className={`mt-2 text-sm leading-7 ${memberTextSecondaryClass}`}>
@@ -279,7 +279,7 @@ export default async function DashboardPage() {
                       <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
                         {copy.duration}
                       </p>
-                      <div className={`mt-3 inline-flex items-center gap-2 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                      <div className={`mt-3 inline-flex items-center gap-2 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>
                         {membership.isLifetime ? <Infinity className="h-4 w-4" /> : <CalendarRange className="h-4 w-4" />}
                         {formatPlanDuration(membership.durationMonths, membership.isLifetime, copy)}
                       </div>
@@ -288,7 +288,7 @@ export default async function DashboardPage() {
                       <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
                         {copy.startedAt}
                       </p>
-                      <p className={`mt-3 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                      <p className={`mt-3 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>
                         {formatMembershipDate(membership.startedAt, currentLanguage)}
                       </p>
                     </div>
@@ -296,7 +296,7 @@ export default async function DashboardPage() {
                       <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>
                         {membership.isLifetime ? copy.lifetime : copy.activeUntil}
                       </p>
-                      <p className={`mt-3 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                      <p className={`mt-3 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>
                         {membership.isLifetime ? copy.lifetime : formatMembershipDate(membership.expiresAt, currentLanguage)}
                       </p>
                     </div>
@@ -309,7 +309,7 @@ export default async function DashboardPage() {
               <div className="member-row-surface mt-6 rounded-[26px] px-5 py-5 sm:px-6 sm:py-6">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <h3 className={`text-[1.35rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>
+                    <h3 className={`text-[1.22rem] font-semibold tracking-tight sm:text-[1.3rem] ${memberTextPrimaryClass}`}>
                       {copy.emptyMembershipTitle}
                     </h3>
                     <p className={`mt-2 max-w-2xl text-sm leading-7 ${memberTextSecondaryClass}`}>

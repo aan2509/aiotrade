@@ -28,10 +28,10 @@ export function PricingSection({ content, ctaExternal = false, ctaHref }: Pricin
       <div className="pointer-events-none absolute bottom-8 right-[-6%] h-72 w-72 rounded-full blur-[120px]" style={{ background: "color-mix(in srgb, var(--landing-accent-blue) 10%, transparent)" }} />
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <Reveal className="mx-auto max-w-4xl text-center">
-          <p className="text-[1.1rem] font-semibold tracking-[-0.015em] text-[var(--landing-accent-blue)] sm:text-[2.05rem]">
+          <p className="text-[0.98rem] font-semibold tracking-[-0.015em] text-[var(--landing-accent-blue)] sm:text-[1.75rem] lg:text-[2.05rem]">
             {content.eyebrow}
           </p>
-          <h2 className="mt-4 text-[3rem] font-semibold leading-none tracking-[-0.04em] text-[var(--landing-accent-gold)] sm:text-[4.5rem]">
+          <h2 className="mt-4 text-[2.35rem] font-semibold leading-none tracking-[-0.04em] text-[var(--landing-accent-gold)] sm:text-[3.55rem] lg:text-[4.5rem]">
             {content.title}
           </h2>
         </Reveal>
@@ -71,13 +71,13 @@ export function PricingSection({ content, ctaExternal = false, ctaHref }: Pricin
                   )}
                 >
                   {!plan.emphasis ? (
-                    <p className="text-[4.55rem] font-bold leading-none tracking-[-0.05em] text-[var(--landing-accent-blue)]">
+                    <p className="text-[3.5rem] font-bold leading-none tracking-[-0.05em] text-[var(--landing-accent-blue)] sm:text-[4.2rem] lg:text-[4.55rem]">
                       #{content.plans.slice(0, index + 1).filter((entry) => !entry.emphasis).length}
                     </p>
                   ) : null}
 
                   {plan.emphasis ? (
-                    <h3 className="text-[4rem] font-semibold leading-none tracking-[-0.055em] text-[var(--landing-accent-blue)] sm:text-[4.9rem]">
+                    <h3 className="text-[3rem] font-semibold leading-none tracking-[-0.055em] text-[var(--landing-accent-blue)] sm:text-[4rem] lg:text-[4.9rem]">
                       {plan.name}
                     </h3>
                   ) : null}
@@ -85,20 +85,20 @@ export function PricingSection({ content, ctaExternal = false, ctaHref }: Pricin
                   <p
                     className={cn(
                       "mt-3 font-semibold tracking-[-0.025em] text-[var(--landing-text-primary)]",
-                      plan.emphasis ? "text-[2rem] sm:text-[2.2rem]" : "text-[1.78rem]",
+                      plan.emphasis ? "text-[1.58rem] sm:text-[1.95rem] lg:text-[2.2rem]" : "text-[1.45rem] sm:text-[1.68rem] lg:text-[1.78rem]",
                     )}
                   >
                     {plan.emphasis ? "Akses Bot Crypto & Saham" : plan.name}
                   </p>
 
                   <div className="mt-6 flex items-end justify-center gap-3">
-                    <span className="text-[3.2rem] font-bold leading-none tracking-[-0.04em] text-[var(--landing-text-primary)]">
+                    <span className="text-[2.5rem] font-bold leading-none tracking-[-0.04em] text-[var(--landing-text-primary)] sm:text-[2.95rem] lg:text-[3.2rem]">
                       {plan.price}
                     </span>
-                    <span className="pb-1 text-[1.15rem] font-semibold text-[var(--landing-accent-green)]">Lifetime</span>
+                    <span className="pb-1 text-[0.98rem] font-semibold text-[var(--landing-accent-green)] sm:text-[1.08rem] lg:text-[1.15rem]">Lifetime</span>
                   </div>
 
-                  <p className="mx-auto mt-8 max-w-[24rem] text-[1.02rem] leading-[1.8] text-[var(--landing-text-secondary)]">
+                  <p className="mx-auto mt-8 max-w-[24rem] text-[0.94rem] leading-[1.72] text-[var(--landing-text-secondary)] sm:text-[0.98rem] lg:text-[1.02rem]">
                     {plan.description}
                   </p>
 

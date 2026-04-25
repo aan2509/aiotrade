@@ -74,7 +74,7 @@ export function MemberAccountOverview({
             <UserRound className="h-5 w-5" />
           </span>
           <div>
-            <h2 className={`text-[1.55rem] font-semibold tracking-tight ${memberTextPrimaryClass}`}>{labels.sectionTitle}</h2>
+            <h2 className={`text-[1.32rem] font-semibold tracking-tight sm:text-[1.48rem] ${memberTextPrimaryClass}`}>{labels.sectionTitle}</h2>
             <p className={`mt-1 text-sm leading-7 ${memberTextSecondaryClass}`}>
               {labels.sectionDescription}
             </p>
@@ -89,7 +89,7 @@ export function MemberAccountOverview({
               </span>
               <div>
                 <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>{labels.username}</p>
-                <p className={`mt-2 text-lg font-semibold ${memberTextPrimaryClass}`}>@{profile.username}</p>
+                <p className={`mt-2 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>@{profile.username}</p>
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@ export function MemberAccountOverview({
               </span>
               <div className="min-w-0">
                 <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>{labels.email}</p>
-                <p className={`mt-2 break-all text-lg font-semibold ${memberTextPrimaryClass}`}>{profile.email ?? "-"}</p>
+                <p className={`mt-2 break-all text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{profile.email ?? "-"}</p>
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@ export function MemberAccountOverview({
               </span>
               <div>
                 <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>{labels.whatsapp}</p>
-                <p className={`mt-2 text-lg font-semibold ${memberTextPrimaryClass}`}>{profile.whatsapp ?? "-"}</p>
+                <p className={`mt-2 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{profile.whatsapp ?? "-"}</p>
               </div>
             </div>
           </div>
@@ -125,7 +125,7 @@ export function MemberAccountOverview({
               </span>
               <div>
                 <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>{labels.referredBy}</p>
-                <p className={`mt-2 text-lg font-semibold ${memberTextPrimaryClass}`}>
+                <p className={`mt-2 text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>
                   {referredByLabel}
                 </p>
               </div>
@@ -140,7 +140,7 @@ export function MemberAccountOverview({
             </span>
             <div className="min-w-0">
               <p className={`text-[0.72rem] font-semibold uppercase tracking-[0.24em] ${memberTextMutedClass}`}>{labels.memberId}</p>
-              <p className={`mt-2 font-mono text-lg font-semibold ${memberTextPrimaryClass}`}>{memberId ?? "-"}</p>
+              <p className={`mt-2 font-mono text-[1rem] font-semibold sm:text-lg ${memberTextPrimaryClass}`}>{memberId ?? "-"}</p>
               <p className={`mt-2 break-all text-sm ${memberTextSecondaryClass}`}>{profile.referralLink ?? "-"}</p>
             </div>
           </div>

@@ -65,8 +65,10 @@ export default function LandingPageUI({
         <BannerAdsSection content={content.bannerAds} />
         <FooterSection
           content={content.footer}
+          currentLanguage={currentLanguage}
           ctaExternal={registrationExternal}
           ctaHref={registrationHref}
+          navItems={navItems}
           previewMode={previewMode}
         />
       </div>

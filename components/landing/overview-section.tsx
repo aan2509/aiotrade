@@ -90,7 +90,7 @@ export function OverviewSection({
                       src={landingImages.logoImage}
                     />
                   </div>
-                  <p className="landing-overview-description mx-auto mt-5 max-w-[21rem] text-[0.95rem] leading-[1.9] text-[var(--landing-text-secondary)] sm:mt-6 sm:max-w-[26rem] sm:text-[1.04rem] sm:leading-[1.95] lg:mx-0 lg:max-w-[30rem] lg:text-[1.1rem] lg:leading-[2]">
+                  <p className="landing-overview-description mx-auto mt-5 max-w-[21rem] text-[0.9rem] leading-[1.82] text-[var(--landing-text-secondary)] sm:mt-6 sm:max-w-[26rem] sm:text-[1.02rem] sm:leading-[1.92] lg:mx-0 lg:max-w-[30rem] lg:text-[1.1rem] lg:leading-[2]">
                     {content.description}
                   </p>
                 </div>

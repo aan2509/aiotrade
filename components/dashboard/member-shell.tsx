@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { MemberSidebar } from "@/components/dashboard/member-sidebar";
+import { MemberThemeToggle } from "@/components/dashboard/member-theme-toggle";
 import { SiteLanguageSelector } from "@/components/shared/site-language-selector";
 import { defaultMemberShellLabels, type MemberShellLabels } from "@/lib/member-shell-labels";
 import { MEMBER_THEME_COOKIE, type MemberTheme } from "@/lib/member-theme";
@@ -141,33 +142,41 @@ export function MemberShell({
       <div className="relative mx-auto flex max-w-[1680px] flex-col gap-4 px-4 py-4 lg:flex-row lg:gap-6 lg:px-6 lg:py-6">
         <div
           className={cn(
-            "member-glass-panel sticky top-2 z-30 flex items-center justify-between rounded-[24px] px-4 py-3 transition duration-300 lg:hidden",
+            "member-glass-panel sticky top-2 z-30 rounded-[24px] px-4 py-3 transition duration-300 lg:hidden",
             mobileHeaderScrolled
               ? "shadow-[0_22px_42px_rgba(15,23,42,0.16)] backdrop-blur-3xl"
               : "shadow-[0_12px_24px_rgba(15,23,42,0.08)] backdrop-blur-xl",
           )}
         >
-          <div>
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[var(--member-text-muted)]">
-              {labels.memberArea}
-            </p>
-            <p className="mt-1 text-base font-semibold text-[var(--member-text-primary)]">{mobileHeaderTitle}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <SiteLanguageSelector
-              currentLanguage={currentLanguage}
-              languages={languageOptions}
-              variant="member"
-            />
-            <button
-              aria-expanded={mobileSidebarOpen}
-              aria-label={mobileSidebarOpen ? labels.closeMenu : labels.openMenu}
-              className="member-row-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl text-[var(--member-text-primary)] transition"
-              onClick={() => setMobileSidebarOpen((current) => !current)}
-              type="button"
-            >
-              {mobileSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[var(--member-text-muted)]">
+                  {labels.memberArea}
+                </p>
+                <p className="mt-1 text-base font-semibold text-[var(--member-text-primary)]">{mobileHeaderTitle}</p>
+              </div>
+              <button
+                aria-expanded={mobileSidebarOpen}
+                aria-label={mobileSidebarOpen ? labels.closeMenu : labels.openMenu}
+                className="member-row-surface inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-[var(--member-text-primary)] transition"
+                onClick={() => setMobileSidebarOpen((current) => !current)}
+                type="button"
+              >
+                {mobileSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <SiteLanguageSelector
+                  currentLanguage={currentLanguage}
+                  languages={languageOptions}
+                  variant="member"
+                />
+              </div>
+              <MemberThemeToggle onChange={handleThemeChange} theme={theme} />
+            </div>
           </div>
         </div>
 

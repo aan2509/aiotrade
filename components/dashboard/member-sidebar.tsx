@@ -75,7 +75,7 @@ export function MemberSidebar({
             <LayoutDashboard className="h-3.5 w-3.5" />
             {labels.memberArea}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 lg:flex">
             <SiteLanguageSelector
               currentLanguage={currentLanguage}
               languages={languageOptions}
@@ -84,7 +84,7 @@ export function MemberSidebar({
             <MemberThemeToggle onChange={onThemeChange} theme={theme} />
           </div>
         </div>
-        <h1 className="mt-5 text-[1.65rem] font-semibold tracking-tight text-[var(--member-text-primary)]">
+        <h1 className="mt-5 text-[1.45rem] font-semibold tracking-tight sm:text-[1.58rem] text-[var(--member-text-primary)]">
           {labels.sidebarTitle}
         </h1>
         <p className="mt-2 max-w-[16rem] text-sm leading-6 text-[var(--member-text-secondary)]">

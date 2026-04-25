@@ -37,7 +37,7 @@ export function BlogSection({ content, posts }: BlogSectionProps) {
       <div className="pointer-events-none absolute bottom-0 right-[-5%] h-60 w-60 rounded-full bg-[#75b9ff]/8 blur-[105px]" />
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <Reveal className="text-center lg:text-left">
-          <h2 className="text-[3rem] font-semibold leading-none tracking-[-0.05em] text-[var(--landing-accent-gold)] sm:text-[4.3rem]">
+          <h2 className="text-[2.35rem] font-semibold leading-none tracking-[-0.05em] text-[var(--landing-accent-gold)] sm:text-[3.35rem] lg:text-[4.3rem]">
             {content.title}
           </h2>
         </Reveal>
@@ -68,13 +68,13 @@ export function BlogSection({ content, posts }: BlogSectionProps) {
                   {article.category}
                 </span>
                 <div className="absolute inset-x-0 bottom-0 flex h-full flex-col justify-end p-5">
-                  <p className="max-w-[16rem] text-[1rem] font-medium leading-[1.35] text-white sm:text-[1.05rem]">
+                  <p className="max-w-[16rem] text-[0.92rem] font-medium leading-[1.35] text-white sm:text-[1rem] lg:text-[1.05rem]">
                     {article.excerpt}
                   </p>
                 </div>
               </div>
               <div className="px-7 pb-7 pt-5">
-                <h3 className="text-[2rem] font-semibold leading-[1.18] tracking-[-0.035em] text-[var(--landing-text-primary)]">
+                <h3 className="text-[1.55rem] font-semibold leading-[1.18] tracking-[-0.035em] text-[var(--landing-text-primary)] sm:text-[1.8rem] lg:text-[2rem]">
                   {article.title}
                 </h3>
                 <Link

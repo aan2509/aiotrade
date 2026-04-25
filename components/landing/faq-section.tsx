@@ -25,10 +25,10 @@ export function FaqSection({ content }: FaqSectionProps) {
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <Reveal className="landing-glass-panel faq-panel-shell overflow-hidden rounded-[30px]">
           <div className="faq-panel-head px-6 py-8 text-center sm:px-10 sm:py-10">
-            <p className="faq-panel-title text-[2.9rem] font-bold tracking-[0.04em] text-[var(--landing-accent-gold)] sm:text-[4rem]">
+            <p className="faq-panel-title text-[2.3rem] font-bold tracking-[0.04em] text-[var(--landing-accent-gold)] sm:text-[3.2rem] lg:text-[4rem]">
               {content.title}
             </p>
-            <p className="mt-2 text-lg text-[var(--landing-text-secondary)] sm:text-[1.05rem]">
+            <p className="mt-2 text-[0.95rem] text-[var(--landing-text-secondary)] sm:text-[1.02rem] lg:text-[1.05rem]">
               {content.subtitle}
             </p>
           </div>
@@ -40,7 +40,7 @@ export function FaqSection({ content }: FaqSectionProps) {
                   <button
                     aria-controls={`faq-panel-${index}`}
                     aria-expanded={openIndex === index}
-                    className={`flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[1.05rem] font-medium transition duration-300 sm:px-7 sm:text-[1.15rem] ${
+                    className={`flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[0.98rem] font-medium transition duration-300 sm:px-7 sm:text-[1.08rem] lg:text-[1.15rem] ${
                       openIndex === index
                         ? "faq-accordion-trigger-active text-[#0f3f67]"
                         : "faq-accordion-trigger-idle text-[var(--landing-text-primary)]"
@@ -70,7 +70,7 @@ export function FaqSection({ content }: FaqSectionProps) {
                         initial={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                       >
-                        <div className="faq-accordion-content px-6 pb-5 pt-4 text-[0.98rem] leading-8 text-[var(--landing-text-secondary)] backdrop-blur-sm sm:px-7">
+                        <div className="faq-accordion-content px-6 pb-5 pt-4 text-[0.92rem] leading-7 text-[var(--landing-text-secondary)] backdrop-blur-sm sm:px-7 sm:text-[0.96rem] sm:leading-8 lg:text-[0.98rem]">
                           {entry.answer}
                         </div>
                       </motion.div>
